@@ -1087,6 +1087,11 @@ def _ollama_generate_text_remote(
         max_tokens = 192
     max_tokens = max(16, min(4096, max_tokens))
 
+    # Reasoning models (Qwen 3.5 etc.) allocate tokens to chain-of-thought
+    # first — the default budget is often too small for content to populate.
+    if _is_reasoning_model(chosen_model):
+        max_tokens = min(4096, max_tokens * _reasoning_token_multiplier())
+
     try:
         temperature = float(
             str(os.getenv("TEXT_GENERATION_TEMPERATURE", "0.2") or "0.2")
@@ -2603,7 +2608,11 @@ def build_image_commentary(
                 }
             ],
             "temperature": 0.2,
-            "max_tokens": 160,
+            "max_tokens": (
+                min(4096, 160 * _reasoning_token_multiplier())
+                if _is_reasoning_model(chosen_model)
+                else 160
+            ),
             "stream": False,
         }
         req = Request(
@@ -3054,6 +3063,111 @@ def _eta_mu_emit_packet(
     return packet
 
 
+# ---------------------------------------------------------------------------
+# Reasoning-model compatibility (Qwen 3.5, DeepSeek-R1, etc.)
+# ---------------------------------------------------------------------------
+
+_REASONING_FALLBACK_COUNT: int = 0
+_REASONING_MODEL_PATTERNS: tuple[str, ...] = ("qwen3",)
+
+
+def _is_reasoning_model(model_name: str) -> bool:
+    """Heuristic: does the model name suggest a reasoning/thinking model?"""
+    lower = str(model_name or "").strip().lower()
+    return any(pat in lower for pat in _REASONING_MODEL_PATTERNS)
+
+
+def _reasoning_token_multiplier() -> int:
+    """Multiplier applied to max_tokens for reasoning models."""
+    try:
+        val = int(
+            float(
+                str(
+                    os.getenv("TEXT_GENERATION_REASONING_TOKEN_MULTIPLIER", "3") or "3"
+                )
+            )
+        )
+    except (TypeError, ValueError):
+        val = 3
+    return max(1, min(10, val))
+
+
+def _reasoning_fallback_max_chars() -> int:
+    """Max chars to keep from sanitized reasoning-fallback text."""
+    try:
+        val = int(
+            float(
+                str(
+                    os.getenv(
+                        "TEXT_GENERATION_REASONING_FALLBACK_MAX_CHARS", "512"
+                    )
+                    or "512"
+                )
+            )
+        )
+    except (TypeError, ValueError):
+        val = 512
+    return max(32, min(4096, val))
+
+
+_CONCLUSION_MARKERS_RE = re.compile(
+    r"(?:^|\n)\s*(?:Output|Final(?:\s+Answer)?|Answer|Response|Result|Conclusion)\s*[:\-]",
+    re.IGNORECASE,
+)
+
+
+def _sanitize_reasoning_fallback(raw: str) -> str:
+    """Extract usable text from chain-of-thought / reasoning output.
+
+    Strategy:
+    1. If conclusion markers exist, take text after the last one.
+    2. Otherwise, take the last non-empty paragraph.
+    3. Strip structural labels and collapse whitespace.
+    4. Cap length.
+    """
+    global _REASONING_FALLBACK_COUNT
+    _REASONING_FALLBACK_COUNT += 1
+
+    text = str(raw or "").strip()
+    if not text:
+        return ""
+
+    max_chars = _reasoning_fallback_max_chars()
+
+    # Try to find conclusion segment after markers
+    matches = list(_CONCLUSION_MARKERS_RE.finditer(text))
+    if matches:
+        last_match = matches[-1]
+        conclusion = text[last_match.end() :].strip()
+        if conclusion:
+            text = conclusion
+
+    else:
+        # Fallback: take last non-empty paragraph
+        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        if paragraphs:
+            text = paragraphs[-1]
+
+    # Strip common structural labels
+    text = re.sub(
+        r"^(?:Thinking\s+Process|Chain\s+of\s+Thought|Reasoning|Step\s+\d+)\s*:\s*",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    # Remove numbered/bulleted list markers at start
+    text = re.sub(r"^[\d]+[.)]\s*", "", text)
+    text = re.sub(r"^[*\-•]\s*", "", text)
+    # Collapse whitespace
+    text = re.sub(r"\s+", " ", text).strip()
+
+    if not text:
+        return ""
+    if len(text) > max_chars:
+        text = text[:max_chars].rsplit(" ", 1)[0].rstrip(".,;:!?") + "…"
+    return text
+
+
 def _extract_openai_chat_content_text(content: Any) -> str:
     if isinstance(content, str):
         return content.strip()
@@ -3091,6 +3205,21 @@ def _extract_openai_chat_response_text(raw: Any) -> str:
         text_value = choice.get("text")
         if isinstance(text_value, str) and text_value.strip():
             return text_value.strip()
+
+    # Reasoning-model fallback: check reasoning / thinking fields when content
+    # is empty (Qwen 3.5 on Ollama, DeepSeek-R1, etc.)
+    for choice in choices:
+        if not isinstance(choice, dict):
+            continue
+        message = choice.get("message")
+        if not isinstance(message, dict):
+            continue
+        for key in ("reasoning", "thinking", "reasoning_content"):
+            reasoning_text = message.get(key)
+            if isinstance(reasoning_text, str) and reasoning_text.strip():
+                sanitized = _sanitize_reasoning_fallback(reasoning_text)
+                if sanitized:
+                    return sanitized
     return ""
 
 
@@ -3155,7 +3284,11 @@ def _eta_mu_image_vllm_caption_for_embedding(
             }
         ],
         "temperature": 0.1,
-        "max_tokens": 96,
+        "max_tokens": (
+            min(4096, 96 * _reasoning_token_multiplier())
+            if _is_reasoning_model(chosen_model)
+            else 96
+        ),
         "stream": False,
     }
 

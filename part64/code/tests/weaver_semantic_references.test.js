@@ -13,6 +13,8 @@ const {
   extractSemanticReferences,
   classifyKnowledgeUrl,
   normalizeAnalysisSummary,
+  extractLlmResponseText,
+  sanitizeReasoningFallback,
   parseAuthHeader,
   llmAuthHeaders,
   WebGraphWeaver,
@@ -385,4 +387,108 @@ test("entityControl configure adjusts count and host limit", () => {
   } finally {
     weaver.shutdown();
   }
+});
+
+// ---------------------------------------------------------------------------
+// extractLlmResponseText — reasoning-model compatibility
+// ---------------------------------------------------------------------------
+
+test("extractLlmResponseText: normal content string", () => {
+  const payload = { choices: [{ message: { content: "Hello world" } }] };
+  assert.equal(extractLlmResponseText(payload), "Hello world");
+});
+
+test("extractLlmResponseText: text field fallback", () => {
+  const payload = { choices: [{ text: "plain text" }] };
+  assert.equal(extractLlmResponseText(payload), "plain text");
+});
+
+test("extractLlmResponseText: content wins over reasoning", () => {
+  const payload = {
+    choices: [
+      {
+        message: {
+          content: "Actual answer",
+          reasoning: "Thinking Process:\n\n1. Analysis...\n\nOutput: Actual answer",
+        },
+      },
+    ],
+  };
+  assert.equal(extractLlmResponseText(payload), "Actual answer");
+});
+
+test("extractLlmResponseText: reasoning-only fallback with conclusion", () => {
+  const payload = {
+    choices: [
+      {
+        message: {
+          content: "",
+          reasoning: "Step 1: think.\nStep 2: decide.\n\nOutput: The answer is blue.",
+        },
+      },
+    ],
+  };
+  const result = extractLlmResponseText(payload);
+  assert.equal(result, "The answer is blue.");
+});
+
+test("extractLlmResponseText: thinking field (native Ollama)", () => {
+  const payload = {
+    choices: [
+      {
+        message: {
+          content: "",
+          thinking: "Some chain of thought.\n\nAnswer: Yes",
+        },
+      },
+    ],
+  };
+  const result = extractLlmResponseText(payload);
+  assert.equal(result, "Yes");
+});
+
+test("extractLlmResponseText: empty payload", () => {
+  assert.equal(extractLlmResponseText({}), "");
+  assert.equal(extractLlmResponseText(null), "");
+  assert.equal(extractLlmResponseText(undefined), "");
+});
+
+test("extractLlmResponseText: reasoning with no conclusion uses last paragraph", () => {
+  const payload = {
+    choices: [
+      {
+        message: {
+          content: "",
+          reasoning: "First thought.\n\nSecond thought.\n\nThe best greeting is Hello.",
+        },
+      },
+    ],
+  };
+  const result = extractLlmResponseText(payload);
+  assert.ok(result.includes("Hello"), `Expected 'Hello' in: ${result}`);
+});
+
+// ---------------------------------------------------------------------------
+// sanitizeReasoningFallback
+// ---------------------------------------------------------------------------
+
+test("sanitizeReasoningFallback: extracts conclusion after Output marker", () => {
+  const text = "Step 1: think.\nStep 2: decide.\n\nOutput: The answer is blue.";
+  assert.equal(sanitizeReasoningFallback(text), "The answer is blue.");
+});
+
+test("sanitizeReasoningFallback: strips Thinking Process label", () => {
+  const text = "Thinking Process: The answer is yes.";
+  assert.equal(sanitizeReasoningFallback(text), "The answer is yes.");
+});
+
+test("sanitizeReasoningFallback: empty input returns empty", () => {
+  assert.equal(sanitizeReasoningFallback(""), "");
+  assert.equal(sanitizeReasoningFallback("   "), "");
+});
+
+test("sanitizeReasoningFallback: truncates long text", () => {
+  const longText = "word ".repeat(200);
+  const result = sanitizeReasoningFallback(longText);
+  assert.ok(result.length <= 520, `Expected <=520 chars, got ${result.length}`);
 });

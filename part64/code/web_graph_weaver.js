@@ -622,6 +622,73 @@ function structuredFallbackAnalysisSummary(text) {
   ].join("\n");
 }
 
+// ---------------------------------------------------------------------------
+// Reasoning-model compatibility (Qwen 3.5, DeepSeek-R1, etc.)
+// ---------------------------------------------------------------------------
+
+const _CONCLUSION_MARKERS_RE =
+  /(?:^|\n)\s*(?:Output|Final(?:\s+Answer)?|Answer|Response|Result|Conclusion)\s*[:\-]/gi;
+
+function sanitizeReasoningFallback(raw) {
+  let text = String(raw || "").trim();
+  if (!text) return "";
+
+  const maxChars = 512;
+
+  // Try to find conclusion segment after last marker
+  const matches = [...text.matchAll(_CONCLUSION_MARKERS_RE)];
+  if (matches.length > 0) {
+    const lastMatch = matches[matches.length - 1];
+    const conclusion = text.slice(lastMatch.index + lastMatch[0].length).trim();
+    if (conclusion) {
+      text = conclusion;
+    }
+  } else {
+    // Fallback: take last non-empty paragraph
+    const paragraphs = text.split(/\n\n+/).filter((p) => p.trim());
+    if (paragraphs.length > 0) {
+      text = paragraphs[paragraphs.length - 1].trim();
+    }
+  }
+
+  // Strip structural labels
+  text = text
+    .replace(/^(?:Thinking\s+Process|Chain\s+of\s+Thought|Reasoning|Step\s+\d+)\s*:\s*/i, "")
+    .replace(/^\d+[.)]\s*/, "")
+    .replace(/^[*\-•]\s*/, "");
+  // Collapse whitespace
+  text = text.replace(/\s+/g, " ").trim();
+
+  if (!text) return "";
+  if (text.length > maxChars) {
+    const cut = text.slice(0, maxChars);
+    const lastSpace = cut.lastIndexOf(" ");
+    text = (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:!?]+$/, "") + "…";
+  }
+  return text;
+}
+
+function extractLlmResponseText(payload) {
+  const choice = payload?.choices?.[0];
+  if (!choice) return "";
+
+  // Primary: content
+  const content = String(choice?.message?.content || "").trim();
+  if (content) return content;
+
+  // Secondary: text
+  const text = String(choice?.text || "").trim();
+  if (text) return text;
+
+  // Reasoning-model fallback
+  const reasoning = String(
+    choice?.message?.reasoning || choice?.message?.thinking || choice?.message?.reasoning_content || "",
+  ).trim();
+  if (reasoning) return sanitizeReasoningFallback(reasoning);
+
+  return "";
+}
+
 function normalizeAnalysisSummary(rawText, fallbackText) {
   const fallbackSummary = structuredFallbackAnalysisSummary(fallbackText);
   const cleanRaw = String(rawText || "").replace(/\r/g, "\n").trim();
@@ -1498,6 +1565,7 @@ class WebGraphWeaver {
       entity_visits: 0,
       llm_analysis_success: 0,
       llm_analysis_fail: 0,
+      llm_reasoning_fallback: 0,
       compliance_checks: 0,
       compliance_pass: 0,
       compliance_fail: 0,
@@ -1967,12 +2035,16 @@ class WebGraphWeaver {
             throw new Error(`llm_http_${response.status}`);
           }
           const payload = await response.json();
-          const candidate = String(
-            payload?.choices?.[0]?.message?.content || payload?.choices?.[0]?.text || "",
-          ).trim();
+          const candidate = extractLlmResponseText(payload);
           if (candidate) {
             summary = normalizeAnalysisSummary(candidate, briefText);
             provider = "openai-chat";
+            // Track reasoning-fallback usage
+            const choice = payload?.choices?.[0];
+            const hadContent = String(choice?.message?.content || "").trim();
+            if (!hadContent && (choice?.message?.reasoning || choice?.message?.thinking)) {
+              this.stats.llm_reasoning_fallback += 1;
+            }
           }
         } finally {
           clearTimeout(timeoutId);
@@ -3260,6 +3332,7 @@ class WebGraphWeaver {
         entity_visits: this.stats.entity_visits,
         llm_analysis_success: this.stats.llm_analysis_success,
         llm_analysis_fail: this.stats.llm_analysis_fail,
+        llm_reasoning_fallback: this.stats.llm_reasoning_fallback,
         average_fetch_ms:
           this.stats.fetched > 0
             ? Number((this.stats.total_fetch_time_ms / this.stats.fetched).toFixed(1))
@@ -3642,6 +3715,8 @@ module.exports = {
   extractSemanticReferences,
   classifyKnowledgeUrl,
   normalizeAnalysisSummary,
+  extractLlmResponseText,
+  sanitizeReasoningFallback,
   parseAuthHeader,
   llmAuthHeaders,
   FrontierQueue,

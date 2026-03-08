@@ -1,0 +1,43 @@
+# Local Docker override for running eta-mu stack against a local Ollama endpoint
+# without requiring /dev/accel NPU mapping.
+#
+# Usage example:
+#   cd part64
+#   ETA_MU_GATEWAY_PORT=18887 ETA_MU_WEAVER_PORT=18997 \
+#   docker compose -f docker-compose.yml -f docker-compose.local-llm.yml up -d eta-mu-system eta-mu-gateway
+
+services:
+  eta-mu-system:
+    # Reset hardware device requirements from base compose for hosts without /dev/accel.
+    devices: !reset []
+    gpus: !reset null
+
+    environment:
+      # Route OpenAI-compatible calls to local Ollama on host.
+      TEXT_GENERATION_BASE_URL: "http://host.docker.internal:11434"
+      WEAVER_LLM_BASE_URL: "http://host.docker.internal:11434"
+      ETA_MU_IMAGE_VISION_BASE_URL: "http://host.docker.internal:11434"
+
+      # Default to small model; override with env var for compatibility testing.
+      TEXT_GENERATION_MODEL: "${TEXT_GENERATION_MODEL:-qwen2.5:0.5b}"
+      WEAVER_LLM_MODEL: "${WEAVER_LLM_MODEL:-qwen2.5:0.5b}"
+
+      # Disable vision by default in this local profile.
+      ETA_MU_IMAGE_VISION_ENABLED: "0"
+
+      # Embedding fallback profile for non-NPU/non-CUDA hosts.
+      EMBEDDINGS_BACKEND: "auto"
+      CDB_EMBED_DEVICE: "AUTO"
+      CDB_EMBED_STRICT_DEVICE: "0"
+      CDB_EMBED_REQUIRE_C: "0"
+
+      # Reasoning models need longer timeouts due to chain-of-thought overhead.
+      TEXT_GENERATION_TIMEOUT_SEC: "${TEXT_GENERATION_TIMEOUT_SEC:-90}"
+
+      # Clear auth defaults so local Ollama can be hit directly.
+      TEXT_GENERATION_BEARER_TOKEN: ""
+      TEXT_GENERATION_AUTH_HEADER: ""
+      TEXT_GENERATION_API_KEY: ""
+      ETA_MU_IMAGE_VISION_BEARER_TOKEN: ""
+      ETA_MU_IMAGE_VISION_AUTH_HEADER: ""
+      ETA_MU_IMAGE_VISION_API_KEY: ""
