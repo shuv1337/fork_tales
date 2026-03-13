@@ -89,7 +89,7 @@ export function useUserPresenceInput(): UserPresenceInputApi {
       kind,
       target,
       message: String(payload.message || "").trim(),
-      embed_daimoi: Boolean(payload.embedDaimoi),
+      embed_particle: Boolean(payload.embedParticle),
       meta: payload.meta && typeof payload.meta === "object" ? payload.meta : {},
       ts_client_ms: nowMs,
     };
@@ -170,7 +170,7 @@ export function useUserPresenceInput(): UserPresenceInputApi {
         kind: "hover",
         target,
         message: `mouse hover over ${target}`,
-        embedDaimoi: true,
+        embedParticle: true,
         meta: {
           source: "ui-control",
         },
@@ -189,7 +189,7 @@ export function useUserPresenceInput(): UserPresenceInputApi {
         kind: "click",
         target,
         message: `click ${target}`,
-        embedDaimoi: true,
+        embedParticle: true,
         meta: {
           source: "ui-control",
         },
@@ -206,7 +206,7 @@ export function useUserPresenceInput(): UserPresenceInputApi {
         kind: "input",
         target,
         message: `input change on ${target}`,
-        embedDaimoi: true,
+        embedParticle: true,
         meta: {
           source: "ui-control",
         },
@@ -225,7 +225,7 @@ export function useUserPresenceInput(): UserPresenceInputApi {
         kind: "keydown",
         target,
         message: `key ${event.key} on ${target}`,
-        embedDaimoi: true,
+        embedParticle: true,
         meta: {
           source: "keyboard",
           key: event.key,

@@ -32,7 +32,7 @@ function createSimulationFixture(): SimulationState {
           route_node_id: "route:1",
           graph_node_id: "node:1",
           top_job: "emit_resource_packet",
-          resource_daimoi: true,
+          resource_particle: true,
         },
       ],
       compute_jobs: [
@@ -64,7 +64,7 @@ function createSimulationFixture(): SimulationState {
         },
       ],
       compute_jobs_180s: 5,
-      resource_daimoi: {
+      resource_particle: {
         delivered_packets: 4,
         total_transfer: 3.2,
       },

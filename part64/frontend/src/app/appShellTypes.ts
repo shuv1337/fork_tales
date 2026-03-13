@@ -29,7 +29,7 @@ export interface UserPresenceInputPayload {
   message?: string;
   xRatio?: number;
   yRatio?: number;
-  embedDaimoi?: boolean;
+  embedParticle?: boolean;
   meta?: Record<string, unknown>;
 }
 

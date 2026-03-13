@@ -5,20 +5,20 @@ import type {
   CouncilDecision,
   CouncilApiResponse,
   DriftScanPayload,
-  MuseWorkspaceContext,
+  AgentWorkspaceContext,
   StudySnapshotPayload,
   TaskQueueSnapshot,
 } from "../types";
 
 interface UseChatCommandHandlersArgs {
-  activeMusePresenceId: string;
+  activeAgentPresenceId: string;
   catalogGeneratedAt?: string;
   catalogTruthGateBlocked?: boolean;
   simulationTimestamp?: string;
   simulationTruthGateBlocked?: boolean;
-  buildMuseSurroundingNodes: (
+  buildAgentSurroundingNodes: (
     musePresenceId: string,
-    workspace: MuseWorkspaceContext | null,
+    workspace: AgentWorkspaceContext | null,
   ) => Array<Record<string, unknown>>;
   emitSystemMessage: (text: string) => void;
   emitWitnessChatReply: (
@@ -37,9 +37,9 @@ interface CommandContext {
   catalogTruthGateBlocked: boolean | undefined;
   simulationTimestamp: string | undefined;
   simulationTruthGateBlocked: boolean | undefined;
-  buildMuseSurroundingNodes: (
+  buildAgentSurroundingNodes: (
     musePresenceId: string,
-    workspace: MuseWorkspaceContext | null,
+    workspace: AgentWorkspaceContext | null,
   ) => Array<Record<string, unknown>>;
   emitSystemMessage: (text: string) => void;
   emitWitnessChatReply: (
@@ -146,7 +146,7 @@ async function handlePresenceSayCommand(
   }
 
   const { presenceId, messageText } = parseSayCommand(trimmed, fallbackMusePresenceId);
-  const surroundingNodes = context.buildMuseSurroundingNodes(presenceId, null);
+  const surroundingNodes = context.buildAgentSurroundingNodes(presenceId, null);
 
   try {
     const payload = await requestSayCommand(
@@ -446,29 +446,29 @@ async function dispatchChatCommand(
 }
 
 export function useChatCommandHandlers({
-  activeMusePresenceId,
+  activeAgentPresenceId,
   catalogGeneratedAt,
   catalogTruthGateBlocked,
   simulationTimestamp,
   simulationTruthGateBlocked,
-  buildMuseSurroundingNodes,
+  buildAgentSurroundingNodes,
   emitSystemMessage,
   emitWitnessChatReply,
 }: UseChatCommandHandlersArgs): UseChatCommandHandlersResult {
   const handleChatCommand = useCallback(
-    async (text: string, musePresenceId = activeMusePresenceId): Promise<boolean> =>
+    async (text: string, musePresenceId = activeAgentPresenceId): Promise<boolean> =>
       dispatchChatCommand(text, musePresenceId, {
         catalogGeneratedAt,
         catalogTruthGateBlocked,
         simulationTimestamp,
         simulationTruthGateBlocked,
-        buildMuseSurroundingNodes,
+        buildAgentSurroundingNodes,
         emitSystemMessage,
         emitWitnessChatReply,
       }),
     [
-      activeMusePresenceId,
-      buildMuseSurroundingNodes,
+      activeAgentPresenceId,
+      buildAgentSurroundingNodes,
       catalogGeneratedAt,
       catalogTruthGateBlocked,
       emitSystemMessage,

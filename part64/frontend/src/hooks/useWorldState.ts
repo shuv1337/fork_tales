@@ -19,7 +19,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { runtimeApiUrl, runtimeWebSocketUrl } from '../runtime/endpoints';
 import type {
   Catalog,
-  MuseEvent,
+  AgentEvent,
   SimulationState,
   MixMeta,
   UIProjectionBundle,
@@ -31,7 +31,7 @@ interface WorldState {
   simulation: SimulationState | null;
   mixMeta: MixMeta | null;
   projection: UIProjectionBundle | null;
-  museEvents: MuseEvent[];
+  agentEvents: AgentEvent[];
   isConnected: boolean;
 }
 
@@ -141,7 +141,7 @@ function mergeCatalogStreamRows(
   });
 }
 
-function mergeMuseEvents(previous: MuseEvent[], incoming: MuseEvent[]): MuseEvent[] {
+function mergeAgentEvents(previous: AgentEvent[], incoming: AgentEvent[]): AgentEvent[] {
   if (!Array.isArray(incoming) || incoming.length <= 0) {
     return previous;
   }
@@ -301,7 +301,7 @@ export function useWorldState(perspective: UIPerspective = 'hybrid') {
     simulation: null,
     mixMeta: null,
     projection: null,
-    museEvents: [],
+    agentEvents: [],
     isConnected: false,
   };
   const [state, setState] = useState<WorldState>(initialState);
@@ -322,7 +322,7 @@ export function useWorldState(perspective: UIPerspective = 'hybrid') {
     simulation?: SimulationState | null;
     mixMeta?: MixMeta | null;
     projection?: UIProjectionBundle | null;
-    museEventsAppend?: MuseEvent[];
+    agentEventsAppend?: AgentEvent[];
   }>({});
 
   const enqueueStatePatch = useCallback(
@@ -331,9 +331,9 @@ export function useWorldState(perspective: UIPerspective = 'hybrid') {
       simulation?: SimulationState | null;
       mixMeta?: MixMeta | null;
       projection?: UIProjectionBundle | null;
-      museEventsAppend?: MuseEvent[];
+      agentEventsAppend?: AgentEvent[];
     }) => {
-      const { museEventsAppend, ...restPatch } = patch;
+      const { agentEventsAppend, ...restPatch } = patch;
       const existing = pendingPatchRef.current;
       if (restPatch.catalog !== undefined) {
         existing.catalog = restPatch.catalog;
@@ -347,11 +347,11 @@ export function useWorldState(perspective: UIPerspective = 'hybrid') {
       if (restPatch.projection !== undefined) {
         existing.projection = restPatch.projection;
       }
-      if (Array.isArray(museEventsAppend) && museEventsAppend.length > 0) {
-        if (existing.museEventsAppend) {
-          existing.museEventsAppend.push(...museEventsAppend);
+      if (Array.isArray(agentEventsAppend) && agentEventsAppend.length > 0) {
+        if (existing.agentEventsAppend) {
+          existing.agentEventsAppend.push(...agentEventsAppend);
         } else {
-          existing.museEventsAppend = [...museEventsAppend];
+          existing.agentEventsAppend = [...agentEventsAppend];
         }
       }
       if (flushFrameRef.current !== null) {
@@ -362,23 +362,23 @@ export function useWorldState(perspective: UIPerspective = 'hybrid') {
         const next = pendingPatchRef.current;
         pendingPatchRef.current = {};
         setState((prev) => {
-          const nextMuseEvents = next.museEventsAppend
-            ? mergeMuseEvents(prev.museEvents, next.museEventsAppend)
-            : prev.museEvents;
+          const nextAgentEvents = next.agentEventsAppend
+            ? mergeAgentEvents(prev.agentEvents, next.agentEventsAppend)
+            : prev.agentEvents;
           const nextState = {
             ...prev,
             ...(next.catalog !== undefined ? { catalog: next.catalog } : {}),
             ...(next.simulation !== undefined ? { simulation: next.simulation } : {}),
             ...(next.mixMeta !== undefined ? { mixMeta: next.mixMeta } : {}),
             ...(next.projection !== undefined ? { projection: next.projection } : {}),
-            ...(nextMuseEvents !== prev.museEvents ? { museEvents: nextMuseEvents } : {}),
+            ...(nextAgentEvents !== prev.agentEvents ? { agentEvents: nextAgentEvents } : {}),
           };
           if (
             nextState.catalog === prev.catalog
             && nextState.simulation === prev.simulation
             && nextState.mixMeta === prev.mixMeta
             && nextState.projection === prev.projection
-            && nextState.museEvents === prev.museEvents
+            && nextState.agentEvents === prev.agentEvents
             && nextState.isConnected === prev.isConnected
           ) {
             return prev;
@@ -421,20 +421,20 @@ export function useWorldState(perspective: UIPerspective = 'hybrid') {
               ? { projection: catalogPayload.ui_projection }
               : {}),
           });
-        } else if (msgType === 'muse_events') {
+        } else if (msgType === 'agent_events') {
           const eventsPayload = msg.events;
           const incoming = Array.isArray(eventsPayload)
-            ? eventsPayload.filter((row: unknown): row is MuseEvent => {
+            ? eventsPayload.filter((row: unknown): row is AgentEvent => {
                 if (!row || typeof row !== 'object') {
                   return false;
                 }
-                const eventId = String((row as MuseEvent).event_id ?? '').trim();
-                const kind = String((row as MuseEvent).kind ?? '').trim();
+                const eventId = String((row as AgentEvent).event_id ?? '').trim();
+                const kind = String((row as AgentEvent).kind ?? '').trim();
                 return eventId.length > 0 && kind.length > 0;
               })
             : [];
           if (incoming.length > 0) {
-            enqueueStatePatch({ museEventsAppend: incoming });
+            enqueueStatePatch({ agentEventsAppend: incoming });
           }
         } else if (msgType === 'simulation') {
           const simulationPayload = (msg.simulation ?? null) as SimulationState | null;

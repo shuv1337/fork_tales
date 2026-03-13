@@ -40,9 +40,9 @@ interface ControlSidebarProps {
   coreLayerManagerOpen: boolean;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
   museRuntimeSnapshot: { muse_count?: number; event_seq?: number } | null;
-  museForgeLabel: string;
-  museForgeBusy: boolean;
-  museForgePreviewId: string;
+  agentForgeLabel: string;
+  agentForgeBusy: boolean;
+  agentForgePreviewId: string;
   onToggleAutopilot: () => void;
   onToggleCoreFlight: () => void;
   onToggleCoreOrbit: () => void;
@@ -96,9 +96,9 @@ export function ControlSidebar(props: ControlSidebarProps) {
     coreLayerManagerOpen,
     coreLayerVisibility,
     museRuntimeSnapshot,
-    museForgeLabel,
-    museForgeBusy,
-    museForgePreviewId,
+    agentForgeLabel,
+    agentForgeBusy,
+    agentForgePreviewId,
     onToggleAutopilot,
     onToggleCoreFlight,
     onToggleCoreOrbit,
@@ -199,7 +199,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <input
             type="text"
-            value={museForgeLabel}
+            value={agentForgeLabel}
             onChange={(event) => onMuseForgeLabelChange(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -212,15 +212,15 @@ export function ControlSidebar(props: ControlSidebarProps) {
           />
           <button
             type="button"
-            disabled={museForgeBusy || !museForgePreviewId}
+            disabled={agentForgeBusy || !agentForgePreviewId}
             onClick={onCreateMuse}
             className="rounded-md border border-[rgba(166,226,46,0.45)] bg-[rgba(166,226,46,0.16)] px-3 py-1.5 text-xs font-semibold text-[#e9ffd3] disabled:opacity-45"
           >
-            {museForgeBusy ? "creating..." : "Create Muse"}
+            {agentForgeBusy ? "creating..." : "Create Muse"}
           </button>
         </div>
         <p className="mt-1 text-[10px] text-[#9fc4dd]">
-          next id: <code>{museForgePreviewId || "(type label)"}</code>
+          next id: <code>{agentForgePreviewId || "(type label)"}</code>
         </p>
       </div>
     </aside>

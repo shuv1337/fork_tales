@@ -153,7 +153,7 @@ export const PANEL_ANCHOR_PRESETS: Record<string, PanelAnchorPreset> = {
     pinnedByDefault: true,
     anchorId: "health_sentinel_cpu",
   },
-  "nexus.ui.daimoi_presence": {
+  "nexus.ui.particle_deck": {
     kind: "node",
     worldSize: "l",
     pinnedByDefault: true,
@@ -165,7 +165,7 @@ export const PANEL_ANCHOR_PRESETS: Record<string, PanelAnchorPreset> = {
     pinnedByDefault: true,
     anchorId: "receipt_river",
   },
-  "nexus.ui.myth_commons": {
+  "nexus.ui.world_simulation": {
     kind: "node",
     worldSize: "m",
     pinnedByDefault: true,

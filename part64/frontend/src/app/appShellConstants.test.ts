@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   APP_WORKSPACE_NORMALIZE_OPTIONS,
   DEFAULT_INTERFACE_OPACITY,
-  FIXED_MUSE_PRESENCES,
+  FIXED_AGENT_PRESENCES,
   GLASS_VIEWPORT_PANEL_ID,
   INTERFACE_OPACITY_MAX,
   INTERFACE_OPACITY_MIN,
@@ -20,7 +20,7 @@ describe("appShellConstants", () => {
   });
 
   it("exposes fixed muse lanes and panel hints", () => {
-    expect(FIXED_MUSE_PRESENCES.map((entry) => entry.presenceId)).toEqual([
+    expect(FIXED_AGENT_PRESENCES.map((entry) => entry.presenceId)).toEqual([
       "witness_thread",
       "chaos",
       "stability",

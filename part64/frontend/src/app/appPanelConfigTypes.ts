@@ -1,7 +1,7 @@
 import { type AutopilotActionEvent } from "../autopilot";
 import type {
   Catalog,
-  MuseWorkspaceContext,
+  AgentWorkspaceContext,
   SimulationState,
   UIProjectionBundle,
   UIProjectionElementState,
@@ -12,28 +12,28 @@ import { type CoreSimulationTuning } from "./coreSimulationConfig";
 import { type WorldAnchorTarget } from "./worldPanelLayout";
 
 export interface UseAppPanelConfigsArgs {
-  activeMusePresenceId: string;
+  activeAgentPresenceId: string;
   activeProjection: UIProjectionBundle | null;
   autopilotEvents: AutopilotActionEvent[];
   catalog: Catalog | null;
   deferredCoreSimulationTuning: CoreSimulationTuning;
   deferredPanelsReady: boolean;
   flyCameraToAnchor: (anchor: WorldAnchorTarget) => void;
-  handleMuseWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
-  handleMuseWorkspaceContextChange: (presenceId: string, workspace: MuseWorkspaceContext) => void;
-  handleMuseWorkspaceSend: (text: string, musePresenceId: string, workspace: MuseWorkspaceContext) => void;
+  handleAgentWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
+  handleAgentWorkspaceContextChange: (presenceId: string, workspace: AgentWorkspaceContext) => void;
+  handleAgentWorkspaceSend: (text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => void;
   handleRecord: () => Promise<void>;
-  handleSendVoice: (musePresenceId: string, workspace: MuseWorkspaceContext) => Promise<void>;
+  handleSendVoice: (musePresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
   handleTranscribe: () => Promise<string | undefined>;
   handleUserPresenceInput: (payload: UserPresenceInputPayload) => void;
   handleWorldInteract: (personId: string, action: "speak" | "pray" | "sing") => Promise<void>;
   interactingPersonId: string | null;
   isRecording: boolean;
   isThinking: boolean;
-  museWorkspaceBindings: Record<string, string[]>;
-  museWorkspaceContexts: Record<string, MuseWorkspaceContext>;
+  agentWorkspaceBindings: Record<string, string[]>;
+  agentWorkspaceContexts: Record<string, AgentWorkspaceContext>;
   projectionStateByElement: Map<string, UIProjectionElementState>;
-  setActiveMusePresenceId: (presenceId: string) => void;
+  setActiveAgentPresenceId: (presenceId: string) => void;
   simulation: SimulationState | null;
   voiceInputMeta: string;
   worldInteraction: WorldInteractionResponse | null;

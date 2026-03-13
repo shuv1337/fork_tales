@@ -20,18 +20,18 @@ function createHookHarness() {
     source: string,
     requestedMusePresenceId?: string,
   ) => void>();
-  const buildMuseSurroundingNodes = vi.fn((...args: [string, unknown]) => {
+  const buildAgentSurroundingNodes = vi.fn((...args: [string, unknown]) => {
     void args;
     return [{ id: "node:1", kind: "file", label: "demo" }];
   });
 
   const hook = renderHook(() => useChatCommandHandlers({
-    activeMusePresenceId: "witness_thread",
+    activeAgentPresenceId: "witness_thread",
     catalogGeneratedAt: "2026-02-26T00:00:00Z",
     catalogTruthGateBlocked: false,
     simulationTimestamp: "2026-02-26T00:01:00Z",
     simulationTruthGateBlocked: false,
-    buildMuseSurroundingNodes: (musePresenceId, workspace) => buildMuseSurroundingNodes(musePresenceId, workspace),
+    buildAgentSurroundingNodes: (musePresenceId, workspace) => buildAgentSurroundingNodes(musePresenceId, workspace),
     emitSystemMessage: (text) => emitSystemMessage(text),
     emitWitnessChatReply: (payload, source, requestedMusePresenceId) =>
       emitWitnessChatReply(payload, source, requestedMusePresenceId),
@@ -41,7 +41,7 @@ function createHookHarness() {
     hook,
     emitSystemMessage,
     emitWitnessChatReply,
-    buildMuseSurroundingNodes,
+    buildAgentSurroundingNodes,
   };
 }
 
@@ -89,7 +89,7 @@ describe("useChatCommandHandlers", () => {
 
     const {
       hook,
-      buildMuseSurroundingNodes,
+      buildAgentSurroundingNodes,
       emitSystemMessage,
       emitWitnessChatReply,
     } = createHookHarness();
@@ -97,7 +97,7 @@ describe("useChatCommandHandlers", () => {
     const consumed = await hook.result.current.handleChatCommand("/say chaos drift now");
 
     expect(consumed).toBe(true);
-    expect(buildMuseSurroundingNodes).toHaveBeenCalledWith("chaos", null);
+    expect(buildAgentSurroundingNodes).toHaveBeenCalledWith("chaos", null);
     expect(emitWitnessChatReply).toHaveBeenCalledWith(
       expect.objectContaining({ reply: "field acknowledged" }),
       "command:/say",

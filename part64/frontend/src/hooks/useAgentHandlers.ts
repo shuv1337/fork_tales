@@ -4,41 +4,41 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { OverlayApi } from "../app/appShellTypes";
-import type { MuseWorkspaceContext } from "../types";
+import type { AgentWorkspaceContext } from "../types";
 import {
-  normalizeMusePresenceId,
-  normalizeMuseWorkspaceContext,
+  normalizeAgentPresenceId,
+  normalizeAgentWorkspaceContext,
   sameStringArray,
-} from "../app/museWorkspace";
+} from "../app/agentWorkspace";
 import {
   APP_WORKSPACE_NORMALIZE_OPTIONS,
-  MUSE_WORKSPACE_STORAGE_KEY,
+  AGENT_WORKSPACE_STORAGE_KEY,
 } from "../app/appShellConstants";
 import {
   buildDeviceSurroundingNodes,
   clamp,
   resolveRuntimeMediaUrl,
   stableUnitHash,
-  toMuseSlug,
+  toAgentSlug,
 } from "../app/appShellUtils";
 import { runtimeBaseUrl } from "../runtime/endpoints";
 import type {
   ChatMessage,
   EntityManifestItem,
   FileGraphNode,
-  MuseEvent,
+  AgentEvent,
   WorldInteractionResponse,
 } from "../types";
 
-export interface MuseHandlersState {
-  activeMusePresenceId: string;
-  setActiveMusePresenceId: (id: string) => void;
-  museForgeLabel: string;
-  setMuseForgeLabel: (label: string) => void;
-  museForgeBusy: boolean;
-  museForgePreviewId: string;
-  museWorkspaceContexts: Record<string, MuseWorkspaceContext>;
-  museWorkspaceBindings: Record<string, string[]>;
+export interface AgentHandlersState {
+  activeAgentPresenceId: string;
+  setActiveAgentPresenceId: (id: string) => void;
+  agentForgeLabel: string;
+  setAgentForgeLabel: (label: string) => void;
+  agentForgeBusy: boolean;
+  agentForgePreviewId: string;
+  agentWorkspaceContexts: Record<string, AgentWorkspaceContext>;
+  agentWorkspaceBindings: Record<string, string[]>;
   isRecording: boolean;
   isThinking: boolean;
   setIsThinking: (val: boolean) => void;
@@ -50,15 +50,15 @@ export interface MuseHandlersState {
 
 // WorldInteractionResponse is imported from ../types
 
-export interface MuseHandlersActions {
+export interface AgentHandlersActions {
   emitChatMessage: (message: ChatMessage) => void;
   emitSystemMessage: (text: string) => void;
-  playMuseAudio: (rawUrl: string, label: string) => Promise<boolean>;
-  openMuseImage: (rawUrl: string, label: string) => boolean;
-  handleCreateMuse: () => Promise<void>;
-  buildMuseSurroundingNodes: (
+  playAgentAudio: (rawUrl: string, label: string) => Promise<boolean>;
+  openAgentImage: (rawUrl: string, label: string) => boolean;
+  handleCreateAgent: () => Promise<void>;
+  buildAgentSurroundingNodes: (
     musePresenceId: string,
-    workspace?: MuseWorkspaceContext | null,
+    workspace?: AgentWorkspaceContext | null,
   ) => Array<Record<string, unknown>>;
   emitWitnessChatReply: (
     payload: Record<string, unknown>,
@@ -67,15 +67,15 @@ export interface MuseHandlersActions {
   ) => void;
   handleRecord: () => Promise<void>;
   handleTranscribe: () => Promise<string | undefined>;
-  handleSendVoice: (musePresenceId: string, workspace: MuseWorkspaceContext) => Promise<void>;
-  handleMuseWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
-  handleMuseWorkspaceContextChange: (presenceId: string, workspace: MuseWorkspaceContext) => void;
-  handleMuseWorkspaceSend: (text: string, musePresenceId: string, workspace: MuseWorkspaceContext) => void;
+  handleSendVoice: (musePresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
+  handleAgentWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
+  handleAgentWorkspaceContextChange: (presenceId: string, workspace: AgentWorkspaceContext) => void;
+  handleAgentWorkspaceSend: (text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => void;
   handleWorldInteract: (personId: string, action: "speak" | "pray" | "sing") => Promise<void>;
   handleOverlayInit: (api: unknown) => void;
 }
 
-interface UseMuseHandlersParams {
+interface UseAgentHandlersParams {
   overlayApi: OverlayApi | null;
   setOverlayApi: (api: OverlayApi | null) => void;
   emitUiToast: (title: string, body: string) => void;
@@ -93,26 +93,26 @@ interface UseMuseHandlersParams {
       };
     };
   } | null;
-  museEvents: MuseEvent[] | undefined;
+  agentEvents: AgentEvent[] | undefined;
   handleAutopilotUserInput: (text: string) => boolean;
   handleChatCommand: (text: string, musePresenceId: string) => Promise<boolean>;
 }
 
-export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersState & MuseHandlersActions {
+export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersState & AgentHandlersActions {
   const {
     overlayApi,
     setOverlayApi,
     emitUiToast,
     catalog,
     simulation,
-    museEvents,
+    agentEvents,
     handleAutopilotUserInput,
     handleChatCommand,
   } = params;
 
-  const [activeMusePresenceId, setActiveMusePresenceId] = useState("witness_thread");
-  const [museForgeLabel, setMuseForgeLabel] = useState("");
-  const [museForgeBusy, setMuseForgeBusy] = useState(false);
+  const [activeAgentPresenceId, setActiveAgentPresenceId] = useState("witness_thread");
+  const [agentForgeLabel, setAgentForgeLabel] = useState("");
+  const [agentForgeBusy, setAgentForgeBusy] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [voiceInputMeta, setVoiceInputMeta] = useState("voice input idle / 音声入力待機");
@@ -120,18 +120,18 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
   const [worldInteraction, setWorldInteraction] = useState<WorldInteractionResponse | null>(null);
   const [interactingPersonId, setInteractingPersonId] = useState<string | null>(null);
 
-  const [museWorkspaceContexts, setMuseWorkspaceContexts] = useState<Record<string, MuseWorkspaceContext>>(() => {
+  const [agentWorkspaceContexts, setAgentWorkspaceContexts] = useState<Record<string, AgentWorkspaceContext>>(() => {
     if (typeof window === "undefined") return {};
     try {
-      const raw = window.localStorage.getItem(MUSE_WORKSPACE_STORAGE_KEY);
+      const raw = window.localStorage.getItem(AGENT_WORKSPACE_STORAGE_KEY);
       if (!raw) return {};
       const parsed = JSON.parse(raw) as Record<string, unknown>;
-      const normalized: Record<string, MuseWorkspaceContext> = {};
+      const normalized: Record<string, AgentWorkspaceContext> = {};
       Object.entries(parsed).forEach(([presenceId, value]) => {
-        const normalizedPresence = normalizeMusePresenceId(String(presenceId || ""));
+        const normalizedPresence = normalizeAgentPresenceId(String(presenceId || ""));
         if (!normalizedPresence || !value || typeof value !== "object") return;
-        const workspace = normalizeMuseWorkspaceContext(
-          value as Partial<MuseWorkspaceContext>,
+        const workspace = normalizeAgentWorkspaceContext(
+          value as Partial<AgentWorkspaceContext>,
           APP_WORKSPACE_NORMALIZE_OPTIONS,
         );
         if (workspace.pinnedFileNodeIds.length <= 0 && workspace.searchQuery.trim().length <= 0) return;
@@ -141,36 +141,36 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     } catch { return {}; }
   });
 
-  const [museWorkspaceBindings, setMuseWorkspaceBindings] = useState<Record<string, string[]>>(() => {
+  const [agentWorkspaceBindings, setAgentWorkspaceBindings] = useState<Record<string, string[]>>(() => {
     const seeded: Record<string, string[]> = {};
-    Object.entries(museWorkspaceContexts).forEach(([presenceId, workspace]) => {
+    Object.entries(agentWorkspaceContexts).forEach(([presenceId, workspace]) => {
       if (workspace.pinnedFileNodeIds.length > 0) seeded[presenceId] = workspace.pinnedFileNodeIds;
     });
     return seeded;
   });
 
-  const processedMuseEventSeqRef = useRef(0);
-  const museAudioElementRef = useRef<HTMLAudioElement | null>(null);
+  const processedAgentEventSeqRef = useRef(0);
+  const agentAudioElementRef = useRef<HTMLAudioElement | null>(null);
 
-  const museForgePreviewId = toMuseSlug(museForgeLabel);
+  const agentForgePreviewId = toAgentSlug(agentForgeLabel);
 
   // Persist workspace contexts to localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const payload: Record<string, MuseWorkspaceContext> = {};
-    Object.entries(museWorkspaceContexts).forEach(([presenceId, workspace]) => {
-      const normalizedPresence = normalizeMusePresenceId(presenceId);
+    const payload: Record<string, AgentWorkspaceContext> = {};
+    Object.entries(agentWorkspaceContexts).forEach(([presenceId, workspace]) => {
+      const normalizedPresence = normalizeAgentPresenceId(presenceId);
       if (!normalizedPresence) return;
-      const normalizedWorkspace = normalizeMuseWorkspaceContext(workspace, APP_WORKSPACE_NORMALIZE_OPTIONS);
+      const normalizedWorkspace = normalizeAgentWorkspaceContext(workspace, APP_WORKSPACE_NORMALIZE_OPTIONS);
       if (normalizedWorkspace.pinnedFileNodeIds.length <= 0 && normalizedWorkspace.searchQuery.trim().length <= 0) return;
       payload[normalizedPresence] = normalizedWorkspace;
     });
     if (Object.keys(payload).length <= 0) {
-      window.localStorage.removeItem(MUSE_WORKSPACE_STORAGE_KEY);
+      window.localStorage.removeItem(AGENT_WORKSPACE_STORAGE_KEY);
       return;
     }
-    window.localStorage.setItem(MUSE_WORKSPACE_STORAGE_KEY, JSON.stringify(payload));
-  }, [museWorkspaceContexts]);
+    window.localStorage.setItem(AGENT_WORKSPACE_STORAGE_KEY, JSON.stringify(payload));
+  }, [agentWorkspaceContexts]);
 
   // --- Chat / toast ---
   const emitChatMessage = useCallback((message: ChatMessage) => {
@@ -181,17 +181,17 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     emitChatMessage({
       role: "assistant",
       text,
-      meta: { channel: "command", source: "muse:system", presenceId: activeMusePresenceId },
+      meta: { channel: "command", source: "muse:system", presenceId: activeAgentPresenceId },
     });
-  }, [activeMusePresenceId, emitChatMessage]);
+  }, [activeAgentPresenceId, emitChatMessage]);
 
   // --- Audio/image ---
-  const playMuseAudio = useCallback(async (rawUrl: string, label: string): Promise<boolean> => {
+  const playAgentAudio = useCallback(async (rawUrl: string, label: string): Promise<boolean> => {
     const resolvedUrl = resolveRuntimeMediaUrl(rawUrl);
     if (!resolvedUrl) return false;
     try {
-      const audio = museAudioElementRef.current ?? new Audio();
-      museAudioElementRef.current = audio;
+      const audio = agentAudioElementRef.current ?? new Audio();
+      agentAudioElementRef.current = audio;
       audio.src = resolvedUrl;
       audio.currentTime = 0;
       await audio.play();
@@ -203,7 +203,7 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     }
   }, [emitUiToast]);
 
-  const openMuseImage = useCallback((rawUrl: string, label: string): boolean => {
+  const openAgentImage = useCallback((rawUrl: string, label: string): boolean => {
     const resolvedUrl = resolveRuntimeMediaUrl(rawUrl);
     if (!resolvedUrl) return false;
     try {
@@ -221,36 +221,36 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
   }, [emitUiToast]);
 
   // --- Create muse ---
-  const handleCreateMuse = useCallback(async () => {
-    const label = String(museForgeLabel || "").trim();
-    if (!label || museForgeBusy) return;
-    const museId = toMuseSlug(label);
-    if (!museId) {
+  const handleCreateAgent = useCallback(async () => {
+    const label = String(agentForgeLabel || "").trim();
+    if (!label || agentForgeBusy) return;
+    const agentId = toAgentSlug(label);
+    if (!agentId) {
       emitUiToast("Muse Create Failed", "Provide a valid muse label.");
       return;
     }
     const anchor = {
-      x: clamp(0.14 + (stableUnitHash(`${museId}|x`) * 0.72), 0.08, 0.92),
-      y: clamp(0.16 + (stableUnitHash(`${museId}|y`) * 0.68), 0.08, 0.92),
+      x: clamp(0.14 + (stableUnitHash(`${agentId}|x`) * 0.72), 0.08, 0.92),
+      y: clamp(0.16 + (stableUnitHash(`${agentId}|y`) * 0.68), 0.08, 0.92),
       zoom: 1,
       kind: "ui-meta-create",
     };
-    setMuseForgeBusy(true);
+    setAgentForgeBusy(true);
     try {
       const baseUrl = runtimeBaseUrl();
       const response = await fetch(`${baseUrl}/api/muse/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ muse_id: museId, label, anchor, user_intent_id: `ui-create:${museId}` }),
+        body: JSON.stringify({ muse_id: agentId, label, anchor, user_intent_id: `ui-create:${agentId}` }),
       });
       const payload = (await response.json()) as {
         ok?: boolean; error?: string; muse?: { id?: string; label?: string };
       };
       if (!response.ok || !payload?.ok) throw new Error(String(payload?.error || `http_${response.status}`));
-      const createdId = String(payload?.muse?.id || museId).trim() || museId;
+      const createdId = String(payload?.muse?.id || agentId).trim() || agentId;
       const createdLabel = String(payload?.muse?.label || label).trim() || label;
-      setActiveMusePresenceId(createdId);
-      setMuseForgeLabel("");
+      setActiveAgentPresenceId(createdId);
+      setAgentForgeLabel("");
       emitUiToast("Muse Created", `${createdLabel} is online as ${createdId}`);
       emitChatMessage({
         role: "assistant",
@@ -263,19 +263,19 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
       emitChatMessage({
         role: "assistant",
         text: `muse create failed\nreason=${reason}`,
-        meta: { channel: "command", source: "meta:/api/muse/create", presenceId: activeMusePresenceId },
+        meta: { channel: "command", source: "meta:/api/muse/create", presenceId: activeAgentPresenceId },
       });
     } finally {
-      setMuseForgeBusy(false);
+      setAgentForgeBusy(false);
     }
-  }, [activeMusePresenceId, emitChatMessage, emitUiToast, museForgeBusy, museForgeLabel]);
+  }, [activeAgentPresenceId, emitChatMessage, emitUiToast, agentForgeBusy, agentForgeLabel]);
 
   // --- Build surrounding nodes ---
-  const buildMuseSurroundingNodes = useCallback((
+  const buildAgentSurroundingNodes = useCallback((
     musePresenceId: string,
-    workspace: MuseWorkspaceContext | null = null,
+    workspace: AgentWorkspaceContext | null = null,
   ): Array<Record<string, unknown>> => {
-    const normalizedMuse = normalizeMusePresenceId(musePresenceId || "witness_thread") || "witness_thread";
+    const normalizedAgent = normalizeAgentPresenceId(musePresenceId || "witness_thread") || "witness_thread";
     const graphNodes = (
       simulation?.file_graph?.file_nodes ?? catalog?.file_graph?.file_nodes ?? []
     ).filter((row): row is FileGraphNode => Boolean(row));
@@ -289,7 +289,7 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     });
 
     const pinnedIds = (
-      workspace?.pinnedFileNodeIds ?? museWorkspaceBindings[normalizedMuse] ?? []
+      workspace?.pinnedFileNodeIds ?? agentWorkspaceBindings[normalizedAgent] ?? []
     )
       .map((item) => String(item || "").trim())
       .filter((item, index, all) => item.length > 0 && all.indexOf(item) === index)
@@ -316,25 +316,25 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
 
     const pinnedRows = pinnedIds.map((nodeId) => {
       const row = nodeById.get(nodeId);
-      const baseSeed = stableUnitHash(`${normalizedMuse}|${nodeId}`);
+      const baseSeed = stableUnitHash(`${normalizedAgent}|${nodeId}`);
       const x = clamp(Number(row?.x ?? (0.22 + (baseSeed * 0.56))), 0, 1);
-      const y = clamp(Number(row?.y ?? (0.24 + (stableUnitHash(`${normalizedMuse}|${nodeId}|y`) * 0.52))), 0, 1);
+      const y = clamp(Number(row?.y ?? (0.24 + (stableUnitHash(`${normalizedAgent}|${nodeId}|y`) * 0.52))), 0, 1);
       const label = String(row?.source_rel_path ?? row?.label ?? row?.name ?? nodeId).trim() || nodeId;
       const text = String(row?.summary ?? row?.text_excerpt ?? label).trim() || label;
       const sourceRelPath = String(row?.source_rel_path ?? "").trim();
       return {
         id: nodeId, kind: String(row?.kind ?? "resource"), label, text, x, y,
-        visibility: "private", tags: [normalizedMuse, "workspace-pin"],
+        visibility: "private", tags: [normalizedAgent, "workspace-pin"],
         source_rel_path: sourceRelPath || undefined, url: resolveNodeUrl(row),
       };
     });
 
     const nearbyRows = graphNodes
       .filter((row) => {
-        const dominantPresence = normalizeMusePresenceId(String(row.dominant_presence ?? ""));
-        const conceptPresence = normalizeMusePresenceId(String(row.concept_presence_id ?? ""));
+        const dominantPresence = normalizeAgentPresenceId(String(row.dominant_presence ?? ""));
+        const conceptPresence = normalizeAgentPresenceId(String(row.concept_presence_id ?? ""));
         if (pinnedIds.includes(String(row.id || row.node_id || "").trim())) return false;
-        return dominantPresence === normalizedMuse || conceptPresence === normalizedMuse;
+        return dominantPresence === normalizedAgent || conceptPresence === normalizedAgent;
       })
       .sort((left, right) => {
         const rightScore = Number(right.importance ?? 0) + Number(right.embed_layer_count ?? 0) * 0.18;
@@ -350,14 +350,14 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
           label: String(row.source_rel_path ?? row.label ?? row.id ?? "resource").trim(),
           text: String(row.summary ?? row.text_excerpt ?? row.label ?? row.id ?? "").trim(),
           x: clamp(Number(row.x ?? 0.5), 0, 1), y: clamp(Number(row.y ?? 0.5), 0, 1),
-          visibility: "public", tags: [normalizedMuse, String(row.dominant_field ?? "field")],
+          visibility: "public", tags: [normalizedAgent, String(row.dominant_field ?? "field")],
           source_rel_path: sourceRelPath || undefined, url: resolveNodeUrl(row),
         };
       })
       .filter((row) => row.id.length > 0);
 
     return [...pinnedRows, ...nearbyRows, ...buildDeviceSurroundingNodes(simulation)].slice(0, 36);
-  }, [catalog?.file_graph?.file_nodes, museWorkspaceBindings, simulation]);
+  }, [catalog?.file_graph?.file_nodes, agentWorkspaceBindings, simulation]);
 
   // --- Witness chat reply ---
   const emitWitnessChatReply = useCallback((
@@ -379,7 +379,7 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     const muse = payload.muse && typeof payload.muse === "object"
       ? payload.muse as Record<string, unknown> : null;
     const tracePresenceId = String(
-      muse?.id ?? entities[0]?.presence_id ?? requestedMusePresenceId ?? activeMusePresenceId ?? "witness_thread",
+      muse?.id ?? entities[0]?.presence_id ?? requestedMusePresenceId ?? activeAgentPresenceId ?? "witness_thread",
     ).trim() || "witness_thread";
     const tracePresenceName = String(
       muse?.label ?? entities[0]?.presence_en ?? tracePresenceId,
@@ -481,64 +481,64 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
       const selectedUrl = String(requestedMedia.selected_url ?? requestedMedia.url ?? "").trim();
       const selectedLabel = String(requestedMedia.selected_label ?? "media target").trim() || "media target";
       if (selectedUrl) {
-        if (mediaKind === "image") openMuseImage(selectedUrl, selectedLabel);
-        else void playMuseAudio(selectedUrl, selectedLabel);
+        if (mediaKind === "image") openAgentImage(selectedUrl, selectedLabel);
+        else void playAgentAudio(selectedUrl, selectedLabel);
       }
     }
     if (safeReply.includes("[[PULSE]]") || overlayTags.includes("[[PULSE]]")) overlayApi?.pulseAt?.(0.5, 0.5, 1);
     if (safeReply.includes("[[TONE]]") || overlayTags.includes("[[TONE]]")) overlayApi?.singAll?.();
-  }, [activeMusePresenceId, emitChatMessage, emitUiToast, openMuseImage, overlayApi, playMuseAudio]);
+  }, [activeAgentPresenceId, emitChatMessage, emitUiToast, openAgentImage, overlayApi, playAgentAudio]);
 
   // --- Muse events effect ---
   useEffect(() => {
-    if (!Array.isArray(museEvents) || museEvents.length <= 0) return;
-    const freshEvents = museEvents.filter(
-      (row: MuseEvent) => Number(row.seq ?? 0) > processedMuseEventSeqRef.current,
+    if (!Array.isArray(agentEvents) || agentEvents.length <= 0) return;
+    const freshEvents = agentEvents.filter(
+      (row: AgentEvent) => Number(row.seq ?? 0) > processedAgentEventSeqRef.current,
     );
     if (freshEvents.length <= 0) return;
-    let maxSeq = processedMuseEventSeqRef.current;
-    freshEvents.forEach((eventRow: MuseEvent) => {
+    let maxSeq = processedAgentEventSeqRef.current;
+    freshEvents.forEach((eventRow: AgentEvent) => {
       const seq = Number(eventRow.seq ?? 0);
       if (Number.isFinite(seq)) maxSeq = Math.max(maxSeq, seq);
       const kind = String(eventRow.kind ?? "").trim();
-      const museId = String(eventRow.muse_id ?? "").trim() || "witness_thread";
+      const agentId = String(eventRow.muse_id ?? "").trim() || "witness_thread";
       const eventPayload = eventRow.payload && typeof eventRow.payload === "object"
         ? eventRow.payload as Record<string, unknown> : {};
       if (kind === "field.delta.applied") {
-        const x = clamp(0.16 + (stableUnitHash(`${museId}|${eventRow.turn_id}|${eventRow.seq}`) * 0.68), 0, 1);
-        const y = clamp(0.14 + (stableUnitHash(`${museId}|${eventRow.turn_id}|${eventRow.seq}|y`) * 0.72), 0, 1);
-        overlayApi?.pulseAt?.(x, y, 0.56, museId);
+        const x = clamp(0.16 + (stableUnitHash(`${agentId}|${eventRow.turn_id}|${eventRow.seq}`) * 0.68), 0, 1);
+        const y = clamp(0.14 + (stableUnitHash(`${agentId}|${eventRow.turn_id}|${eventRow.seq}|y`) * 0.72), 0, 1);
+        overlayApi?.pulseAt?.(x, y, 0.56, agentId);
       }
       if (kind === "muse.gpu.claim.granted") {
         overlayApi?.singAll?.();
         const device = String(eventPayload.device ?? "gpu").trim() || "gpu";
-        emitUiToast("Muse GPU Claim", `${museId} claimed ${device}`);
+        emitUiToast("Muse GPU Claim", `${agentId} claimed ${device}`);
       }
       if (kind === "audio.play.requested") {
         const label = String(eventPayload.label ?? "audio track").trim() || "audio track";
         const target = String(eventPayload.target_node_id ?? "audio").trim() || "audio";
-        emitUiToast("Muse Audio Request", `${museId} requested ${label} (${target})`);
+        emitUiToast("Muse Audio Request", `${agentId} requested ${label} (${target})`);
       }
       if (kind === "image.open.requested") {
         const label = String(eventPayload.label ?? "image").trim() || "image";
         const target = String(eventPayload.target_node_id ?? "image").trim() || "image";
-        emitUiToast("Muse Image Request", `${museId} requested ${label} (${target})`);
+        emitUiToast("Muse Image Request", `${agentId} requested ${label} (${target})`);
       }
-      if (kind === "muse.turn.completed" && normalizeMusePresenceId(museId) === normalizeMusePresenceId(activeMusePresenceId)) {
+      if (kind === "muse.turn.completed" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         const deltaCount = Number(eventPayload.field_deltas ?? 0);
         const daimonCount = Number(eventPayload.daimoi ?? 0);
-        emitUiToast("Muse Turn Complete", `${museId} emitted ${daimonCount} daimoi and ${deltaCount} field deltas`);
+        emitUiToast("Muse Turn Complete", `${agentId} emitted ${daimonCount} daimoi and ${deltaCount} field deltas`);
       }
-      if (kind === "muse.rate_limited" && normalizeMusePresenceId(museId) === normalizeMusePresenceId(activeMusePresenceId)) {
-        emitUiToast("Muse Rate Limit", `${museId} hit turn budget; wait a moment.`);
+      if (kind === "muse.rate_limited" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
+        emitUiToast("Muse Rate Limit", `${agentId} hit turn budget; wait a moment.`);
       }
-      if (kind === "muse.rejected" && normalizeMusePresenceId(museId) === normalizeMusePresenceId(activeMusePresenceId)) {
+      if (kind === "muse.rejected" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         const reason = String(eventPayload.reason ?? "rejected").trim() || "rejected";
-        emitUiToast("Muse Rejected", `${museId} blocked turn (${reason})`);
+        emitUiToast("Muse Rejected", `${agentId} blocked turn (${reason})`);
       }
     });
-    processedMuseEventSeqRef.current = maxSeq;
-  }, [activeMusePresenceId, emitUiToast, museEvents, overlayApi]);
+    processedAgentEventSeqRef.current = maxSeq;
+  }, [activeAgentPresenceId, emitUiToast, agentEvents, overlayApi]);
 
   // --- Recording ---
   const handleRecord = useCallback(async () => {
@@ -587,11 +587,11 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     } catch { setVoiceInputMeta("transcribe failed"); return undefined; }
   }, [recordedBlob]);
 
-  const handleSendVoice = useCallback(async (musePresenceId: string, workspace: MuseWorkspaceContext) => {
+  const handleSendVoice = useCallback(async (musePresenceId: string, workspace: AgentWorkspaceContext) => {
     const text = await handleTranscribe();
     if (!text) return;
-    const resolvedMusePresenceId = String(musePresenceId || activeMusePresenceId || "witness_thread").trim() || "witness_thread";
-    const surroundingNodes = buildMuseSurroundingNodes(resolvedMusePresenceId, workspace);
+    const resolvedMusePresenceId = String(musePresenceId || activeAgentPresenceId || "witness_thread").trim() || "witness_thread";
+    const surroundingNodes = buildAgentSurroundingNodes(resolvedMusePresenceId, workspace);
     emitChatMessage({ role: "user", text, meta: { channel: "llm", source: "voice", presenceId: resolvedMusePresenceId } });
     const baseUrl = runtimeBaseUrl();
     try {
@@ -614,22 +614,22 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
         meta: { channel: "command", source: "voice:/api/muse/message", presenceId: resolvedMusePresenceId },
       });
     }
-  }, [activeMusePresenceId, buildMuseSurroundingNodes, catalog, emitChatMessage, emitWitnessChatReply, handleTranscribe, simulation]);
+  }, [activeAgentPresenceId, buildAgentSurroundingNodes, catalog, emitChatMessage, emitWitnessChatReply, handleTranscribe, simulation]);
 
   // --- Workspace ---
-  const handleMuseWorkspaceBindingsChange = useCallback((presenceId: string, fileNodeIds: string[]) => {
-    const normalizedPresence = normalizeMusePresenceId(String(presenceId || "").trim() || "witness_thread");
+  const handleAgentWorkspaceBindingsChange = useCallback((presenceId: string, fileNodeIds: string[]) => {
+    const normalizedPresence = normalizeAgentPresenceId(String(presenceId || "").trim() || "witness_thread");
     const normalizedIds = fileNodeIds
       .map((item) => String(item || "").trim())
       .filter((item, index, all) => item.length > 0 && all.indexOf(item) === index)
       .slice(0, 48);
-    setMuseWorkspaceBindings((prev) => {
+    setAgentWorkspaceBindings((prev) => {
       const prevIds = prev[normalizedPresence] ?? [];
       if (prevIds.length === normalizedIds.length && prevIds.every((id, index) => id === normalizedIds[index])) return prev;
       return { ...prev, [normalizedPresence]: normalizedIds };
     });
-    setMuseWorkspaceContexts((prev) => {
-      const currentWorkspace = normalizeMuseWorkspaceContext(prev[normalizedPresence], APP_WORKSPACE_NORMALIZE_OPTIONS);
+    setAgentWorkspaceContexts((prev) => {
+      const currentWorkspace = normalizeAgentWorkspaceContext(prev[normalizedPresence], APP_WORKSPACE_NORMALIZE_OPTIONS);
       if (sameStringArray(currentWorkspace.pinnedFileNodeIds, normalizedIds)) return prev;
       return { ...prev, [normalizedPresence]: { ...currentWorkspace, pinnedFileNodeIds: normalizedIds } };
     });
@@ -641,18 +641,18 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
     }).catch(() => {});
   }, []);
 
-  const handleMuseWorkspaceContextChange = useCallback((presenceId: string, workspace: MuseWorkspaceContext) => {
-    const normalizedPresence = normalizeMusePresenceId(String(presenceId || "").trim() || "witness_thread");
-    const normalizedWorkspace = normalizeMuseWorkspaceContext(workspace, APP_WORKSPACE_NORMALIZE_OPTIONS);
-    setMuseWorkspaceContexts((prev) => {
-      const currentWorkspace = normalizeMuseWorkspaceContext(prev[normalizedPresence], APP_WORKSPACE_NORMALIZE_OPTIONS);
+  const handleAgentWorkspaceContextChange = useCallback((presenceId: string, workspace: AgentWorkspaceContext) => {
+    const normalizedPresence = normalizeAgentPresenceId(String(presenceId || "").trim() || "witness_thread");
+    const normalizedWorkspace = normalizeAgentWorkspaceContext(workspace, APP_WORKSPACE_NORMALIZE_OPTIONS);
+    setAgentWorkspaceContexts((prev) => {
+      const currentWorkspace = normalizeAgentWorkspaceContext(prev[normalizedPresence], APP_WORKSPACE_NORMALIZE_OPTIONS);
       const pinnedUnchanged = sameStringArray(currentWorkspace.pinnedFileNodeIds, normalizedWorkspace.pinnedFileNodeIds);
       const searchUnchanged = currentWorkspace.searchQuery === normalizedWorkspace.searchQuery;
       const summariesUnchanged = sameStringArray(currentWorkspace.pinnedNexusSummaries, normalizedWorkspace.pinnedNexusSummaries);
       if (pinnedUnchanged && searchUnchanged && summariesUnchanged) return prev;
       return { ...prev, [normalizedPresence]: normalizedWorkspace };
     });
-    setMuseWorkspaceBindings((prev) => {
+    setAgentWorkspaceBindings((prev) => {
       const prevIds = prev[normalizedPresence] ?? [];
       if (sameStringArray(prevIds, normalizedWorkspace.pinnedFileNodeIds)) return prev;
       return { ...prev, [normalizedPresence]: normalizedWorkspace.pinnedFileNodeIds };
@@ -660,16 +660,16 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
   }, []);
 
   // --- Workspace send ---
-  const handleMuseWorkspaceSend = useCallback((text: string, musePresenceId: string, workspace: MuseWorkspaceContext) => {
-    const resolvedMusePresenceId = String(musePresenceId || activeMusePresenceId || "witness_thread").trim() || "witness_thread";
-    setActiveMusePresenceId(resolvedMusePresenceId);
+  const handleAgentWorkspaceSend = useCallback((text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => {
+    const resolvedMusePresenceId = String(musePresenceId || activeAgentPresenceId || "witness_thread").trim() || "witness_thread";
+    setActiveAgentPresenceId(resolvedMusePresenceId);
     if (handleAutopilotUserInput(text)) return;
     setIsThinking(true);
     (async () => {
       const consumed = await handleChatCommand(text, resolvedMusePresenceId);
       if (consumed) return;
       const baseUrl = runtimeBaseUrl();
-      const surroundingNodes = buildMuseSurroundingNodes(resolvedMusePresenceId, workspace);
+      const surroundingNodes = buildAgentSurroundingNodes(resolvedMusePresenceId, workspace);
       const response = await fetch(`${baseUrl}/api/muse/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -691,7 +691,7 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
         });
       })
       .finally(() => { setIsThinking(false); });
-  }, [activeMusePresenceId, catalog, emitChatMessage, emitWitnessChatReply, handleAutopilotUserInput, buildMuseSurroundingNodes, handleChatCommand, simulation]);
+  }, [activeAgentPresenceId, catalog, emitChatMessage, emitWitnessChatReply, handleAutopilotUserInput, buildAgentSurroundingNodes, handleChatCommand, simulation]);
 
   // --- World interaction ---
   const handleWorldInteract = useCallback(async (personId: string, action: "speak" | "pray" | "sing") => {
@@ -726,21 +726,21 @@ export function useMuseHandlers(params: UseMuseHandlersParams): MuseHandlersStat
   }, [setOverlayApi]);
 
   return {
-    activeMusePresenceId, setActiveMusePresenceId,
-    museForgeLabel, setMuseForgeLabel,
-    museForgeBusy, museForgePreviewId,
-    museWorkspaceContexts, museWorkspaceBindings,
+    activeAgentPresenceId, setActiveAgentPresenceId,
+    agentForgeLabel, setAgentForgeLabel,
+    agentForgeBusy, agentForgePreviewId,
+    agentWorkspaceContexts, agentWorkspaceBindings,
     isRecording, isThinking, setIsThinking,
     voiceInputMeta, recordedBlob,
     worldInteraction, interactingPersonId,
     emitChatMessage, emitSystemMessage,
-    playMuseAudio, openMuseImage,
-    handleCreateMuse, buildMuseSurroundingNodes,
+    playAgentAudio, openAgentImage,
+    handleCreateAgent, buildAgentSurroundingNodes,
     emitWitnessChatReply,
     handleRecord, handleTranscribe, handleSendVoice,
-    handleMuseWorkspaceBindingsChange,
-    handleMuseWorkspaceContextChange,
-    handleMuseWorkspaceSend,
+    handleAgentWorkspaceBindingsChange,
+    handleAgentWorkspaceContextChange,
+    handleAgentWorkspaceSend,
     handleWorldInteract,
     handleOverlayInit,
   };

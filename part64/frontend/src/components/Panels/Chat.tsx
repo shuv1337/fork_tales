@@ -11,10 +11,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
-  normalizeMusePresenceId,
-  normalizeMuseWorkspaceContext,
+  normalizeAgentPresenceId,
+  normalizeAgentWorkspaceContext,
   sameStringArray,
-} from "../../app/museWorkspace";
+} from "../../app/agentWorkspace";
 import { relativeTime } from "../../app/time";
 import { runtimeApiUrl } from "../../runtime/endpoints";
 import type { AskPayload } from "../../autopilot";
@@ -23,35 +23,35 @@ import type {
   Catalog,
   ChatMessage,
   FileGraphNode,
-  MuseWorkspaceContext,
+  AgentWorkspaceContext,
   SimulationState,
   StudySnapshotPayload,
   UIProjectionChatSession,
   UIProjectionElementState,
   WorldPresence,
-  WitnessLineagePayload,
-  WitnessThreadState,
+  ContinuityLineagePayload,
+  ContinuityState,
 } from "../../types";
 
 interface Props {
-  onSend: (text: string, musePresenceId: string, workspace: MuseWorkspaceContext) => void;
+  onSend: (text: string, agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
   onRecord: () => void;
   onTranscribe: () => void;
-  onSendVoice: (musePresenceId: string, workspace: MuseWorkspaceContext) => void;
+  onSendVoice: (agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
   isRecording: boolean;
   isThinking: boolean;
   voiceInputMeta: string;
   catalog: Catalog | null;
   simulation: SimulationState | null;
-  activeMusePresenceId?: string;
-  onMusePresenceChange?: (presenceId: string) => void;
-  fixedMusePresenceId?: string;
-  workspaceContext?: MuseWorkspaceContext | null;
-  onWorkspaceContextChange?: (musePresenceId: string, workspace: MuseWorkspaceContext) => void;
-  onWorkspaceBindingsChange?: (musePresenceId: string, pinnedFileNodeIds: string[]) => void;
+  activeAgentPresenceId?: string;
+  onAgentPresenceChange?: (presenceId: string) => void;
+  fixedAgentPresenceId?: string;
+  workspaceContext?: AgentWorkspaceContext | null;
+  onWorkspaceContextChange?: (agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
+  onWorkspaceBindingsChange?: (agentPresenceId: string, pinnedFileNodeIds: string[]) => void;
   chatLensState?: UIProjectionElementState | null;
   activeChatSession?: UIProjectionChatSession | null;
-  minimalMuseView?: boolean;
+  minimalAgentView?: boolean;
 }
 
 type ChatChannel = "ledger" | "llm";
@@ -77,7 +77,7 @@ const FALLBACK_MUSES: WorldPresence[] = [
   },
 ];
 
-interface MusePresenceOption {
+interface AgentPresenceOption {
   id: string;
   en: string;
   ja: string;
@@ -139,7 +139,7 @@ function particleColor(particle: BackendFieldParticle): string {
   return `rgb(${red} ${green} ${blue})`;
 }
 
-function buildMusePresenceOptions(catalog: Catalog | null, simulation: SimulationState | null): MusePresenceOption[] {
+function buildAgentPresenceOptions(catalog: Catalog | null, simulation: SimulationState | null): AgentPresenceOption[] {
   const runtimeMuses = Array.isArray(catalog?.muse_runtime?.muses)
     ? catalog.muse_runtime.muses
     : [];
@@ -155,9 +155,9 @@ function buildMusePresenceOptions(catalog: Catalog | null, simulation: Simulatio
           id,
           en: label,
           ja: "",
-        } satisfies MusePresenceOption;
+        } satisfies AgentPresenceOption;
       })
-      .filter((row): row is MusePresenceOption => row !== null);
+      .filter((row): row is AgentPresenceOption => row !== null);
   }
 
   const fromWorld = simulation?.world?.presences ?? [];
@@ -172,9 +172,9 @@ function buildMusePresenceOptions(catalog: Catalog | null, simulation: Simulatio
           id,
           en: String(row?.name?.en ?? id).trim() || id,
           ja: String(row?.name?.ja ?? "").trim(),
-        } satisfies MusePresenceOption;
+        } satisfies AgentPresenceOption;
       })
-      .filter((row): row is MusePresenceOption => row !== null);
+      .filter((row): row is AgentPresenceOption => row !== null);
     if (mapped.length > 0) {
       return mapped;
     }
@@ -192,9 +192,9 @@ function buildMusePresenceOptions(catalog: Catalog | null, simulation: Simulatio
           id,
           en: String(row?.en ?? id).trim() || id,
           ja: String(row?.ja ?? "").trim(),
-        } satisfies MusePresenceOption;
+        } satisfies AgentPresenceOption;
       })
-      .filter((row): row is MusePresenceOption => row !== null);
+      .filter((row): row is AgentPresenceOption => row !== null);
     if (mapped.length > 0) {
       return mapped;
     }
@@ -210,9 +210,9 @@ function buildMusePresenceOptions(catalog: Catalog | null, simulation: Simulatio
 function collectNearbyEmbedSummaries(
   catalog: Catalog | null,
   simulation: SimulationState | null,
-  musePresenceId: string,
+  agentPresenceId: string,
 ): string[] {
-  const normalizedPresence = normalizeMusePresenceId(musePresenceId);
+  const normalizedPresence = normalizeAgentPresenceId(agentPresenceId);
   const graph = simulation?.file_graph ?? catalog?.file_graph;
   const nodes: FileGraphNode[] = Array.isArray(graph?.file_nodes) ? graph.file_nodes : [];
   if (nodes.length === 0) {
@@ -221,8 +221,8 @@ function collectNearbyEmbedSummaries(
 
   const rows = nodes
     .filter((node) => {
-      const dominantPresence = normalizeMusePresenceId(String(node?.dominant_presence ?? ""));
-      const conceptPresence = normalizeMusePresenceId(String(node?.concept_presence_id ?? ""));
+      const dominantPresence = normalizeAgentPresenceId(String(node?.dominant_presence ?? ""));
+      const conceptPresence = normalizeAgentPresenceId(String(node?.concept_presence_id ?? ""));
       return dominantPresence === normalizedPresence || conceptPresence === normalizedPresence;
     })
     .sort((left, right) => {
@@ -267,56 +267,56 @@ export function ChatPanel({
   voiceInputMeta,
   catalog,
   simulation,
-  activeMusePresenceId,
-  onMusePresenceChange,
-  fixedMusePresenceId,
+  activeAgentPresenceId,
+  onAgentPresenceChange,
+  fixedAgentPresenceId,
   workspaceContext,
   onWorkspaceContextChange,
   onWorkspaceBindingsChange,
   chatLensState,
   activeChatSession,
-  minimalMuseView = false,
+  minimalAgentView = false,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pendingAsk, setPendingAsk] = useState<AskPayload | null>(null);
   const [chatChannel, setChatChannel] = useState<ChatChannel>("ledger");
-  const [searchQuery, setSearchQuery] = useState(() => normalizeMuseWorkspaceContext(workspaceContext).searchQuery);
+  const [searchQuery, setSearchQuery] = useState(() => normalizeAgentWorkspaceContext(workspaceContext).searchQuery);
   const [pinnedFileNodeIds, setPinnedFileNodeIds] = useState<string[]>(
-    () => normalizeMuseWorkspaceContext(workspaceContext).pinnedFileNodeIds,
+    () => normalizeAgentWorkspaceContext(workspaceContext).pinnedFileNodeIds,
   );
   const [studySnapshot, setStudySnapshot] = useState<StudySnapshotPayload | null>(null);
-  const [lineageSnapshot, setLineageSnapshot] = useState<WitnessLineagePayload | null>(null);
+  const [lineageSnapshot, setLineageSnapshot] = useState<ContinuityLineagePayload | null>(null);
   const [runtimeError, setRuntimeError] = useState("");
   const [runtimeLoading, setRuntimeLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const selectedMuseSeed = fixedMusePresenceId ?? activeMusePresenceId ?? "witness_thread";
+  const selectedMuseSeed = fixedAgentPresenceId ?? activeAgentPresenceId ?? "witness_thread";
 
   const musePresenceOptions = useMemo(
-    () => buildMusePresenceOptions(catalog, simulation),
+    () => buildAgentPresenceOptions(catalog, simulation),
     [catalog, simulation],
   );
 
   const resolvedMusePresenceId = useMemo(() => {
-    if (fixedMusePresenceId) {
-      return fixedMusePresenceId;
+    if (fixedAgentPresenceId) {
+      return fixedAgentPresenceId;
     }
-    const normalizedSelected = normalizeMusePresenceId(selectedMuseSeed);
+    const normalizedSelected = normalizeAgentPresenceId(selectedMuseSeed);
     const selected = musePresenceOptions.find(
-      (row) => normalizeMusePresenceId(row.id) === normalizedSelected,
+      (row) => normalizeAgentPresenceId(row.id) === normalizedSelected,
     );
     if (selected) {
       return selected.id;
     }
     return musePresenceOptions[0]?.id ?? "witness_thread";
-  }, [fixedMusePresenceId, musePresenceOptions, selectedMuseSeed]);
+  }, [fixedAgentPresenceId, musePresenceOptions, selectedMuseSeed]);
 
   const activeMuse = useMemo(
     () =>
       musePresenceOptions.find(
-        (row) => normalizeMusePresenceId(row.id) === normalizeMusePresenceId(resolvedMusePresenceId),
+        (row) => normalizeAgentPresenceId(row.id) === normalizeAgentPresenceId(resolvedMusePresenceId),
       )
       ?? null,
     [musePresenceOptions, resolvedMusePresenceId],
@@ -362,7 +362,7 @@ export function ChatPanel({
 
   const filteredSearchNexus = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const normalizedMuseId = normalizeMusePresenceId(resolvedMusePresenceId);
+    const normalizedMuseId = normalizeAgentPresenceId(resolvedMusePresenceId);
     const rows = fileNodes
       .map((row) => {
         const searchable = [
@@ -379,7 +379,7 @@ export function ChatPanel({
 
         const matches = query.length <= 0 || searchable.includes(query);
         const museAffinity =
-          normalizeMusePresenceId(String(row.dominant_presence ?? "")) === normalizedMuseId
+          normalizeAgentPresenceId(String(row.dominant_presence ?? "")) === normalizedMuseId
             ? 1
             : 0;
         const weight = (Number(row.importance ?? 0) * 0.75) + (museAffinity * 0.9);
@@ -393,11 +393,11 @@ export function ChatPanel({
   }, [fileNodes, resolvedMusePresenceId, searchQuery]);
 
   const nearbyNexusRows = useMemo(() => {
-    const normalizedMuseId = normalizeMusePresenceId(resolvedMusePresenceId);
+    const normalizedMuseId = normalizeAgentPresenceId(resolvedMusePresenceId);
     const scored = fileNodes
       .map((row) => {
-        const dominantPresence = normalizeMusePresenceId(String(row.dominant_presence ?? ""));
-        const conceptPresence = normalizeMusePresenceId(String(row.concept_presence_id ?? ""));
+        const dominantPresence = normalizeAgentPresenceId(String(row.dominant_presence ?? ""));
+        const conceptPresence = normalizeAgentPresenceId(String(row.concept_presence_id ?? ""));
         const affinity = dominantPresence === normalizedMuseId || conceptPresence === normalizedMuseId ? 1 : 0;
         const score = (Number(row.importance ?? 0) * 0.78) + (Number(row.embed_layer_count ?? 0) * 0.09) + (affinity * 0.92);
         return { row, affinity, score };
@@ -416,7 +416,7 @@ export function ChatPanel({
     return scored.slice(0, 16).map((item) => item.row);
   }, [fileNodes, resolvedMusePresenceId]);
 
-  const liveWorkspaceContext = useMemo<MuseWorkspaceContext>(
+  const liveWorkspaceContext = useMemo<AgentWorkspaceContext>(
     () => ({
       pinnedFileNodeIds,
       searchQuery,
@@ -425,7 +425,7 @@ export function ChatPanel({
     [pinnedFileNodeIds, pinnedNexusSummaries, searchQuery],
   );
 
-  const workspaceSyncContext = useMemo<MuseWorkspaceContext>(
+  const workspaceSyncContext = useMemo<AgentWorkspaceContext>(
     () => ({
       pinnedFileNodeIds,
       searchQuery,
@@ -435,7 +435,7 @@ export function ChatPanel({
   );
 
   const normalizedExternalWorkspace = useMemo(
-    () => normalizeMuseWorkspaceContext(workspaceContext),
+    () => normalizeAgentWorkspaceContext(workspaceContext),
     [workspaceContext],
   );
 
@@ -449,12 +449,12 @@ export function ChatPanel({
   }, [normalizedExternalWorkspace, pinnedFileNodeIds, searchQuery]);
 
   useEffect(() => {
-    const normalizedCurrent = normalizeMusePresenceId(selectedMuseSeed);
-    const normalizedResolved = normalizeMusePresenceId(resolvedMusePresenceId);
-    if (!fixedMusePresenceId && onMusePresenceChange && normalizedCurrent !== normalizedResolved) {
-      onMusePresenceChange(resolvedMusePresenceId);
+    const normalizedCurrent = normalizeAgentPresenceId(selectedMuseSeed);
+    const normalizedResolved = normalizeAgentPresenceId(resolvedMusePresenceId);
+    if (!fixedAgentPresenceId && onAgentPresenceChange && normalizedCurrent !== normalizedResolved) {
+      onAgentPresenceChange(resolvedMusePresenceId);
     }
-  }, [fixedMusePresenceId, onMusePresenceChange, resolvedMusePresenceId, selectedMuseSeed]);
+  }, [fixedAgentPresenceId, onAgentPresenceChange, resolvedMusePresenceId, selectedMuseSeed]);
 
   useEffect(() => {
     onWorkspaceBindingsChange?.(resolvedMusePresenceId, pinnedFileNodeIds);
@@ -465,16 +465,16 @@ export function ChatPanel({
   }, [onWorkspaceContextChange, resolvedMusePresenceId, workspaceSyncContext]);
 
   useEffect(() => {
-    if (minimalMuseView && chatChannel !== "llm") {
+    if (minimalAgentView && chatChannel !== "llm") {
       setChatChannel("llm");
     }
-  }, [chatChannel, minimalMuseView]);
+  }, [chatChannel, minimalAgentView]);
 
   const activeMuseLabel = activeMuse
     ? `${activeMuse.en}${activeMuse.ja ? ` / ${activeMuse.ja}` : ""}`
     : resolvedMusePresenceId;
 
-  const witnessState: WitnessThreadState | null =
+  const witnessState: ContinuityState | null =
     simulation?.presence_dynamics?.witness_thread ?? null;
 
   const witnessParticles = useMemo(() => {
@@ -482,7 +482,7 @@ export function ChatPanel({
     return rows.filter(
       (row): row is BackendFieldParticle =>
         Boolean(row)
-        && normalizeMusePresenceId(String(row.presence_id || "")) === normalizeMusePresenceId(resolvedMusePresenceId),
+        && normalizeAgentPresenceId(String(row.presence_id || "")) === normalizeAgentPresenceId(resolvedMusePresenceId),
     );
   }, [resolvedMusePresenceId, simulation?.field_particles, simulation?.presence_dynamics?.field_particles]);
 
@@ -520,7 +520,7 @@ export function ChatPanel({
       if (!lineageResponse.ok) {
         errors.push(`lineage(${lineageResponse.status})`);
       } else {
-        const payload = (await lineageResponse.json()) as WitnessLineagePayload;
+        const payload = (await lineageResponse.json()) as ContinuityLineagePayload;
         if (payload?.ok) {
           setLineageSnapshot(payload);
         } else {
@@ -544,7 +544,7 @@ export function ChatPanel({
         return false;
       }
 
-      const effectiveChannel: ChatChannel = minimalMuseView ? "llm" : chatChannel;
+      const effectiveChannel: ChatChannel = minimalAgentView ? "llm" : chatChannel;
       const routedPresenceId = resolvedMusePresenceId || "witness_thread";
       const witnessFallbackRoute = `/say witness_thread ${trimmed}`;
       const routedLedgerCommand =
@@ -575,7 +575,7 @@ export function ChatPanel({
       setPendingAsk(null);
       return true;
     },
-    [activeMuse?.en, chatChannel, isThinking, liveWorkspaceContext, minimalMuseView, onSend, resolvedMusePresenceId],
+    [activeMuse?.en, chatChannel, isThinking, liveWorkspaceContext, minimalAgentView, onSend, resolvedMusePresenceId],
   );
 
   const handleSend = () => {
@@ -620,8 +620,8 @@ export function ChatPanel({
       if (!customEvent.detail) {
         return;
       }
-      const incomingPresenceId = normalizeMusePresenceId(String(customEvent.detail.meta?.presenceId ?? ""));
-      const currentPresenceId = normalizeMusePresenceId(resolvedMusePresenceId);
+      const incomingPresenceId = normalizeAgentPresenceId(String(customEvent.detail.meta?.presenceId ?? ""));
+      const currentPresenceId = normalizeAgentPresenceId(resolvedMusePresenceId);
       if (incomingPresenceId && incomingPresenceId !== currentPresenceId) {
         return;
       }
@@ -669,7 +669,7 @@ export function ChatPanel({
     return () => window.removeEventListener("autopilot:ask", handler);
   }, [activeMuse?.en, resolvedMusePresenceId]);
 
-  if (minimalMuseView) {
+  if (minimalAgentView) {
     return (
       <div
         id="chat-panel"
@@ -830,9 +830,9 @@ export function ChatPanel({
     );
   }
 
-  const isWitnessMuse = normalizeMusePresenceId(resolvedMusePresenceId) === "witness_thread";
+  const isWitnessMuse = normalizeAgentPresenceId(resolvedMusePresenceId) === "witness_thread";
   const selectedImpact = (simulation?.presence_dynamics?.presence_impacts ?? []).find(
-    (row) => normalizeMusePresenceId(String(row?.id ?? "")) === normalizeMusePresenceId(resolvedMusePresenceId),
+    (row) => normalizeAgentPresenceId(String(row?.id ?? "")) === normalizeAgentPresenceId(resolvedMusePresenceId),
   );
 
   const continuityPercent = isWitnessMuse
@@ -872,7 +872,7 @@ export function ChatPanel({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {fixedMusePresenceId ? (
+          {fixedAgentPresenceId ? (
             <div className="rounded-md border border-[rgba(102,217,239,0.3)] bg-[rgba(14,23,33,0.86)] px-3 py-2">
               <p className="text-[10px] uppercase tracking-[0.12em] text-[#a8c6db]">Muse Workspace</p>
               <p className="text-xs text-[#d9edff] mt-1">{activeMuseLabel}</p>
@@ -882,7 +882,7 @@ export function ChatPanel({
               Muse Presence
               <select
                 value={resolvedMusePresenceId}
-                onChange={(event) => onMusePresenceChange?.(event.target.value)}
+                onChange={(event) => onAgentPresenceChange?.(event.target.value)}
                 className="min-w-[220px] rounded-md border border-[rgba(102,217,239,0.34)] bg-[rgba(14,23,33,0.9)] px-2 py-1.5 text-xs text-[#e5f3ff]"
               >
                 {musePresenceOptions.map((option) => (

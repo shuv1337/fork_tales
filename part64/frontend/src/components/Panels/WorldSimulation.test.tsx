@@ -3,7 +3,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { MythWorldPanel } from "./MythWorld";
+import { WorldSimulationPanel } from "./WorldSimulation";
 import type { SimulationState, WorldInteractionResponse } from "../../types";
 
 function makeSimulation(): SimulationState {
@@ -57,10 +57,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("MythWorldPanel", () => {
+describe("WorldSimulationPanel", () => {
   it("shows loading-state copy when world state is absent", () => {
     render(
-      <MythWorldPanel
+      <WorldSimulationPanel
         simulation={null}
         interaction={null}
         interactingPersonId={null}
@@ -75,7 +75,7 @@ describe("MythWorldPanel", () => {
     const onInteract = vi.fn();
 
     render(
-      <MythWorldPanel
+      <WorldSimulationPanel
         simulation={makeSimulation()}
         interaction={makeInteraction()}
         interactingPersonId={null}
@@ -100,7 +100,7 @@ describe("MythWorldPanel", () => {
 
   it("disables interaction buttons for the active speaker", () => {
     render(
-      <MythWorldPanel
+      <WorldSimulationPanel
         simulation={makeSimulation()}
         interaction={null}
         interactingPersonId="p-1"

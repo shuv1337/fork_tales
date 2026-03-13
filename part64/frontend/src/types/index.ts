@@ -5,7 +5,7 @@
 // The unified model has exactly four primitive types:
 // - Presence: AI physics-based agent with spec embedding, need, priority, mass
 // - Nexus: Graph node/particle representing a resource with embedding, capacity, demand, role
-// - Daimoi: Free particle with carrier embedding, seed embedding, type distribution, owner
+// - Particles: Free particle with carrier embedding, seed embedding, type distribution, owner
 // - Field: Shared global scalar field (demand, flow, entropy, graph)
 //
 // Everything else is a projection, view, or instance of these four.
@@ -204,29 +204,29 @@ export interface Presence {
   extension?: Record<string, unknown>;
 }
 
-// -------------- Daimoi (Canonical Particle) -----------------
+// -------------- Particles (Canonical Particle) -----------------
 
-export interface DaimoiTypeDistribution {
+export interface ParticleTypeDistribution {
   types: Record<string, number>;  // type -> probability (simplex)
   entropy: number;
 }
 
-export interface DaimoiLocation {
+export interface ParticleLocation {
   mode: "graph" | "continuous";
   node_id?: string;      // If mode === "graph"
   position?: { x: number; y: number; z?: number };  // If mode === "continuous"
 }
 
-export interface Daimoi {
+export interface Particles {
   id: string;
-  record: "ημ.daimon.v1";
+  record: "ημ.particle.v1";
 
   // Embeddings
   carrier_embedding: number[];   // Current position in semantic space
   seed_embedding: number[];      // Initial bias from owner's purpose
 
   // Type distribution
-  type_dist: DaimoiTypeDistribution;
+  type_dist: ParticleTypeDistribution;
 
   // Size/payload
   size: number;  // tokens/bytes/payload mass
@@ -236,7 +236,7 @@ export interface Daimoi {
   task_id?: string;  // Optional task/contract pointer
 
   // Location
-  location: DaimoiLocation;
+  location: ParticleLocation;
 
   // Movement dynamics
   velocity?: { x: number; y: number; z?: number };
@@ -253,8 +253,8 @@ export interface Daimoi {
   frequency?: number;
 }
 
-export interface DaimoiPacket {
-  record: "ημ.daimoi-packet.v1";
+export interface ParticlePacket {
+  record: "ημ.particle-packet.v1";
   generated_at: string;
 
   components: Array<{
@@ -363,7 +363,7 @@ export interface LedgerEvent {
 
 // -------------- Braid Diagnostics (Field-Derived) -----------------
 
-export interface BraidThread {
+export interface DiagnosticThread {
   name: string;
   values: Array<{ ts: string; value: number }>;
 
@@ -375,11 +375,11 @@ export interface BraidThread {
   };
 }
 
-export interface BraidDiagnostics {
+export interface DiagnosticBundle {
   record: "ημ.braid-diagnostics.v1";
   generated_at: string;
 
-  threads: BraidThread[];
+  threads: DiagnosticThread[];
 
   // Field snapshot reference
   field_registry_ref?: string;
@@ -504,7 +504,7 @@ export interface BackendFieldParticle {
   valve_health_term?: number;
   valve_score_proxy?: number;
   influence_power?: number;
-  resource_daimoi?: boolean;
+  resource_particle?: boolean;
   resource_type?: string;
   resource_emit_amount?: number;
   resource_target_presence_id?: string;
@@ -926,7 +926,7 @@ export interface PainField {
   join_key: string;
 }
 
-export interface Echo {
+export interface TextOverlay {
   id: string;
   text: string;
   x: number;
@@ -935,7 +935,7 @@ export interface Echo {
   life: number;
 }
 
-export interface MythSummary {
+export interface AttributionSummary {
   generated_at: string;
   event_type: string;
   ledger_size: number;
@@ -952,7 +952,7 @@ export interface WorldPresence {
   type: string;
 }
 
-export interface WorldPerson {
+export interface WorldActor {
   id: string;
   name: { en: string; ja: string };
   role: { en: string; ja: string };
@@ -964,7 +964,7 @@ export interface WorldPerson {
   hymn_bpm: number;
 }
 
-export interface WorldSong {
+export interface WorldTrack {
   id: string;
   leader: { en: string; ja: string };
   title: { en: string; ja: string };
@@ -972,7 +972,7 @@ export interface WorldSong {
   energy: number;
 }
 
-export interface WorldBook {
+export interface WorldReport {
   id: string;
   title: { en: string; ja: string };
   author: { en: string; ja: string };
@@ -984,9 +984,9 @@ export interface WorldSummary {
   generated_at: string;
   tick: number;
   presences: WorldPresence[];
-  people: WorldPerson[];
-  songs: WorldSong[];
-  books: WorldBook[];
+  people: WorldActor[];
+  songs: WorldTrack[];
+  books: WorldReport[];
   prayer_intensity: number;
 }
 
@@ -1079,9 +1079,9 @@ export interface SimulationState {
   logical_graph?: LogicalGraph;
   pain_field?: PainField;
   entities?: EntityState[];
-  echoes?: Echo[];
+  echoes?: TextOverlay[];
   presence_dynamics?: PresenceDynamics;
-  myth?: MythSummary;
+  myth?: AttributionSummary;
   world?: WorldSummary;
   projection?: UIProjectionBundle;
   perspective?: UIPerspective;
@@ -1255,7 +1255,7 @@ export interface PresenceImpact {
   notes_ja: string;
 }
 
-export interface ForkTaxState {
+export interface ForkCostState {
   law_en: string;
   law_ja: string;
   debt: number;
@@ -1264,7 +1264,7 @@ export interface ForkTaxState {
   paid_ratio: number;
 }
 
-export interface GhostRoleState {
+export interface AutoAgentState {
   id: string;
   en: string;
   ja: string;
@@ -1349,7 +1349,7 @@ export interface PresenceRuntimeSnapshot {
   fallback_reason?: string;
 }
 
-export interface MuseRuntimeMuseRow {
+export interface AgentRuntimeAgentRow {
   id: string;
   label: string;
   presence_type?: string;
@@ -1373,7 +1373,7 @@ export interface MuseRuntimeMuseRow {
   };
 }
 
-export interface MuseRuntimeSnapshot {
+export interface AgentRuntimeSnapshot {
   record: string;
   schema_version: string;
   enabled: boolean;
@@ -1381,10 +1381,10 @@ export interface MuseRuntimeSnapshot {
   generated_at: string;
   muse_count: number;
   event_seq: number;
-  muses: MuseRuntimeMuseRow[];
+  muses: AgentRuntimeAgentRow[];
 }
 
-export interface MuseEvent {
+export interface AgentEvent {
   record: string;
   schema_version: string;
   event_id: string;
@@ -1397,7 +1397,7 @@ export interface MuseEvent {
   payload?: Record<string, unknown>;
 }
 
-export interface DaimoiProbabilisticSummary {
+export interface ParticleProbabilisticSummary {
   record: string;
   schema_version: string;
   active: number;
@@ -1534,7 +1534,7 @@ export interface DaimoiProbabilisticSummary {
       tangent?: number;
     };
   };
-  resource_daimoi?: ResourceDaimoiSummary;
+  resource_particle?: ResourceParticleSummary;
   resource_consumption?: ResourceConsumptionSummary;
 }
 
@@ -1632,7 +1632,7 @@ export interface PresenceDynamics {
     y: number;
     count?: number;
   }>;
-  resource_daimoi?: ResourceDaimoiSummary;
+  resource_particle?: ResourceParticleSummary;
   resource_consumption?: ResourceConsumptionSummary;
   user_presence?: {
     id: string;
@@ -1675,13 +1675,13 @@ export interface PresenceDynamics {
     rate: number;
     turbulence: number;
   };
-  ghost: GhostRoleState;
-  fork_tax: ForkTaxState;
-  witness_thread?: WitnessThreadState;
+  ghost: AutoAgentState;
+  fork_tax: ForkCostState;
+  witness_thread?: ContinuityState;
   presence_impacts: PresenceImpact[];
   growth_guard?: SimulationGrowthGuard;
   daimoi_probabilistic_record?: string;
-  daimoi_probabilistic?: DaimoiProbabilisticSummary;
+  daimoi_probabilistic?: ParticleProbabilisticSummary;
   daimoi_behavior_defaults?: string[];
   user_query_transient_edges?: Array<Record<string, unknown>>;
   user_query_transient_edge_count?: number;
@@ -1690,7 +1690,7 @@ export interface PresenceDynamics {
   distributed_runtime?: PresenceRuntimeSnapshot;
 }
 
-export interface ResourceDaimoiSummary {
+export interface ResourceParticleSummary {
   record: string;
   schema_version: string;
   emitter_rows: number;
@@ -1754,14 +1754,14 @@ export interface NooiFieldGrid {
   cells: NooiFieldCell[];
 }
 
-export interface WitnessThreadLineageEntry {
+export interface ContinuityLineageEntry {
   kind: string;
   ref: string;
   why_en: string;
   why_ja: string;
 }
 
-export interface WitnessThreadState {
+export interface ContinuityState {
   id: string;
   en: string;
   ja: string;
@@ -1769,12 +1769,12 @@ export interface WitnessThreadState {
   click_pressure: number;
   file_pressure: number;
   linked_presences: string[];
-  lineage: WitnessThreadLineageEntry[];
+  lineage: ContinuityLineageEntry[];
   notes_en: string;
   notes_ja: string;
 }
 
-export interface WitnessLineageRepo {
+export interface ContinuityLineageRepo {
   available: boolean;
   root: string;
   branch: string;
@@ -1783,37 +1783,37 @@ export interface WitnessLineageRepo {
   remote_url: string;
 }
 
-export interface WitnessLineageCheckpoint {
+export interface ContinuityLineageCheckpoint {
   branch: string;
   upstream: string;
   ahead: number;
   behind: number;
 }
 
-export interface WitnessLineageWorkingTree {
+export interface ContinuityLineageWorkingTree {
   dirty: boolean;
   staged: number;
   unstaged: number;
   untracked: number;
 }
 
-export interface WitnessLineageDrift {
+export interface ContinuityLineageDrift {
   active: boolean;
   code: string;
   message: string;
 }
 
-export interface WitnessLineagePayload {
+export interface ContinuityLineagePayload {
   ok: boolean;
   record: string;
   generated_at: string;
-  repo: WitnessLineageRepo;
-  checkpoint: WitnessLineageCheckpoint;
-  working_tree: WitnessLineageWorkingTree;
+  repo: ContinuityLineageRepo;
+  checkpoint: ContinuityLineageCheckpoint;
+  working_tree: ContinuityLineageWorkingTree;
   latest_commit: string;
   push_obligation: boolean;
   push_obligation_unknown: boolean;
-  continuity_drift: WitnessLineageDrift;
+  continuity_drift: ContinuityLineageDrift;
 }
 
 export interface MixMeta {
@@ -2097,7 +2097,7 @@ export interface Catalog {
   }>;
   task_queue?: TaskQueueSnapshot;
   council?: CouncilSnapshot;
-  muse_runtime?: MuseRuntimeSnapshot;
+  muse_runtime?: AgentRuntimeSnapshot;
   presence_runtime?: {
     generated_at: string;
     clicks_45s: number;
@@ -2145,13 +2145,13 @@ export interface Catalog {
       warn_count: number;
     };
     resource_heartbeat?: ResourceHeartbeatSnapshot;
-    fork_tax?: ForkTaxState;
-    ghost?: GhostRoleState;
+    fork_tax?: ForkCostState;
+    ghost?: AutoAgentState;
   };
   items: CatalogItem[];
 }
 
-export type VoiceDeliveryMode = "whispered" | "spoken" | "canticle";
+export type VoiceDeliveryMode = "whispered" | "spoken" | "sustained";
 
 export interface InstrumentState {
   masterLevel: number;
@@ -2188,7 +2188,7 @@ export interface VoicePack {
   generated_at: string;
 }
 
-export interface MuseWorkspaceContext {
+export interface AgentWorkspaceContext {
   pinnedFileNodeIds: string[];
   searchQuery: string;
   pinnedNexusSummaries: string[];

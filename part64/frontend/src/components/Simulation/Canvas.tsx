@@ -19,7 +19,7 @@ interface Props {
     message?: string;
     xRatio?: number;
     yRatio?: number;
-    embedDaimoi?: boolean;
+    embedParticle?: boolean;
     meta?: Record<string, unknown>;
   }) => void;
   height?: number;
@@ -38,7 +38,7 @@ interface Props {
   backgroundWash?: number;
   layerVisibility?: OverlayLayerVisibility;
   glassCenterRatio?: { x: number; y: number };
-  museWorkspaceBindings?: Record<string, string[]>;
+  agentWorkspaceBindings?: Record<string, string[]>;
   className?: string;
   // Mouse daimon controls
   mouseDaimonEnabled?: boolean;
@@ -1812,11 +1812,11 @@ function resolveProjectionBundleManifest(node: any, fileGraph: any): { groupId: 
 function semanticWeightScaleForParticle(row: BackendFieldParticle): number {
   const textChars = Math.max(0, Number((row as any)?.semantic_text_chars ?? 0));
   const semanticMass = Math.max(0, Number((row as any)?.semantic_mass ?? row.mass ?? 0));
-  const daimoiEnergy = Math.max(0, Number((row as any)?.daimoi_energy ?? 0));
+  const particleEnergy = Math.max(0, Number((row as any)?.daimoi_energy ?? 0));
   const messageProbability = clamp01(Number((row as any)?.message_probability ?? 0));
   const packageEntropy = Math.max(0, Number((row as any)?.package_entropy ?? 0));
   const textTerm = Math.log1p(textChars) * 0.22;
-  const energyTerm = Math.log1p((daimoiEnergy * 2.2) + (messageProbability * 3.0)) * 0.28;
+  const energyTerm = Math.log1p((particleEnergy * 2.2) + (messageProbability * 3.0)) * 0.28;
   const entropyTerm = packageEntropy * 0.06;
   const massTerm = semanticMass * 0.12;
   const scale = 0.9 + textTerm + energyTerm + entropyTerm + massTerm;
@@ -2174,7 +2174,7 @@ interface OverlayParticleFlags {
   isChaosParticle: boolean;
   isStaticParticle: boolean;
   isNexusParticle: boolean;
-  isSmartDaimoi: boolean;
+  isSmartParticle: boolean;
   isResourceEmitter: boolean;
   isTransferParticle: boolean;
   routeNodeId: string;
@@ -2194,8 +2194,8 @@ function resolveOverlayParticleFlags(row: BackendFieldParticle): OverlayParticle
   const isChaosParticle = particleMode === "chaos-butterfly";
   const isStaticParticle = particleMode === "static-daimoi";
   const isNexusParticle = Boolean((row as any)?.is_nexus) || isStaticParticle || presenceRole === "nexus-passive";
-  const isSmartDaimoi = !isNexusParticle;
-  const isResourceEmitter = Boolean((row as any)?.resource_daimoi) || topJob === "emit_resource_packet";
+  const isSmartParticle = !isNexusParticle;
+  const isResourceEmitter = Boolean((row as any)?.resource_particle) || topJob === "emit_resource_packet";
   const isTransferParticle = (
     routeNodeId.length > 0
     && graphNodeId.length > 0
@@ -2207,7 +2207,7 @@ function resolveOverlayParticleFlags(row: BackendFieldParticle): OverlayParticle
     isChaosParticle,
     isStaticParticle,
     isNexusParticle,
-    isSmartDaimoi,
+    isSmartParticle,
     isResourceEmitter,
     isTransferParticle,
     routeNodeId,
@@ -2237,7 +2237,7 @@ export function SimulationCanvas({
   backgroundWash = 0.58,
   layerVisibility,
   glassCenterRatio = { x: 0.5, y: 0.5 },
-  museWorkspaceBindings = {},
+  agentWorkspaceBindings = {},
   className = "",
   mouseDaimonEnabled = true,
   mouseDaimonMessage = "witness",
@@ -2251,8 +2251,8 @@ export function SimulationCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const simulationRef = useRef<SimulationState | null>(simulation);
   const catalogRef = useRef<Catalog | null>(catalog);
-  const museWorkspaceBindingsRef = useRef<Record<string, string[]>>(
-    normalizeWorkspaceBindingMap(museWorkspaceBindings),
+  const agentWorkspaceBindingsRef = useRef<Record<string, string[]>>(
+    normalizeWorkspaceBindingMap(agentWorkspaceBindings),
   );
   const particleDensityRef = useRef(clampValue(particleDensity, 0.08, 1));
   const particleScaleRef = useRef(clampValue(particleScale, 0.5, 1.9));
@@ -2670,8 +2670,8 @@ export function SimulationCanvas({
   }, [catalog]);
 
   useEffect(() => {
-    museWorkspaceBindingsRef.current = normalizeWorkspaceBindingMap(museWorkspaceBindings);
-  }, [museWorkspaceBindings]);
+    agentWorkspaceBindingsRef.current = normalizeWorkspaceBindingMap(agentWorkspaceBindings);
+  }, [agentWorkspaceBindings]);
 
   useEffect(() => {
     particleDensityRef.current = clampValue(particleDensity, 0.08, 1);
@@ -3780,7 +3780,7 @@ export function SimulationCanvas({
       const probabilisticSummary = state.presence_dynamics?.daimoi_probabilistic;
       const graphRuntimeSummary = probabilisticSummary?.graph_runtime;
       const nooiField = state.presence_dynamics?.nooi_field;
-      const resourceDaimoiSummary = state.presence_dynamics?.resource_daimoi ?? probabilisticSummary?.resource_daimoi;
+      const resourceParticleSummary = state.presence_dynamics?.resource_particle ?? probabilisticSummary?.resource_particle;
       const resourceConsumptionSummary = state.presence_dynamics?.resource_consumption ?? probabilisticSummary?.resource_consumption;
       const routeMean = Number(probabilisticSummary?.mean_route_probability ?? Number.NaN);
       const driftMean = Number(probabilisticSummary?.mean_drift_score ?? Number.NaN);
@@ -3788,8 +3788,8 @@ export function SimulationCanvas({
       const priceMean = Number(graphRuntimeSummary?.price_mean ?? Number.NaN);
       const nooiCells = Number(nooiField?.active_cells ?? Number.NaN);
       const nooiInfluenceMean = Number(nooiField?.mean_influence ?? Number.NaN);
-      const resourcePackets = Number(resourceDaimoiSummary?.delivered_packets ?? Number.NaN);
-      const resourceTransfer = Number(resourceDaimoiSummary?.total_transfer ?? Number.NaN);
+      const resourcePackets = Number(resourceParticleSummary?.delivered_packets ?? Number.NaN);
+      const resourceTransfer = Number(resourceParticleSummary?.total_transfer ?? Number.NaN);
       const resourceConsumed = Number(resourceConsumptionSummary?.consumed_total ?? Number.NaN);
       const resourceBlocked = Number(resourceConsumptionSummary?.blocked_packets ?? Number.NaN);
       const resourceStarved = Number.isFinite(resourceBlocked)
@@ -4266,7 +4266,7 @@ export function SimulationCanvas({
         webNodeRole?: GraphWebNodeRole;
       }
     >();
-    const daimoiFlowLanes = new Map<
+    const particleFlowLanes = new Map<
       string,
       {
         sourceX: number;
@@ -4675,7 +4675,7 @@ export function SimulationCanvas({
       namedFormRows.length = 0;
       hotspots.length = 0;
       graphNodeLookup.clear();
-      daimoiFlowLanes.clear();
+      particleFlowLanes.clear();
 
       const addPoint = (
         xRatio: number,
@@ -5172,28 +5172,28 @@ export function SimulationCanvas({
       const crawlerEdges = showCrawlerGraphLayer && Array.isArray(crawlerGraph?.edges) ? crawlerGraph.edges : [];
       const maxEdgeCount = isLowPowerOverlay ? 1200 : 3200;
 
-      const daimoiCounts: Record<string, number> = {};
-      let totalResourceDaimoi = 0;
-      const daimoiStride = isLowPowerOverlay
+      const particleCounts: Record<string, number> = {};
+      let totalResourceParticle = 0;
+      const particleStride = isLowPowerOverlay
         ? Math.max(1, Math.ceil(allFieldParticles.length / 960))
         : 1;
-      for (let i = 0; i < allFieldParticles.length; i += daimoiStride) {
+      for (let i = 0; i < allFieldParticles.length; i += particleStride) {
         const row = allFieldParticles[i] as any;
-        if (row.resource_daimoi) {
+        if (row.resource_particle) {
           const type = String(row.resource_type ?? "cpu");
-          daimoiCounts[type] = (daimoiCounts[type] ?? 0) + 1;
-          totalResourceDaimoi += daimoiStride;
+          particleCounts[type] = (particleCounts[type] ?? 0) + 1;
+          totalResourceParticle += particleStride;
         }
       }
-      let dominantDaimoiType = "cpu";
+      let dominantParticleType = "cpu";
       let maxCount = -1;
-      Object.entries(daimoiCounts).forEach(([type, count]) => {
+      Object.entries(particleCounts).forEach(([type, count]) => {
         if (count > maxCount) {
           maxCount = count;
-          dominantDaimoiType = type;
+          dominantParticleType = type;
         }
       });
-      const getDaimoiColor = (type: string): [number, number, number] => {
+      const getParticleColor = (type: string): [number, number, number] => {
         switch (type) {
           case "cpu": return [1.0, 0.55, 0.2];
           case "ram": return [0.2, 0.8, 1.0];
@@ -5203,10 +5203,10 @@ export function SimulationCanvas({
           default: return [0.7, 0.7, 0.7];
         }
       };
-      const [dr, dg, db] = getDaimoiColor(dominantDaimoiType);
+      const [dr, dg, db] = getParticleColor(dominantParticleType);
       const strobePhase = (ts * 0.004);
       const strobe = (Math.sin(strobePhase) * 0.5) + 0.5;
-      const flowIntensity = Math.min(1.0, totalResourceDaimoi / 20.0);
+      const flowIntensity = Math.min(1.0, totalResourceParticle / 20.0);
 
       let renderedEdgeCount = 0;
       const drawEdgeRows = (edges: any[]) => {
@@ -5525,15 +5525,15 @@ export function SimulationCanvas({
                 row?.resource_type
                   ?? row?.resource_consume_type
                   ?? row?.route_resource_focus
-                  ?? dominantDaimoiType,
-              ).trim().toLowerCase() || dominantDaimoiType;
-              const existingLane = daimoiFlowLanes.get(laneKey);
+                  ?? dominantParticleType,
+              ).trim().toLowerCase() || dominantParticleType;
+              const existingLane = particleFlowLanes.get(laneKey);
               if (existingLane) {
                 existingLane.count += 1;
                 existingLane.score += laneWeight;
                 existingLane.resourceTypeCounts[resourceType] = (existingLane.resourceTypeCounts[resourceType] ?? 0) + 1;
               } else {
-                daimoiFlowLanes.set(laneKey, {
+                particleFlowLanes.set(laneKey, {
                   sourceX: source.x,
                   sourceY: source.y,
                   targetX: target.x,
@@ -5575,9 +5575,9 @@ export function SimulationCanvas({
         }
       }
 
-      if (daimoiFlowLanes.size > 0) {
+      if (particleFlowLanes.size > 0) {
         activeFlowLaneRows.length = 0;
-        for (const lane of daimoiFlowLanes.values()) {
+        for (const lane of particleFlowLanes.values()) {
           activeFlowLaneRows.push(lane);
         }
         activeFlowLaneRows.sort((left, right) => right.score - left.score);
@@ -5588,7 +5588,7 @@ export function SimulationCanvas({
           const normalizedCount = clamp01(lane.count / 6);
           const normalizedActivity = clamp01((lane.score / Math.max(1, lane.count)) * 0.9);
           const throughput = clamp01((normalizedCount * 0.72) + (normalizedActivity * 0.28));
-          let dominantLaneResourceType = dominantDaimoiType;
+          let dominantLaneResourceType = dominantParticleType;
           let dominantLaneResourceCount = -1;
           Object.entries(lane.resourceTypeCounts).forEach(([type, count]) => {
             const numericCount = Number(count);
@@ -5597,7 +5597,7 @@ export function SimulationCanvas({
               dominantLaneResourceCount = numericCount;
             }
           });
-          const [laneR, laneG, laneB] = getDaimoiColor(dominantLaneResourceType);
+          const [laneR, laneG, laneB] = getParticleColor(dominantLaneResourceType);
           const streamR = clamp01((laneR * 0.72) + 0.24);
           const streamG = clamp01((laneG * 0.72) + 0.24);
           const streamB = clamp01((laneB * 0.72) + 0.24);
@@ -5928,7 +5928,7 @@ export function SimulationCanvas({
           message: `click graph node ${hit.id}`,
           xRatio: nodeXRatio,
           yRatio: nodeYRatio,
-          embedDaimoi: true,
+          embedParticle: true,
           meta: {
             source: "simulation-canvas",
             nodeKind: hit.nodeKind,
@@ -5959,7 +5959,7 @@ export function SimulationCanvas({
         message: `click simulation field ${target}`,
         xRatio: clickXRatio,
         yRatio: clickYRatio,
-        embedDaimoi: true,
+        embedParticle: true,
         meta: {
           source: "simulation-canvas",
           renderer: "webgl",
@@ -6076,7 +6076,7 @@ export function SimulationCanvas({
           message: "mouse move in simulation",
           xRatio: pointerField.x,
           yRatio: pointerField.y,
-          embedDaimoi: false,
+          embedParticle: false,
           meta: {
             source: "simulation-canvas",
             renderer: "webgl",
@@ -6247,7 +6247,7 @@ export function SimulationCanvas({
     }
     const dynamics = simulation?.presence_dynamics;
     const probabilistic = dynamics?.daimoi_probabilistic;
-    const resourceSummary = dynamics?.resource_daimoi ?? probabilistic?.resource_daimoi;
+    const resourceSummary = dynamics?.resource_particle ?? probabilistic?.resource_particle;
     const consumptionSummary = dynamics?.resource_consumption ?? probabilistic?.resource_consumption;
     const packets = Math.max(0, Number(resourceSummary?.delivered_packets ?? 0));
     const transfer = Math.max(0, Number(resourceSummary?.total_transfer ?? 0));
@@ -6420,7 +6420,7 @@ export function SimulationCanvas({
         isChaosParticle,
         isStaticParticle,
         isNexusParticle,
-        isSmartDaimoi,
+        isSmartParticle,
         isResourceEmitter,
         isTransferParticle,
       } = resolveOverlayParticleFlags(row);
@@ -6440,7 +6440,7 @@ export function SimulationCanvas({
         primary.resource += 1;
       } else if (isTransferParticle) {
         primary.transfer += 1;
-      } else if (isSmartDaimoi) {
+      } else if (isSmartParticle) {
         primary.smart += 1;
       } else {
         primary.legacy += 1;
@@ -6799,15 +6799,15 @@ export function SimulationCanvas({
               <p><span className="text-[#ffa8e8]">✦</span> chaos butterflies ({particleLegendStats.primary.chaos})</p>
               <p><span className="text-[#cce4ff]">◆</span> nexus particles (passive) ({particleLegendStats.primary.nexus})</p>
               <p><span className="text-[#ffdba1]">●</span> resource emitters / packets ({particleLegendStats.primary.resource})</p>
-              <p><span className="text-[#7fe8ff]">●</span> transfer daimoi ({particleLegendStats.primary.transfer})</p>
-              <p><span className="text-[#87b9df]">·</span> smart daimoi ({particleLegendStats.primary.smart}) · legacy points ({particleLegendStats.primary.legacy})</p>
+              <p><span className="text-[#7fe8ff]">●</span> transfer particles ({particleLegendStats.primary.transfer})</p>
+              <p><span className="text-[#87b9df]">·</span> smart particles ({particleLegendStats.primary.smart}) · legacy points ({particleLegendStats.primary.legacy})</p>
               <p className="mt-1 text-[#9ecbe8]">
                 stream signals: transfer ({particleLegendStats.overlays.transfer}) · resource ({particleLegendStats.overlays.resource})
               </p>
-              <p className="text-[#9ecbe8]">ghost trails: smart daimoi keep short path memory for easier tracing.</p>
+              <p className="text-[#9ecbe8]">ghost trails: smart particles keep short path memory for easier tracing.</p>
               <p className="text-[#9ecbe8]">flow lanes: backend simulation drives nexus routing telemetry.</p>
               <p className="text-[#9ecbe8]">all nexus node movement now comes from backend simulation deltas.</p>
-              <p className="text-[#9ecbe8]">graph view: daimoi flow is shown as lane lines + pulses + arrowheads from backend state.</p>
+              <p className="text-[#9ecbe8]">graph view: particle flow is shown as lane lines + pulses + arrowheads from backend state.</p>
               <p className="mt-1 text-[#ffd7aa]">
                 economy: packets {resourceEconomyHud.packets} · actions {resourceEconomyHud.actionPackets} · blocked {resourceEconomyHud.blockedPackets}
               </p>

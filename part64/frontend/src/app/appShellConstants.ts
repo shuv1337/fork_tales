@@ -26,16 +26,16 @@ export const PANEL_TOOL_HINTS: Record<string, string[]> = {
   "nexus.ui.world_log": ["receipts", "events", "review"],
   "nexus.ui.stability_observatory": ["study", "drift", "council"],
   "nexus.ui.runtime_config": ["config", "constants", "tuning"],
-  "nexus.ui.daimoi_presence": ["daimoi", "presence", "focus"],
+  "nexus.ui.particle_deck": ["particles", "presence", "focus"],
   "nexus.ui.omni_archive": ["catalog", "memories", "artifacts"],
-  "nexus.ui.myth_commons": ["interact", "pray", "speak"],
+  "nexus.ui.world_simulation": ["interact", "boost", "speak"],
   "nexus.ui.dedicated_views": ["overlay", "focus", "monitor"],
   "nexus.ui.glass_viewport": ["glass", "camera", "pan"],
 };
 
 export const COUNCIL_BOOST_STORAGE_KEY = "eta_mu.council_boosts.v1";
 export const TERTIARY_PIN_STORAGE_KEY = "eta_mu.tertiary_pin.v1";
-export const MUSE_WORKSPACE_STORAGE_KEY = "eta_mu.muse_workspace.v1";
+export const AGENT_WORKSPACE_STORAGE_KEY = "eta_mu.agent_workspace.v1";
 export const INTERFACE_OPACITY_STORAGE_KEY = "eta_mu.interface_opacity.v2";
 export const GLASS_VIEWPORT_PANEL_ID = "nexus.ui.glass_viewport";
 export const RUNTIME_CONFIG_PANEL_ID = "nexus.ui.runtime_config";
@@ -44,7 +44,7 @@ export const INTERFACE_OPACITY_MAX = 1;
 export const DEFAULT_INTERFACE_TRANSPARENCY_PERCENT = 0;
 export const DEFAULT_INTERFACE_OPACITY = 1 - (DEFAULT_INTERFACE_TRANSPARENCY_PERCENT / 100);
 
-export const FIXED_MUSE_PRESENCES = [
+export const FIXED_AGENT_PRESENCES = [
   {
     id: "nexus.ui.chat.witness_thread",
     presenceId: "witness_thread",

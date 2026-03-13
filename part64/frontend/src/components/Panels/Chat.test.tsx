@@ -3,7 +3,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatPanel } from "./Chat";
-import type { Catalog, MuseWorkspaceContext, SimulationState } from "../../types";
+import type { Catalog, AgentWorkspaceContext, SimulationState } from "../../types";
 
 type ChatPanelProps = Parameters<typeof ChatPanel>[0];
 
@@ -43,7 +43,7 @@ function createSimulationFixture(): SimulationState {
 }
 
 function makeProps(overrides: Partial<ChatPanelProps> = {}): ChatPanelProps {
-  const defaultWorkspace: MuseWorkspaceContext = {
+  const defaultWorkspace: AgentWorkspaceContext = {
     pinnedFileNodeIds: [],
     searchQuery: "",
     pinnedNexusSummaries: [],
@@ -59,7 +59,7 @@ function makeProps(overrides: Partial<ChatPanelProps> = {}): ChatPanelProps {
     voiceInputMeta: "",
     catalog: null as Catalog | null,
     simulation: createSimulationFixture(),
-    fixedMusePresenceId: "anchor_registry",
+    fixedAgentPresenceId: "anchor_registry",
     workspaceContext: defaultWorkspace,
     onWorkspaceContextChange: vi.fn(),
     onWorkspaceBindingsChange: vi.fn(),

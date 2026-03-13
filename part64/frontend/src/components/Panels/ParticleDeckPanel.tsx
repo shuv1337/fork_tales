@@ -10,7 +10,7 @@ interface Props {
     kind: string;
     target: string;
     message?: string;
-    embedDaimoi?: boolean;
+    embedParticle?: boolean;
     meta?: Record<string, unknown>;
   }) => void;
 }
@@ -138,7 +138,7 @@ function normalizeQueryEdgeRows(payload: unknown): QueryEdgeEntry[] {
   return rows.slice(0, 12);
 }
 
-export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmitUserInput }: Props) {
+export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUserInput }: Props) {
   const [lastFocusLabel, setLastFocusLabel] = useState("");
   const [queryDraft, setQueryDraft] = useState("");
   const [queryTarget, setQueryTarget] = useState("nexus");
@@ -246,7 +246,7 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
       .slice(0, 10);
   }, [fieldRows, presenceMeta]);
 
-  const globalSummary = simulation?.presence_dynamics?.daimoi_probabilistic;
+  const globalSummary = simulation?.presence_dynamics?.daimoi_probabilistic; // field name from backend wire format
   const antiClumpSummary = globalSummary?.anti_clump;
   const antiClumpMetrics = antiClumpSummary?.metrics;
   const antiClumpScales = antiClumpSummary?.scales;
@@ -291,7 +291,7 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
     };
   }, [globalSummary?.deflects, globalSummary?.diffuses, globalSummary?.handoffs, globalSummary?.deliveries]);
 
-  const highlightedDaimoi = useMemo(() => {
+  const highlightedParticles = useMemo(() => {
     return fieldRows
       .map((row) => ({
         id: String(row.id ?? "").trim(),
@@ -326,9 +326,9 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
       kind: "search_query",
       target: queryTarget.trim() || "nexus",
       message: query,
-      embedDaimoi: true,
+      embedParticle: true,
       meta: {
-        source: "daimoi-presence-panel",
+        source: "particle-deck-panel",
         query,
       },
     });
@@ -343,7 +343,7 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-2 md:grid-cols-6">
         <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">active daimoi</p>
+          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">active particles</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{Number(globalSummary?.active ?? fieldRows.length)}</p>
         </div>
         <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
@@ -440,7 +440,7 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
       ) : null}
 
       <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.56)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Search Daimoi Emitter</p>
+        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Search Particle Emitter</p>
         <div className="mt-2 grid gap-2 md:grid-cols-[1.2fr_0.8fr_auto]">
           <input
             type="text"
@@ -452,7 +452,7 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
                 submitSearchQuery();
               }
             }}
-            placeholder="search query -> emits query daimoi + variants"
+            placeholder="search query -> emits query particles + variants"
             className="rounded-md border border-[rgba(124,190,228,0.32)] bg-[rgba(10,24,35,0.72)] px-2 py-1.5 text-xs text-[#e6f5ff] outline-none placeholder:text-[#87adc5]"
           />
           <input
@@ -600,11 +600,11 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
       </section>
 
       <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.5)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Daimoi highlights (click to zoom)</p>
+        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Particle highlights (click to zoom)</p>
         <div className="mt-2 grid gap-1.5 md:grid-cols-2">
-          {highlightedDaimoi.length === 0 ? (
-            <p className="text-xs text-[#9fc4dd]">No daimoi highlights available.</p>
-          ) : highlightedDaimoi.map((row) => (
+          {highlightedParticles.length === 0 ? (
+            <p className="text-xs text-[#9fc4dd]">No particle highlights available.</p>
+          ) : highlightedParticles.map((row) => (
             <button
               key={row.id}
               type="button"
@@ -620,7 +620,7 @@ export function DaimoiPresencePanel({ catalog, simulation, onFocusAnchor, onEmit
                   confidence: 0.74,
                   presenceSignature: { [row.presenceId]: 1 },
                 },
-                `daimoi ${row.id}`,
+                `particle ${row.id}`,
               )}
               className="rounded-md border border-[rgba(124,190,228,0.26)] bg-[rgba(11,26,36,0.58)] px-2 py-1.5 text-left hover:border-[rgba(143,224,255,0.52)]"
             >

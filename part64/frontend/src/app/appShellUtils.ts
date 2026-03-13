@@ -108,7 +108,7 @@ export function stableUnitHash(seed: string): number {
   return (hash >>> 0) / 4294967295;
 }
 
-export function toMuseSlug(raw: string): string {
+export function toAgentSlug(raw: string): string {
   const cleaned = String(raw || "")
     .trim()
     .toLowerCase()
@@ -120,7 +120,7 @@ export function toMuseSlug(raw: string): string {
     return "";
   }
   if (/^[0-9]/.test(cleaned)) {
-    return `muse_${cleaned}`;
+    return `agent_${cleaned}`;
   }
   return cleaned;
 }

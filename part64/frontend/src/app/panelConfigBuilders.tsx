@@ -1,15 +1,15 @@
 import { type ReactNode, Suspense, lazy } from "react";
 
-import { MusePresencePanel } from "../components/Panels/MusePresencePanel";
+import { AgentPresencePanel } from "../components/Panels/AgentPresencePanel";
 import { ProjectionLedgerPanel } from "../components/Panels/ProjectionLedgerPanel";
 import {
   OVERLAY_VIEW_OPTIONS,
   SimulationCanvas,
 } from "../components/Simulation/Canvas";
-import { FIXED_MUSE_PRESENCES, GLASS_VIEWPORT_PANEL_ID } from "./appShellConstants";
+import { FIXED_AGENT_PRESENCES, GLASS_VIEWPORT_PANEL_ID } from "./appShellConstants";
 import { type UseAppPanelConfigsArgs } from "./appPanelConfigTypes";
 import { projectionOpacity } from "./appShellUtils";
-import { normalizeMusePresenceId } from "./museWorkspace";
+import { normalizeAgentPresenceId } from "./agentWorkspace";
 import { type PanelConfig } from "./worldPanelLayout";
 
 const VitalsPanel = lazy(() =>
@@ -21,8 +21,8 @@ const CatalogPanel = lazy(() =>
 const OmniPanel = lazy(() =>
   import("../components/Panels/Omni").then((module) => ({ default: module.OmniPanel })),
 );
-const MythWorldPanel = lazy(() =>
-  import("../components/Panels/MythWorld").then((module) => ({ default: module.MythWorldPanel })),
+const WorldSimulationPanel = lazy(() =>
+  import("../components/Panels/WorldSimulation").then((module) => ({ default: module.WorldSimulationPanel })),
 );
 const WebGraphWeaverPanel = lazy(() =>
   import("../components/Panels/WebGraphWeaverPanel").then((module) => ({
@@ -49,9 +49,9 @@ const RuntimeConfigPanel = lazy(() =>
     default: module.RuntimeConfigPanel,
   })),
 );
-const DaimoiPresencePanel = lazy(() =>
-  import("../components/Panels/DaimoiPresencePanel").then((module) => ({
-    default: module.DaimoiPresencePanel,
+const ParticleDeckPanel = lazy(() =>
+  import("../components/Panels/ParticleDeckPanel").then((module) => ({
+    default: module.ParticleDeckPanel,
   })),
 );
 const WorldLogPanel = lazy(() =>
@@ -114,7 +114,7 @@ function buildDedicatedViewsPanel(args: BuildPanelConfigsArgs): PanelConfig {
                 layerDepth={args.deferredCoreSimulationTuning.layerDepth}
                 graphNodeSmoothness={args.deferredCoreSimulationTuning.graphNodeSmoothness}
                 graphNodeStepScale={args.deferredCoreSimulationTuning.graphNodeStepScale}
-                museWorkspaceBindings={args.museWorkspaceBindings}
+                agentWorkspaceBindings={args.agentWorkspaceBindings}
               />
             </section>
           ))}
@@ -146,24 +146,24 @@ function buildGlassViewportPanel(): PanelConfig {
   };
 }
 
-function buildMusePresencePanels(args: BuildPanelConfigsArgs): PanelConfig[] {
-  return FIXED_MUSE_PRESENCES.map((muse) => {
+function buildAgentPresencePanels(args: BuildPanelConfigsArgs): PanelConfig[] {
+  return FIXED_AGENT_PRESENCES.map((muse) => {
     const panelId = muse.id;
-    const musePresenceId = muse.presenceId;
+    const agentPresenceId = muse.presenceId;
     const panelState = args.projectionStateByElement.get(panelId) ?? null;
     const panelSession =
       args.activeProjection?.chat_sessions?.find(
-        (session) => normalizeMusePresenceId(String(session.presence ?? "")) === normalizeMusePresenceId(musePresenceId),
+        (session) => normalizeAgentPresenceId(String(session.presence ?? "")) === normalizeAgentPresenceId(agentPresenceId),
       )
       ?? null;
-    const bindingKey = normalizeMusePresenceId(musePresenceId);
-    const boundCount = args.museWorkspaceBindings[bindingKey]?.length ?? 0;
+    const bindingKey = normalizeAgentPresenceId(agentPresenceId);
+    const boundCount = args.agentWorkspaceBindings[bindingKey]?.length ?? 0;
 
     return {
       id: panelId,
       fallbackSpan: 4,
       anchorKind: "node" as const,
-      anchorId: musePresenceId,
+      anchorId: agentPresenceId,
       worldSize: "m" as const,
       render: () => (
         <div
@@ -176,9 +176,9 @@ function buildMusePresencePanels(args: BuildPanelConfigsArgs): PanelConfig[] {
             transition: "transform 200ms ease, opacity 200ms ease",
           }}
         >
-          <MusePresencePanel
-            museId={musePresenceId}
-            onSend={args.handleMuseWorkspaceSend}
+          <AgentPresencePanel
+            agentId={agentPresenceId}
+            onSend={args.handleAgentWorkspaceSend}
             onRecord={args.handleRecord}
             onTranscribe={args.handleTranscribe}
             onSendVoice={args.handleSendVoice}
@@ -187,13 +187,13 @@ function buildMusePresencePanels(args: BuildPanelConfigsArgs): PanelConfig[] {
             voiceInputMeta={args.voiceInputMeta}
             catalog={args.catalog}
             simulation={args.simulation}
-            workspaceContext={args.museWorkspaceContexts[bindingKey] ?? null}
-            onWorkspaceContextChange={args.handleMuseWorkspaceContextChange}
-            onWorkspaceBindingsChange={args.handleMuseWorkspaceBindingsChange}
+            workspaceContext={args.agentWorkspaceContexts[bindingKey] ?? null}
+            onWorkspaceContextChange={args.handleAgentWorkspaceContextChange}
+            onWorkspaceBindingsChange={args.handleAgentWorkspaceBindingsChange}
             chatLensState={panelState}
             activeChatSession={panelSession}
-            activeMusePresenceId={args.activeMusePresenceId}
-            onMusePresenceChange={args.setActiveMusePresenceId}
+            activeAgentPresenceId={args.activeAgentPresenceId}
+            onAgentPresenceChange={args.setActiveAgentPresenceId}
           />
           <p className="mt-2 text-[10px] text-[#8db3ca]">
             workspace binds <code>{boundCount}</code>
@@ -378,22 +378,22 @@ function buildRuntimeConfigPanel(args: BuildPanelConfigsArgs): PanelConfig {
   };
 }
 
-function buildDaimoiPresencePanel(args: BuildPanelConfigsArgs): PanelConfig {
+function buildParticleDeckPanel(args: BuildPanelConfigsArgs): PanelConfig {
   return {
-    id: "nexus.ui.daimoi_presence",
+    id: "nexus.ui.particle_deck",
     fallbackSpan: 6,
     className: "card relative overflow-hidden",
     render: () => (
       <>
         <div className="absolute top-0 left-0 w-1 h-full bg-[#89c6eb] opacity-70" />
-        <h2 className="text-2xl font-bold mb-2">Daimoi Presence Deck / 代網存在甲板</h2>
+        <h2 className="text-2xl font-bold mb-2">Particle Deck / 代網存在甲板</h2>
         <p className="text-muted mb-4">
-          Probabilistic daimoi and presence distributions with direct camera focus controls.
+          Probabilistic particle and presence distributions with direct camera focus controls.
         </p>
         {renderDeferredPanel(
           args.deferredPanelsReady,
-          "Daimoi Presence",
-          <DaimoiPresencePanel
+          "Particle Deck",
+          <ParticleDeckPanel
             catalog={args.catalog}
             simulation={args.simulation}
             onFocusAnchor={args.flyCameraToAnchor}
@@ -425,9 +425,9 @@ function buildOmniArchivePanel(args: BuildPanelConfigsArgs): PanelConfig {
   };
 }
 
-function buildMythCommonsPanel(args: BuildPanelConfigsArgs): PanelConfig {
+function buildWorldSimulationPanel(args: BuildPanelConfigsArgs): PanelConfig {
   return {
-    id: "nexus.ui.myth_commons",
+    id: "nexus.ui.world_simulation",
     fallbackSpan: 4,
     className: "card relative overflow-hidden",
     render: () => (
@@ -438,7 +438,7 @@ function buildMythCommonsPanel(args: BuildPanelConfigsArgs): PanelConfig {
         {renderDeferredPanel(
           args.deferredPanelsReady,
           "Myth Commons",
-          <MythWorldPanel
+          <WorldSimulationPanel
             simulation={args.simulation}
             interaction={args.worldInteraction}
             interactingPersonId={args.interactingPersonId}
@@ -454,7 +454,7 @@ export function buildPanelConfigs(args: BuildPanelConfigsArgs): PanelConfig[] {
   return [
     buildDedicatedViewsPanel(args),
     buildGlassViewportPanel(),
-    ...buildMusePresencePanels(args),
+    ...buildAgentPresencePanels(args),
     buildWebGraphWeaverPanel(args),
     buildThreatRadarPanel(args),
     buildInspirationAtlasPanel(args),
@@ -464,8 +464,8 @@ export function buildPanelConfigs(args: BuildPanelConfigsArgs): PanelConfig[] {
     buildWorldLogPanel(args),
     buildStabilityObservatoryPanel(args),
     buildRuntimeConfigPanel(args),
-    buildDaimoiPresencePanel(args),
+    buildParticleDeckPanel(args),
     buildOmniArchivePanel(args),
-    buildMythCommonsPanel(args),
+    buildWorldSimulationPanel(args),
   ];
 }

@@ -3,7 +3,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { DaimoiPresencePanel } from "./DaimoiPresencePanel";
+import { ParticleDeckPanel } from "./ParticleDeckPanel";
 import type { Catalog, SimulationState } from "../../types";
 
 function createCatalogFixture(): Catalog {
@@ -103,10 +103,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("DaimoiPresencePanel", () => {
+describe("ParticleDeckPanel", () => {
   it("renders waiting state when simulation is missing", () => {
     render(
-      <DaimoiPresencePanel
+      <ParticleDeckPanel
         catalog={null}
         simulation={null}
         onFocusAnchor={vi.fn()}
@@ -119,7 +119,7 @@ describe("DaimoiPresencePanel", () => {
 
   it("renders anti-clump, edge, and presence summaries", async () => {
     render(
-      <DaimoiPresencePanel
+      <ParticleDeckPanel
         catalog={createCatalogFixture()}
         simulation={createSimulationFixture()}
         onFocusAnchor={vi.fn()}
@@ -145,7 +145,7 @@ describe("DaimoiPresencePanel", () => {
     const onEmitUserInput = vi.fn();
 
     render(
-      <DaimoiPresencePanel
+      <ParticleDeckPanel
         catalog={createCatalogFixture()}
         simulation={createSimulationFixture()}
         onFocusAnchor={onFocusAnchor}
@@ -156,7 +156,7 @@ describe("DaimoiPresencePanel", () => {
     fireEvent.click(screen.getByText("emit"));
     expect(screen.getByText("Type a query first.")).toBeTruthy();
 
-    fireEvent.change(screen.getByPlaceholderText("search query -> emits query daimoi + variants"), {
+    fireEvent.change(screen.getByPlaceholderText("search query -> emits query particles + variants"), {
       target: { value: "trace anomaly" },
     });
     fireEvent.change(screen.getByPlaceholderText("target: nexus or presence_id"), {
@@ -171,7 +171,7 @@ describe("DaimoiPresencePanel", () => {
           kind: "search_query",
           target: "gates_of_truth",
           message: "trace anomaly",
-          embedDaimoi: true,
+          embedParticle: true,
         }),
       );
       expect(screen.getByText("Query emitted: trace anomaly")).toBeTruthy();
@@ -193,12 +193,12 @@ describe("DaimoiPresencePanel", () => {
       expect(screen.getByText("presence Witness Thread")).toBeTruthy();
     });
 
-    const daimoiLabel = screen.getAllByText("daimoi-1").find((element) => element.closest("button"));
-    const daimoiButton = daimoiLabel?.closest("button");
-    if (!(daimoiButton instanceof HTMLButtonElement)) {
-      throw new Error("daimoi focus button not found");
+    const particleLabel = screen.getAllByText("daimoi-1").find((element) => element.closest("button"));
+    const particleButton = particleLabel?.closest("button");
+    if (!(particleButton instanceof HTMLButtonElement)) {
+      throw new Error("particle focus button not found");
     }
-    fireEvent.click(daimoiButton);
+    fireEvent.click(particleButton);
 
     await waitFor(() => {
       const lastCallArg = onFocusAnchor.mock.calls.at(-1)?.[0];
@@ -206,7 +206,7 @@ describe("DaimoiPresencePanel", () => {
         kind: "node",
         id: "daimoi-1",
       });
-      expect(screen.getByText("daimoi daimoi-1")).toBeTruthy();
+      expect(screen.getByText("particle daimoi-1")).toBeTruthy();
     });
   });
 });

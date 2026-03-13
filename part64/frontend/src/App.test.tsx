@@ -7,7 +7,7 @@ import App from "./App";
 import {
   COUNCIL_BOOST_STORAGE_KEY,
   INTERFACE_OPACITY_STORAGE_KEY,
-  MUSE_WORKSPACE_STORAGE_KEY,
+  AGENT_WORKSPACE_STORAGE_KEY,
   TERTIARY_PIN_STORAGE_KEY,
 } from "./app/appShellConstants";
 import type { Catalog, SimulationState } from "./types";
@@ -103,7 +103,7 @@ vi.mock("./components/App/CoreBackdrop", () => {
               message: "mock click",
               xRatio: 0.55,
               yRatio: 0.62,
-              embedDaimoi: true,
+              embedParticle: true,
             });
           }}
         >
@@ -279,7 +279,7 @@ beforeEach(() => {
     catalog: createCatalogFixture(),
     simulation: createSimulationFixture(),
     projection: null,
-    museEvents: [],
+    agentEvents: [],
     isConnected: true,
   });
 
@@ -384,7 +384,7 @@ describe("App", () => {
   }, 15000);
 
   it("survives invalid localStorage seeds and disconnected mode", () => {
-    window.localStorage.setItem(MUSE_WORKSPACE_STORAGE_KEY, "{bad-json");
+    window.localStorage.setItem(AGENT_WORKSPACE_STORAGE_KEY, "{bad-json");
     window.localStorage.setItem(COUNCIL_BOOST_STORAGE_KEY, "{bad-json");
     window.localStorage.setItem(TERTIARY_PIN_STORAGE_KEY, "\n\n");
     window.localStorage.setItem(INTERFACE_OPACITY_STORAGE_KEY, "not-a-number");
@@ -393,7 +393,7 @@ describe("App", () => {
       catalog: createCatalogFixture(),
       simulation: createSimulationFixture(),
       projection: null,
-      museEvents: [],
+      agentEvents: [],
       isConnected: false,
     });
 

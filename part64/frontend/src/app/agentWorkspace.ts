@@ -1,12 +1,12 @@
-import type { MuseWorkspaceContext } from "../types";
+import type { AgentWorkspaceContext } from "../types";
 
-interface MuseWorkspaceNormalizeOptions {
+interface AgentWorkspaceNormalizeOptions {
   maxPinnedFileNodeIds?: number;
   maxSearchQueryLength?: number;
   maxPinnedNexusSummaries?: number;
 }
 
-export function normalizeMusePresenceId(raw: string): string {
+export function normalizeAgentPresenceId(raw: string): string {
   return raw.trim().toLowerCase().replace(/[\s-]+/g, "_");
 }
 
@@ -22,10 +22,10 @@ export function sameStringArray(left: string[], right: string[]): boolean {
   return true;
 }
 
-export function normalizeMuseWorkspaceContext(
-  raw: MuseWorkspaceContext | Partial<MuseWorkspaceContext> | null | undefined,
-  options: MuseWorkspaceNormalizeOptions = {},
-): MuseWorkspaceContext {
+export function normalizeAgentWorkspaceContext(
+  raw: AgentWorkspaceContext | Partial<AgentWorkspaceContext> | null | undefined,
+  options: AgentWorkspaceNormalizeOptions = {},
+): AgentWorkspaceContext {
   const maxPinnedFileNodeIds = options.maxPinnedFileNodeIds ?? 24;
   const maxSearchQueryLength = options.maxSearchQueryLength ?? 180;
   const maxPinnedNexusSummaries = options.maxPinnedNexusSummaries ?? 24;

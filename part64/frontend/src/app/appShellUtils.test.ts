@@ -12,7 +12,7 @@ import {
   resolveRuntimeMediaUrl,
   shouldRouteWheelToCore,
   stableUnitHash,
-  toMuseSlug,
+  toAgentSlug,
 } from "./appShellUtils";
 
 afterEach(() => {
@@ -110,9 +110,9 @@ describe("appShellUtils", () => {
     expect(a).toBeGreaterThanOrEqual(0);
     expect(a).toBeLessThanOrEqual(1);
 
-    expect(toMuseSlug("  Archive Witness  ")).toBe("archive_witness");
-    expect(toMuseSlug("33 bells")).toBe("muse_33_bells");
-    expect(toMuseSlug("!!!")).toBe("");
+    expect(toAgentSlug("  Archive Witness  ")).toBe("archive_witness");
+    expect(toAgentSlug("33 bells")).toBe("agent_33_bells");
+    expect(toAgentSlug("!!!")).toBe("");
   });
 
   it("resolves runtime media URLs against runtime bridge base", () => {

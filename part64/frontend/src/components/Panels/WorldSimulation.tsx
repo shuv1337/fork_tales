@@ -7,7 +7,7 @@ interface Props {
   onInteract: (personId: string, action: "speak" | "pray" | "sing") => void;
 }
 
-export function MythWorldPanel({
+export function WorldSimulationPanel({
   simulation,
   interaction,
   interactingPersonId,

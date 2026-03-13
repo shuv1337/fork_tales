@@ -17,9 +17,9 @@ const mockProjection = {
   elements: [
     {
       record: "eta_mu.ui_projection.element.v1",
-      id: "nexus.ui.daimoi_presence",
+      id: "nexus.ui.particle_deck",
       kind: "panel",
-      title: "Daimoi Presence Deck",
+      title: "Particle Deck",
       binds_to: ["presence_dynamics", "daimoi_probabilistic"],
       field_bindings: {
         daimoi: 1,
@@ -33,7 +33,7 @@ const mockProjection = {
   states: [
     {
       record: "eta_mu.ui_projection.element_state.v1",
-      element_id: "nexus.ui.daimoi_presence",
+      element_id: "nexus.ui.particle_deck",
       ts: Date.parse("2026-02-20T19:45:00Z"),
       mass: 0.74,
       priority: 0.98,
@@ -51,8 +51,8 @@ const mockProjection = {
         field_bindings: {
           daimoi: 1,
         },
-        reason_en: "Daimoi lane prioritized for inspection.",
-        reason_ja: "代網レーンを優先表示。",
+        reason_en: "Particle deck lane prioritized for inspection.",
+        reason_ja: "パーティクルデッキレーンを優先表示。",
         coherence_tension: 0.15,
       },
     },
@@ -329,10 +329,10 @@ test.beforeEach(async ({ page }) => {
   await installRuntimeMocks(page);
 });
 
-test("renders normalized Daimoi action distributions", async ({ page }) => {
+test("renders normalized Particle action distributions", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByText("Daimoi Presence Deck / 代網存在甲板")).toBeVisible();
+  await expect(page.getByText("Particle Deck / 代網存在甲板")).toBeVisible();
   await expect(page.getByText("Action distribution")).toBeVisible();
   await expect(page.getByText("40% (40)")).toBeVisible();
   await expect(page.getByText("20% (20)").first()).toBeVisible();
@@ -341,7 +341,7 @@ test("renders normalized Daimoi action distributions", async ({ page }) => {
   await expect(triggerSection.getByText("route")).toBeVisible();
 });
 
-test("updates focus-lock label when selecting presence and daimoi", async ({ page }) => {
+test("updates focus-lock label when selecting presence and particle", async ({ page }) => {
   await page.goto("/");
 
   const witnessPresenceButton = page.getByRole("button", {
@@ -356,5 +356,5 @@ test("updates focus-lock label when selecting presence and daimoi", async ({ pag
   }).first();
   await expect(daimonButton).toBeVisible();
   await daimonButton.click();
-  await expect(page.getByText("focus locked -> daimoi dm-1")).toBeVisible();
+  await expect(page.getByText("focus locked -> particle dm-1")).toBeVisible();
 });

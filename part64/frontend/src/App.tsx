@@ -32,7 +32,7 @@ import { useAppPanelConfigs } from "./app/useAppPanelConfigs";
 import { useChatCommandHandlers } from "./app/useChatCommandHandlers";
 import { useAutopilotController } from "./hooks/useAutopilotController";
 import { useCoreCameraControls } from "./hooks/useCoreCameraControls";
-import { useMuseHandlers } from "./hooks/useMuseHandlers";
+import { useAgentHandlers } from "./hooks/useAgentHandlers";
 import { useSimulationTuning } from "./hooks/useSimulationTuning";
 import { useToastManager } from "./hooks/useToastManager";
 import { useUserPresenceInput } from "./hooks/useUserPresenceInput";
@@ -43,7 +43,7 @@ import type { UIPerspective, UIProjectionBundle, UIProjectionElementState } from
 export default function App() {
   // --- Core world data ---
   const [uiPerspective, setUiPerspective] = useState<UIPerspective>("hybrid");
-  const { catalog, simulation, projection, museEvents, isConnected } = useWorldState(uiPerspective);
+  const { catalog, simulation, projection, agentEvents, isConnected } = useWorldState(uiPerspective);
 
   // --- Overlay API ---
   const [overlayApi, setOverlayApi] = useState<OverlayApi | null>(null);
@@ -83,14 +83,14 @@ export default function App() {
     window.localStorage.setItem(INTERFACE_OPACITY_STORAGE_KEY, simTuning.interfaceOpacity.toFixed(3));
   }, [simTuning.interfaceOpacity]);
 
-  // Initial muse handlers (without autopilot wiring, for bootstrapping)
-  const muse = useMuseHandlers({
+  // Initial agent handlers (without autopilot wiring, for bootstrapping)
+  const agentBootstrap = useAgentHandlers({
     overlayApi,
     setOverlayApi,
     emitUiToast,
     catalog,
     simulation,
-    museEvents,
+    agentEvents,
     handleAutopilotUserInput: () => false,
     handleChatCommand: async () => false,
   });
@@ -102,27 +102,27 @@ export default function App() {
     autopilotEvents,
     handleAutopilotUserInput,
     toggleAutopilot,
-  } = useAutopilotController({ catalog, simulation, isConnected, emitSystemMessage: muse.emitSystemMessage });
+  } = useAutopilotController({ catalog, simulation, isConnected, emitSystemMessage: agentBootstrap.emitSystemMessage });
 
   const { handleChatCommand } = useChatCommandHandlers({
-    activeMusePresenceId: muse.activeMusePresenceId,
+    activeAgentPresenceId: agentBootstrap.activeAgentPresenceId,
     catalogGeneratedAt: catalog?.generated_at,
     catalogTruthGateBlocked: catalog?.truth_state?.gate?.blocked,
     simulationTimestamp: simulation?.timestamp,
     simulationTruthGateBlocked: simulation?.truth_state?.gate?.blocked,
-    buildMuseSurroundingNodes: muse.buildMuseSurroundingNodes,
-    emitSystemMessage: muse.emitSystemMessage,
-    emitWitnessChatReply: muse.emitWitnessChatReply,
+    buildAgentSurroundingNodes: agentBootstrap.buildAgentSurroundingNodes,
+    emitSystemMessage: agentBootstrap.emitSystemMessage,
+    emitWitnessChatReply: agentBootstrap.emitWitnessChatReply,
   });
 
-  // Final muse handlers with all real dependencies
-  const museWithDeps = useMuseHandlers({
+  // Final agent handlers with all real dependencies
+  const agentWithDeps = useAgentHandlers({
     overlayApi,
     setOverlayApi,
     emitUiToast,
     catalog,
     simulation,
-    museEvents,
+    agentEvents,
     handleAutopilotUserInput,
     handleChatCommand,
   });
@@ -141,31 +141,31 @@ export default function App() {
 
   // --- Panel configs ---
   const panelConfigs = useAppPanelConfigs({
-    activeMusePresenceId: museWithDeps.activeMusePresenceId,
+    activeAgentPresenceId: agentWithDeps.activeAgentPresenceId,
     activeProjection: projection ?? simulation?.projection ?? catalog?.ui_projection ?? null,
     autopilotEvents,
     catalog,
     deferredCoreSimulationTuning: simTuning.deferredCoreSimulationTuning,
     deferredPanelsReady,
     flyCameraToAnchor: camera.flyCameraToAnchor,
-    handleMuseWorkspaceBindingsChange: museWithDeps.handleMuseWorkspaceBindingsChange,
-    handleMuseWorkspaceContextChange: museWithDeps.handleMuseWorkspaceContextChange,
-    handleMuseWorkspaceSend: museWithDeps.handleMuseWorkspaceSend,
-    handleRecord: museWithDeps.handleRecord,
-    handleSendVoice: museWithDeps.handleSendVoice,
-    handleTranscribe: museWithDeps.handleTranscribe,
+    handleAgentWorkspaceBindingsChange: agentWithDeps.handleAgentWorkspaceBindingsChange,
+    handleAgentWorkspaceContextChange: agentWithDeps.handleAgentWorkspaceContextChange,
+    handleAgentWorkspaceSend: agentWithDeps.handleAgentWorkspaceSend,
+    handleRecord: agentWithDeps.handleRecord,
+    handleSendVoice: agentWithDeps.handleSendVoice,
+    handleTranscribe: agentWithDeps.handleTranscribe,
     handleUserPresenceInput,
-    handleWorldInteract: museWithDeps.handleWorldInteract,
-    interactingPersonId: museWithDeps.interactingPersonId,
-    isRecording: museWithDeps.isRecording,
-    isThinking: museWithDeps.isThinking,
-    museWorkspaceBindings: museWithDeps.museWorkspaceBindings,
-    museWorkspaceContexts: museWithDeps.museWorkspaceContexts,
+    handleWorldInteract: agentWithDeps.handleWorldInteract,
+    interactingPersonId: agentWithDeps.interactingPersonId,
+    isRecording: agentWithDeps.isRecording,
+    isThinking: agentWithDeps.isThinking,
+    agentWorkspaceBindings: agentWithDeps.agentWorkspaceBindings,
+    agentWorkspaceContexts: agentWithDeps.agentWorkspaceContexts,
     projectionStateByElement,
-    setActiveMusePresenceId: museWithDeps.setActiveMusePresenceId,
+    setActiveAgentPresenceId: agentWithDeps.setActiveAgentPresenceId,
     simulation,
-    voiceInputMeta: museWithDeps.voiceInputMeta,
-    worldInteraction: museWithDeps.worldInteraction,
+    voiceInputMeta: agentWithDeps.voiceInputMeta,
+    worldInteraction: agentWithDeps.worldInteraction,
   });
 
   // --- Panel manager ---
@@ -254,11 +254,11 @@ export default function App() {
         coreSimulationTuning={simTuning.coreSimulationTuning}
         coreVisualTuning={simTuning.coreVisualTuning}
         coreLayerVisibility={simTuning.coreLayerVisibility}
-        museWorkspaceBindings={museWithDeps.museWorkspaceBindings}
+        agentWorkspaceBindings={agentWithDeps.agentWorkspaceBindings}
         galaxyLayerStyles={galaxyLayerStyles}
         mouseDaimonTuning={simTuning.mouseDaimonTuning}
         onUserPresenceInput={handleUserPresenceInput}
-        onOverlayInit={museWithDeps.handleOverlayInit}
+        onOverlayInit={agentWithDeps.handleOverlayInit}
         onNexusInteraction={handleNexusInteraction}
         glassCenterRatio={panelManager.glassCenterRatio}
         onPointerDown={camera.handleCorePointerDown}
@@ -301,9 +301,9 @@ export default function App() {
           coreLayerManagerOpen={simTuning.coreLayerManagerOpen}
           coreLayerVisibility={simTuning.coreLayerVisibility}
           museRuntimeSnapshot={museRuntimeSnapshot}
-          museForgeLabel={museWithDeps.museForgeLabel}
-          museForgeBusy={museWithDeps.museForgeBusy}
-          museForgePreviewId={museWithDeps.museForgePreviewId}
+          agentForgeLabel={agentWithDeps.agentForgeLabel}
+          agentForgeBusy={agentWithDeps.agentForgeBusy}
+          agentForgePreviewId={agentWithDeps.agentForgePreviewId}
           onToggleAutopilot={toggleAutopilot}
           onToggleCoreFlight={camera.toggleCoreFlight}
           onToggleCoreOrbit={camera.toggleCoreOrbit}
@@ -326,8 +326,8 @@ export default function App() {
           onToggleCoreLayerManagerOpen={() => simTuning.setCoreLayerManagerOpen(!simTuning.coreLayerManagerOpen)}
           onSetAllLayers={simTuning.setAllCoreLayers}
           onSetLayerEnabled={simTuning.setCoreLayerEnabled}
-          onMuseForgeLabelChange={museWithDeps.setMuseForgeLabel}
-          onCreateMuse={() => { void museWithDeps.handleCreateMuse(); }}
+          onMuseForgeLabelChange={agentWithDeps.setAgentForgeLabel}
+          onCreateMuse={() => { void agentWithDeps.handleCreateAgent(); }}
         />
 
         <WorldPanelsViewport

@@ -32,7 +32,7 @@ interface Props {
   coreSimulationTuning: CoreSimulationTuning;
   coreVisualTuning: CoreVisualTuning;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
-  museWorkspaceBindings: Record<string, string[]>;
+  agentWorkspaceBindings: Record<string, string[]>;
   galaxyLayerStyles: GalaxyLayerStyles;
   mouseDaimonTuning: MouseDaimonTuning;
   onUserPresenceInput: (payload: {
@@ -41,7 +41,7 @@ interface Props {
     message?: string;
     xRatio?: number;
     yRatio?: number;
-    embedDaimoi?: boolean;
+    embedParticle?: boolean;
     meta?: Record<string, unknown>;
   }) => void;
   onOverlayInit: (api: unknown) => void;
@@ -63,7 +63,7 @@ export function CoreBackdrop({
   coreSimulationTuning,
   coreVisualTuning,
   coreLayerVisibility,
-  museWorkspaceBindings,
+  agentWorkspaceBindings,
   galaxyLayerStyles,
   mouseDaimonTuning,
   onUserPresenceInput,
@@ -110,7 +110,7 @@ export function CoreBackdrop({
           graphNodeStepScale={coreSimulationTuning.graphNodeStepScale}
           backgroundWash={coreVisualTuning.backgroundWash}
           layerVisibility={coreLayerVisibility}
-          museWorkspaceBindings={museWorkspaceBindings}
+          agentWorkspaceBindings={agentWorkspaceBindings}
           mouseDaimonEnabled={mouseDaimonTuning.enabled}
           mouseDaimonMessage={mouseDaimonTuning.message}
           mouseDaimonMode={mouseDaimonTuning.mode}

@@ -50,7 +50,7 @@ function makeProps(overrides: Partial<CoreBackdropProps> = {}): CoreBackdropProp
       logic: false,
       "pain-field": false,
     },
-    museWorkspaceBindings: { witness_thread: ["file:1"] },
+    agentWorkspaceBindings: { witness_thread: ["file:1"] },
     galaxyLayerStyles: {
       far: { opacity: 0.3 },
       mid: { opacity: 0.5 },

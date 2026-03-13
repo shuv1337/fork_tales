@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
-  normalizeMusePresenceId,
-  normalizeMuseWorkspaceContext,
+  normalizeAgentPresenceId,
+  normalizeAgentWorkspaceContext,
   sameStringArray,
-} from "./museWorkspace";
+} from "./agentWorkspace";
 
-describe("normalizeMusePresenceId", () => {
+describe("normalizeAgentPresenceId", () => {
   it("normalizes casing, whitespace, and hyphen separators", () => {
-    expect(normalizeMusePresenceId(" Witness-Thread ")).toBe("witness_thread");
-    expect(normalizeMusePresenceId("gates  of---truth")).toBe("gates_of_truth");
+    expect(normalizeAgentPresenceId(" Witness-Thread ")).toBe("witness_thread");
+    expect(normalizeAgentPresenceId("gates  of---truth")).toBe("gates_of_truth");
   });
 });
 
@@ -23,9 +23,9 @@ describe("sameStringArray", () => {
   });
 });
 
-describe("normalizeMuseWorkspaceContext", () => {
+describe("normalizeAgentWorkspaceContext", () => {
   it("returns empty defaults for missing input", () => {
-    expect(normalizeMuseWorkspaceContext(null)).toEqual({
+    expect(normalizeAgentWorkspaceContext(null)).toEqual({
       pinnedFileNodeIds: [],
       searchQuery: "",
       pinnedNexusSummaries: [],
@@ -34,7 +34,7 @@ describe("normalizeMuseWorkspaceContext", () => {
 
   it("trims, deduplicates, and preserves search query text", () => {
     expect(
-      normalizeMuseWorkspaceContext({
+      normalizeAgentWorkspaceContext({
         pinnedFileNodeIds: [" node-a ", "", "node-b", "node-a", " node-c "],
         searchQuery: "  keep spacing  ",
         pinnedNexusSummaries: [" summary-1 ", "", "summary-2", "summary-1"],
@@ -48,7 +48,7 @@ describe("normalizeMuseWorkspaceContext", () => {
 
   it("respects override limits", () => {
     expect(
-      normalizeMuseWorkspaceContext(
+      normalizeAgentWorkspaceContext(
         {
           pinnedFileNodeIds: ["a", "b", "c"],
           searchQuery: "abcdefgh",

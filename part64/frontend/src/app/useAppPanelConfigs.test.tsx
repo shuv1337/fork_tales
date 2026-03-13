@@ -20,8 +20,8 @@ vi.mock("../components/Simulation/Canvas", () => ({
   ),
 }));
 
-vi.mock("../components/Panels/MusePresencePanel", () => ({
-  MusePresencePanel: ({ museId }: { museId: string }) => <div data-testid={`muse-presence-${museId}`}>{museId}</div>,
+vi.mock("../components/Panels/AgentPresencePanel", () => ({
+  AgentPresencePanel: ({ agentId }: { agentId: string }) => <div data-testid={`muse-presence-${agentId}`}>{agentId}</div>,
 }));
 
 vi.mock("../components/Panels/ProjectionLedgerPanel", () => ({
@@ -40,8 +40,8 @@ vi.mock("../components/Panels/Omni", () => ({
   OmniPanel: () => <div data-testid="lazy-omni-panel" />,
 }));
 
-vi.mock("../components/Panels/MythWorld", () => ({
-  MythWorldPanel: () => <div data-testid="lazy-myth-panel" />,
+vi.mock("../components/Panels/WorldSimulation", () => ({
+  WorldSimulationPanel: () => <div data-testid="lazy-world-sim-panel" />,
 }));
 
 vi.mock("../components/Panels/WebGraphWeaverPanel", () => ({
@@ -64,8 +64,8 @@ vi.mock("../components/Panels/RuntimeConfigPanel", () => ({
   RuntimeConfigPanel: () => <div data-testid="lazy-runtime-config-panel" />,
 }));
 
-vi.mock("../components/Panels/DaimoiPresencePanel", () => ({
-  DaimoiPresencePanel: () => <div data-testid="lazy-daimoi-panel" />,
+vi.mock("../components/Panels/ParticleDeckPanel", () => ({
+  ParticleDeckPanel: () => <div data-testid="lazy-daimoi-panel" />,
 }));
 
 vi.mock("../components/Panels/WorldLogPanel", () => ({
@@ -74,7 +74,7 @@ vi.mock("../components/Panels/WorldLogPanel", () => ({
 
 function createArgs(overrides: Partial<UseAppPanelConfigsArgs> = {}): UseAppPanelConfigsArgs {
   return {
-    activeMusePresenceId: "witness_thread",
+    activeAgentPresenceId: "witness_thread",
     activeProjection: null,
     autopilotEvents: [],
     catalog: null,
@@ -89,9 +89,9 @@ function createArgs(overrides: Partial<UseAppPanelConfigsArgs> = {}): UseAppPane
     },
     deferredPanelsReady: false,
     flyCameraToAnchor: vi.fn(),
-    handleMuseWorkspaceBindingsChange: vi.fn(),
-    handleMuseWorkspaceContextChange: vi.fn(),
-    handleMuseWorkspaceSend: vi.fn(),
+    handleAgentWorkspaceBindingsChange: vi.fn(),
+    handleAgentWorkspaceContextChange: vi.fn(),
+    handleAgentWorkspaceSend: vi.fn(),
     handleRecord: vi.fn(async () => undefined),
     handleSendVoice: vi.fn(async () => undefined),
     handleTranscribe: vi.fn(async () => "voice text"),
@@ -100,13 +100,13 @@ function createArgs(overrides: Partial<UseAppPanelConfigsArgs> = {}): UseAppPane
     interactingPersonId: null,
     isRecording: false,
     isThinking: false,
-    museWorkspaceBindings: {
+    agentWorkspaceBindings: {
       witness_thread: ["file:1", "file:2"],
       chaos: [],
       stability: [],
       symmetry: [],
     },
-    museWorkspaceContexts: {
+    agentWorkspaceContexts: {
       witness_thread: {
         pinnedFileNodeIds: ["file:1", "file:2"],
         searchQuery: "focus",
@@ -126,7 +126,7 @@ function createArgs(overrides: Partial<UseAppPanelConfigsArgs> = {}): UseAppPane
         },
       ],
     ]) as unknown as UseAppPanelConfigsArgs["projectionStateByElement"],
-    setActiveMusePresenceId: vi.fn(),
+    setActiveAgentPresenceId: vi.fn(),
     simulation: null,
     voiceInputMeta: "voice idle",
     worldInteraction: null,
@@ -219,8 +219,8 @@ describe("useAppPanelConfigs", () => {
     const webGraphPanel = result.current.find((entry) => entry.id === "nexus.ui.web_graph_weaver");
     const threatRadarPanel = result.current.find((entry) => entry.id === "nexus.ui.threat_radar");
     const runtimeConfigPanel = result.current.find((entry) => entry.id === "nexus.ui.runtime_config");
-    const mythCommonsPanel = result.current.find((entry) => entry.id === "nexus.ui.myth_commons");
-    if (!webGraphPanel || !threatRadarPanel || !runtimeConfigPanel || !mythCommonsPanel) {
+    const worldSimPanel = result.current.find((entry) => entry.id === "nexus.ui.world_simulation");
+    if (!webGraphPanel || !threatRadarPanel || !runtimeConfigPanel || !worldSimPanel) {
       throw new Error("missing deferred panel config");
     }
 
@@ -229,7 +229,7 @@ describe("useAppPanelConfigs", () => {
         {webGraphPanel.render()}
         {threatRadarPanel.render()}
         {runtimeConfigPanel.render()}
-        {mythCommonsPanel.render()}
+        {worldSimPanel.render()}
       </>,
     );
 
@@ -237,7 +237,7 @@ describe("useAppPanelConfigs", () => {
       expect(screen.getByTestId("lazy-web-graph-panel")).toBeTruthy();
       expect(screen.getByTestId("lazy-threat-radar-panel")).toBeTruthy();
       expect(screen.getByTestId("lazy-runtime-config-panel")).toBeTruthy();
-      expect(screen.getByTestId("lazy-myth-panel")).toBeTruthy();
+      expect(screen.getByTestId("lazy-world-sim-panel")).toBeTruthy();
     });
   });
 

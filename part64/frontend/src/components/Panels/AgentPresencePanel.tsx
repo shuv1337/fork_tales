@@ -1,34 +1,34 @@
 import { ChatPanel } from "./Chat";
 import type {
   Catalog,
-  MuseWorkspaceContext,
+  AgentWorkspaceContext,
   SimulationState,
   UIProjectionChatSession,
   UIProjectionElementState,
 } from "../../types";
 
 interface Props {
-  museId: string;
-  onSend: (text: string, musePresenceId: string, workspace: MuseWorkspaceContext) => void;
+  agentId: string;
+  onSend: (text: string, agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
   onRecord: () => void;
   onTranscribe: () => void;
-  onSendVoice: (musePresenceId: string, workspace: MuseWorkspaceContext) => void;
+  onSendVoice: (agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
   isRecording: boolean;
   isThinking: boolean;
   voiceInputMeta: string;
   catalog: Catalog | null;
   simulation: SimulationState | null;
-  workspaceContext?: MuseWorkspaceContext | null;
-  onWorkspaceContextChange?: (musePresenceId: string, workspace: MuseWorkspaceContext) => void;
-  onWorkspaceBindingsChange?: (musePresenceId: string, pinnedFileNodeIds: string[]) => void;
+  workspaceContext?: AgentWorkspaceContext | null;
+  onWorkspaceContextChange?: (agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
+  onWorkspaceBindingsChange?: (agentPresenceId: string, pinnedFileNodeIds: string[]) => void;
   chatLensState?: UIProjectionElementState | null;
   activeChatSession?: UIProjectionChatSession | null;
-  activeMusePresenceId?: string;
-  onMusePresenceChange?: (presenceId: string) => void;
+  activeAgentPresenceId?: string;
+  onAgentPresenceChange?: (presenceId: string) => void;
 }
 
-export function MusePresencePanel({
-  museId,
+export function AgentPresencePanel({
+  agentId,
   onSend,
   onRecord,
   onTranscribe,
@@ -43,8 +43,8 @@ export function MusePresencePanel({
   onWorkspaceBindingsChange,
   chatLensState,
   activeChatSession,
-  activeMusePresenceId,
-  onMusePresenceChange,
+  activeAgentPresenceId,
+  onAgentPresenceChange,
 }: Props) {
   return (
     <ChatPanel
@@ -57,15 +57,15 @@ export function MusePresencePanel({
       voiceInputMeta={voiceInputMeta}
       catalog={catalog}
       simulation={simulation}
-      fixedMusePresenceId={museId}
+      fixedAgentPresenceId={agentId}
       workspaceContext={workspaceContext}
       onWorkspaceContextChange={onWorkspaceContextChange}
       onWorkspaceBindingsChange={onWorkspaceBindingsChange}
       chatLensState={chatLensState}
       activeChatSession={activeChatSession}
-      activeMusePresenceId={activeMusePresenceId}
-      onMusePresenceChange={onMusePresenceChange}
-      minimalMuseView
+      activeAgentPresenceId={activeAgentPresenceId}
+      onAgentPresenceChange={onAgentPresenceChange}
+      minimalAgentView
     />
   );
 }

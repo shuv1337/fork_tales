@@ -2,8 +2,8 @@
 
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MusePresencePanel } from "./MusePresencePanel";
-import type { MuseWorkspaceContext, SimulationState } from "../../types";
+import { AgentPresencePanel } from "./AgentPresencePanel";
+import type { AgentWorkspaceContext, SimulationState } from "../../types";
 
 function mockJsonResponse(body: unknown, status = 200): Response {
   return {
@@ -68,19 +68,19 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("MusePresencePanel workspace integration", () => {
+describe("AgentPresencePanel workspace integration", () => {
   it("emits workspace binding callbacks for the fixed muse", async () => {
     const onWorkspaceBindingsChange = vi.fn();
     const onWorkspaceContextChange = vi.fn();
-    const workspaceContext: MuseWorkspaceContext = {
+    const workspaceContext: AgentWorkspaceContext = {
       pinnedFileNodeIds: ["node-1"],
       searchQuery: "alpha",
       pinnedNexusSummaries: [],
     };
 
     render(
-      <MusePresencePanel
-        museId="anchor_registry"
+      <AgentPresencePanel
+        agentId="anchor_registry"
         onSend={vi.fn()}
         onRecord={vi.fn()}
         onTranscribe={vi.fn()}
@@ -112,8 +112,8 @@ describe("MusePresencePanel workspace integration", () => {
     const onSend = vi.fn();
 
     render(
-      <MusePresencePanel
-        museId="anchor_registry"
+      <AgentPresencePanel
+        agentId="anchor_registry"
         onSend={onSend}
         onRecord={vi.fn()}
         onTranscribe={vi.fn()}
