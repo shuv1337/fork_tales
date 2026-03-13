@@ -6,7 +6,7 @@ from typing import Any
 from .metrics import _safe_float
 
 
-DAIMOI_RESOURCE_ALIASES: dict[str, str] = {
+PARTICLE_RESOURCE_ALIASES: dict[str, str] = {
     "cpu": "cpu",
     "gpu": "gpu",
     "gpu0": "gpu",
@@ -24,7 +24,7 @@ DAIMOI_RESOURCE_ALIASES: dict[str, str] = {
 }
 
 
-DAIMOI_WALLET_FLOOR: dict[str, float] = {
+PARTICLE_WALLET_FLOOR: dict[str, float] = {
     "cpu": 6.0,
     "gpu": 5.0,
     "npu": 4.0,
@@ -62,7 +62,7 @@ def resource_wallet_by_type(
     alias_map = (
         resource_aliases
         if isinstance(resource_aliases, dict)
-        else DAIMOI_RESOURCE_ALIASES
+        else PARTICLE_RESOURCE_ALIASES
     )
     for key, raw in wallet.items():
         token = str(key or "").strip().lower()
@@ -96,7 +96,7 @@ def presence_need_by_resource(
         resource_keys=resource_keys,
         resource_aliases=resource_aliases,
     )
-    floor_map = wallet_floor if isinstance(wallet_floor, dict) else DAIMOI_WALLET_FLOOR
+    floor_map = wallet_floor if isinstance(wallet_floor, dict) else PARTICLE_WALLET_FLOOR
 
     needs: dict[str, float] = {}
     for resource in resource_keys:

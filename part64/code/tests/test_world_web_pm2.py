@@ -106,19 +106,19 @@ def test_world_payload_and_artifact_resolution() -> None:
         assert blocked is None
 
 
-def test_simulation_ws_payload_missing_daimoi_summary_guard() -> None:
-    assert world_web_server._simulation_ws_payload_missing_daimoi_summary({}) is True
+def test_simulation_ws_payload_missing_particle_summary_guard() -> None:
+    assert world_web_server._simulation_ws_payload_missing_particle_summary({}) is True
     assert (
-        world_web_server._simulation_ws_payload_missing_daimoi_summary(
-            {"presence_dynamics": {"daimoi_probabilistic": {}}}
+        world_web_server._simulation_ws_payload_missing_particle_summary(
+            {"presence_dynamics": {"particle_probabilistic": {}}}
         )
         is False
     )
     assert (
-        world_web_server._simulation_ws_payload_missing_daimoi_summary(
+        world_web_server._simulation_ws_payload_missing_particle_summary(
             {
                 "presence_dynamics": {
-                    "daimoi_probabilistic": {
+                    "particle_probabilistic": {
                         "clump_score": 0.42,
                         "anti_clump_drive": -0.08,
                         "anti_clump": {"target": 0.38},
@@ -130,19 +130,19 @@ def test_simulation_ws_payload_missing_daimoi_summary_guard() -> None:
     )
 
 
-def test_simulation_ws_ensure_daimoi_summary_backfills_legacy_payload() -> None:
+def test_simulation_ws_ensure_particle_summary_backfills_legacy_payload() -> None:
     payload: dict[str, Any] = {
         "presence_dynamics": {
-            "daimoi_probabilistic": {
+            "particle_probabilistic": {
                 "active": 128,
                 "collisions": 7,
             }
         }
     }
 
-    world_web_server._simulation_ws_ensure_daimoi_summary(payload)
+    world_web_server._simulation_ws_ensure_particle_summary(payload)
 
-    summary = payload["presence_dynamics"]["daimoi_probabilistic"]
+    summary = payload["presence_dynamics"]["particle_probabilistic"]
     anti = summary.get("anti_clump")
     assert isinstance(anti, dict)
     assert isinstance(anti.get("metrics"), dict)
@@ -153,12 +153,12 @@ def test_simulation_ws_ensure_daimoi_summary_backfills_legacy_payload() -> None:
     assert anti.get("target") is not None
 
 
-def test_simulation_ws_ensure_daimoi_summary_tracks_live_clump_and_graph_variability() -> (
+def test_simulation_ws_ensure_particle_summary_tracks_live_clump_and_graph_variability() -> (
     None
 ):
-    with world_web_server._SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_LOCK:
-        world_web_server._SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE.clear()
-        world_web_server._SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE.update(
+    with world_web_server._SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_LOCK:
+        world_web_server._SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_STATE.clear()
+        world_web_server._SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_STATE.update(
             {
                 "positions": {},
                 "score": 0.0,
@@ -184,12 +184,12 @@ def test_simulation_ws_ensure_daimoi_summary_tracks_live_clump_and_graph_variabi
                 "node:a": {"x": 0.2, "y": 0.2},
                 "node:b": {"x": 0.8, "y": 0.8},
             },
-            "daimoi_probabilistic": {},
+            "particle_probabilistic": {},
         }
     }
 
-    world_web_server._simulation_ws_ensure_daimoi_summary(payload)
-    summary_one = payload["presence_dynamics"]["daimoi_probabilistic"]
+    world_web_server._simulation_ws_ensure_particle_summary(payload)
+    summary_one = payload["presence_dynamics"]["particle_probabilistic"]
     anti_one = summary_one.get("anti_clump", {})
     assert float(summary_one.get("clump_score", 0.0)) > 0.0
     assert isinstance(anti_one.get("metrics"), dict)
@@ -201,8 +201,8 @@ def test_simulation_ws_ensure_daimoi_summary_tracks_live_clump_and_graph_variabi
         "node:a": {"x": 0.35, "y": 0.22},
         "node:b": {"x": 0.66, "y": 0.77},
     }
-    world_web_server._simulation_ws_ensure_daimoi_summary(payload)
-    summary_two = payload["presence_dynamics"]["daimoi_probabilistic"]
+    world_web_server._simulation_ws_ensure_particle_summary(payload)
+    summary_two = payload["presence_dynamics"]["particle_probabilistic"]
     anti_two = summary_two.get("anti_clump", {})
     graph_two = anti_two.get("graph_variability", {})
     scales_two = anti_two.get("scales", {})
@@ -213,7 +213,7 @@ def test_simulation_ws_ensure_daimoi_summary_tracks_live_clump_and_graph_variabi
     assert float(scales_two.get("route_damp", 1.0)) <= 1.0
 
 
-def test_simulation_ws_ensure_daimoi_summary_can_skip_live_refresh_work(
+def test_simulation_ws_ensure_particle_summary_can_skip_live_refresh_work(
     monkeypatch: Any,
 ) -> None:
     def fail_live_metrics(*_: Any, **__: Any) -> dict[str, Any]:
@@ -224,7 +224,7 @@ def test_simulation_ws_ensure_daimoi_summary_can_skip_live_refresh_work(
 
     monkeypatch.setattr(
         world_web_server,
-        "_simulation_ws_daimoi_live_metrics",
+        "_simulation_ws_particle_live_metrics",
         fail_live_metrics,
     )
     monkeypatch.setattr(
@@ -243,7 +243,7 @@ def test_simulation_ws_ensure_daimoi_summary_can_skip_live_refresh_work(
                 "node:a": {"x": 0.2, "y": 0.2},
                 "node:b": {"x": 0.8, "y": 0.8},
             },
-            "daimoi_probabilistic": {
+            "particle_probabilistic": {
                 "clump_score": 0.41,
                 "anti_clump_drive": -0.09,
                 "anti_clump": {
@@ -265,13 +265,13 @@ def test_simulation_ws_ensure_daimoi_summary_can_skip_live_refresh_work(
         }
     }
 
-    world_web_server._simulation_ws_ensure_daimoi_summary(
+    world_web_server._simulation_ws_ensure_particle_summary(
         payload,
         include_live_metrics=False,
         include_graph_variability=False,
     )
 
-    summary = payload["presence_dynamics"]["daimoi_probabilistic"]
+    summary = payload["presence_dynamics"]["particle_probabilistic"]
     anti = summary.get("anti_clump", {})
     graph = anti.get("graph_variability", {})
 

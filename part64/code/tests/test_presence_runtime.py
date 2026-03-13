@@ -204,8 +204,8 @@ def test_presence_runtime_handoff_moves_ownership_and_emits_inbox_event() -> Non
         queue_ratio=0.1,
         resource_ratio=0.2,
     )
-    assert first["counts"]["daimoi_updates"] == 1
-    assert storage.presence_daimoi_ids("witness_thread") == {"field:witness_thread:0"}
+    assert first["counts"]["particle_updates"] == 1
+    assert storage.presence_particle_ids("witness_thread") == {"field:witness_thread:0"}
 
     second = manager.sync(
         field_particles=[
@@ -222,15 +222,15 @@ def test_presence_runtime_handoff_moves_ownership_and_emits_inbox_event() -> Non
     )
 
     assert second["counts"]["handoffs"] == 1
-    assert storage.presence_daimoi_ids("witness_thread") == set()
-    assert storage.presence_daimoi_ids("anchor_registry") == {"field:witness_thread:0"}
+    assert storage.presence_particle_ids("witness_thread") == set()
+    assert storage.presence_particle_ids("anchor_registry") == {"field:witness_thread:0"}
 
-    owner, _ = storage.get_daimoi_owner_ver("field:witness_thread:0")
+    owner, _ = storage.get_particle_owner_ver("field:witness_thread:0")
     assert owner == "anchor_registry"
 
     inbox_rows = storage.inbox_events("anchor_registry", limit=20)
     assert any(
-        str(row.get("event", {}).get("kind", "")) == "daimoi.owner.handoff"
+        str(row.get("event", {}).get("kind", "")) == "particles.owner.handoff"
         for row in inbox_rows
     )
 
@@ -280,7 +280,7 @@ def test_presence_runtime_reports_pause_resume_dedupe_and_rate_limit() -> None:
         resource_ratio=0.0,
     )
     assert resumed_snapshot["counts"]["resumed"] == 1
-    assert resumed_snapshot["counts"]["daimoi_updates"] == 1
+    assert resumed_snapshot["counts"]["particle_updates"] == 1
 
     dedupe_snapshot = manager.sync(
         field_particles=[
@@ -324,7 +324,7 @@ def test_presence_runtime_reports_pause_resume_dedupe_and_rate_limit() -> None:
     ]
     assert "presence.writer.paused" in kinds
     assert "presence.writer.resumed" in kinds
-    assert "daimoi.write.deduped" in kinds
+    assert "particles.write.deduped" in kinds
     assert "presence.write.rate-limited" in kinds
 
 
@@ -363,7 +363,7 @@ def test_build_simulation_delta_reports_changed_keys() -> None:
         "video": 0,
         "points": [{"x": 0.0, "y": 0.0}],
         "presence_dynamics": {"click_events": 0},
-        "daimoi": {"record": "eta-mu.daimoi.v1"},
+        "particles": {"record": "eta-mu.particle.v1"},
     }
     current = {
         "timestamp": "2026-01-01T00:00:01+00:00",
@@ -373,7 +373,7 @@ def test_build_simulation_delta_reports_changed_keys() -> None:
         "video": 0,
         "points": [{"x": 0.2, "y": 0.2}],
         "presence_dynamics": {"click_events": 2},
-        "daimoi": {"record": "eta-mu.daimoi.v1"},
+        "particles": {"record": "eta-mu.particle.v1"},
     }
 
     delta = build_simulation_delta(previous, current)
@@ -410,10 +410,10 @@ def test_build_simulation_state_includes_distributed_runtime_snapshot(
     assert runtime_snapshot.get("backend") in {"memory", "redis"}
     counts = runtime_snapshot.get("counts", {})
     assert int(counts.get("presences", 0)) >= 1
-    assert "daimoi_updates" in counts
+    assert "particle_updates" in counts
 
 
-def test_build_simulation_state_growth_guard_deploys_daimoi_consolidation() -> None:
+def test_build_simulation_state_growth_guard_deploys_particle_consolidation() -> None:
     original_file_count = 300
     graph = _synthetic_file_graph(file_count=original_file_count, edges_per_file=3)
 
@@ -444,7 +444,7 @@ def test_build_simulation_state_growth_guard_deploys_daimoi_consolidation() -> N
     assert guard.get("schema_version") == "simulation.growth-guard.v1"
     assert guard.get("active") is True
     action = guard.get("action", {})
-    assert action.get("kind") == "daimoi.consolidation.deployed"
+    assert action.get("kind") == "particles.consolidation.deployed"
     assert int(action.get("collapsed_file_nodes", 0)) > 0
     assert int(action.get("clusters", 0)) >= 1
 
@@ -455,17 +455,17 @@ def test_build_simulation_state_growth_guard_deploys_daimoi_consolidation() -> N
 
     guard_events = guard.get("events", [])
     assert any(
-        str(row.get("kind", "")) == "daimoi.consolidation.deployed"
+        str(row.get("kind", "")) == "particles.consolidation.deployed"
         for row in guard_events
         if isinstance(row, dict)
     )
 
-    daimoi_state = simulation.get("daimoi", {})
-    assert isinstance(daimoi_state.get("growth_guard", {}), dict)
-    daimoi_rows = daimoi_state.get("daimoi", [])
+    particle_state = simulation.get("particles", {})
+    assert isinstance(particle_state.get("growth_guard", {}), dict)
+    particle_rows = particle_state.get("particles", [])
     assert any(
-        str(row.get("id", "")).startswith("daimo:consolidator")
-        for row in daimoi_rows
+        str(row.get("id", "")).startswith("particle:consolidator")
+        for row in particle_rows
         if isinstance(row, dict)
     )
 
@@ -996,7 +996,7 @@ def test_simulation_projection_can_enter_decompression_mode_with_headroom() -> N
     assert int(limits.get("edge_cap", 0)) >= int(limits.get("edge_cap_base", 0))
 
 
-def test_user_search_query_emits_query_daimoi_packet_components() -> None:
+def test_user_search_query_emits_query_particle_packet_components() -> None:
     simulation = build_simulation_state(
         {
             "items": [{"rel_path": "docs/a.md", "part": "part64", "kind": "text"}],
@@ -1009,10 +1009,10 @@ def test_user_search_query_emits_query_daimoi_packet_components() -> None:
                     "kind": "search_query",
                     "target": "nexus mage_of_receipts",
                     "message": "receipt graph drift",
-                    "embed_daimoi": True,
+                    "embed_particle": True,
                     "meta": {
                         "query": "receipt graph drift",
-                        "search_daimoi": {
+                        "search_particle": {
                             "components": [
                                 {
                                     "component_id": "query:base",
@@ -1044,7 +1044,7 @@ def test_user_search_query_emits_query_daimoi_packet_components() -> None:
         for row in rows
         if isinstance(row, dict)
         and str(row.get("presence_id", "")) == "presence.user.operator"
-        and str(row.get("top_job", "")) == "emit_query_daimoi_packet"
+        and str(row.get("top_job", "")) == "emit_query_particle_packet"
     ]
     assert user_rows
     packet_components = user_rows[0].get("packet_components", [])
@@ -1066,10 +1066,10 @@ def test_user_query_transient_edges_promote_after_repeated_hits() -> None:
                     "kind": "search_query",
                     "target": "nexus witness_thread",
                     "message": "where are recent witness receipts",
-                    "embed_daimoi": True,
+                    "embed_particle": True,
                     "meta": {
                         "query": "where are recent witness receipts",
-                        "search_daimoi": {
+                        "search_particle": {
                             "components": [
                                 {
                                     "component_id": "query:witness",

@@ -1303,19 +1303,19 @@ def test_simulation_state_includes_presence_dynamics_and_file_sentinel() -> None
     assert isinstance(field_particles, list)
     assert dynamics.get("field_particles_record") == "ημ.field-particles.v1"
     assert simulation.get("field_particles") == field_particles
-    outcome_summary = dynamics.get("daimoi_outcome_summary", {})
+    outcome_summary = dynamics.get("particle_outcome_summary", {})
     assert isinstance(outcome_summary, dict)
     assert "food" in outcome_summary
     assert "death" in outcome_summary
     assert "total" in outcome_summary
-    trails = dynamics.get("daimoi_outcome_trails", [])
+    trails = dynamics.get("particle_outcome_trails", [])
     assert isinstance(trails, list)
-    resource_daimoi = dynamics.get("resource_daimoi", {})
-    assert resource_daimoi.get("record") == "eta-mu.resource-daimoi-flow.v1"
-    assert "delivered_packets" in resource_daimoi
-    assert "total_transfer" in resource_daimoi
+    resource_particle = dynamics.get("resource_particle", {})
+    assert resource_particle.get("record") == "eta-mu.resource-particle-flow.v1"
+    assert "delivered_packets" in resource_particle
+    assert "total_transfer" in resource_particle
     resource_consumption = dynamics.get("resource_consumption", {})
-    assert resource_consumption.get("record") == "eta-mu.resource-daimoi-consumption.v1"
+    assert resource_consumption.get("record") == "eta-mu.resource-particle-consumption.v1"
     assert "action_packets" in resource_consumption
     assert "blocked_packets" in resource_consumption
     assert "consumed_total" in resource_consumption
@@ -1469,7 +1469,7 @@ def test_backend_field_particles_shift_toward_embedded_similarity(
         },
     ]
 
-    cache = getattr(world_web_module, "_DAIMO_DYNAMICS_CACHE", {})
+    cache = getattr(world_web_module, "_PARTICLE_DYNAMICS_CACHE", {})
     if isinstance(cache, dict):
         cache["field_particles"] = {}
     embed_simulation = build_simulation_state(embed_catalog)
@@ -1582,7 +1582,7 @@ def test_backend_field_particles_scale_with_local_cluster_density(
             }
         )
 
-    cache = getattr(world_web_module, "_DAIMO_DYNAMICS_CACHE", {})
+    cache = getattr(world_web_module, "_PARTICLE_DYNAMICS_CACHE", {})
     if isinstance(cache, dict):
         cache["field_particles"] = {}
     dense_simulation = build_simulation_state(_catalog_with_nodes(dense_nodes))

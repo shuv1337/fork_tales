@@ -4,24 +4,24 @@ import math
 from typing import Any
 
 import pytest
-import code.world_web.daimoi_observer as daimoi_observer_module
+import code.world_web.particle_observer as particle_observer_module
 import code.world_web.server as server_module
 import code.world_web.simulation as simulation_module
 
 from code.world_web import build_simulation_state
-from code.world_web import daimoi_probabilistic as daimoi_module
-from code.world_web.daimoi_probabilistic import (
-    build_probabilistic_daimoi_particles,
-    reset_probabilistic_daimoi_state_for_tests,
+from code.world_web import particle_probabilistic as particle_module
+from code.world_web.particle_probabilistic import (
+    build_probabilistic_particles,
+    reset_probabilistic_particle_state_for_tests,
     run_probabilistic_collision_stress,
 )
 
 
 @pytest.fixture(autouse=True)
 def _reset_probabilistic_cache() -> Any:
-    reset_probabilistic_daimoi_state_for_tests()
+    reset_probabilistic_particle_state_for_tests()
     yield
-    reset_probabilistic_daimoi_state_for_tests()
+    reset_probabilistic_particle_state_for_tests()
 
 
 def test_probabilistic_collision_stress_has_no_nan_and_normalized_probabilities() -> (
@@ -36,7 +36,7 @@ def test_probabilistic_collision_stress_has_no_nan_and_normalized_probabilities(
 
 
 def test_probabilistic_builder_emits_job_distribution_and_actions() -> None:
-    particles, model_summary = build_probabilistic_daimoi_particles(
+    particles, model_summary = build_probabilistic_particles(
         file_graph={"file_nodes": []},
         presence_impacts=[
             {
@@ -64,10 +64,10 @@ def test_probabilistic_builder_emits_job_distribution_and_actions() -> None:
     )
 
     assert particles
-    assert model_summary["record"] == "ημ.daimoi-probabilistic.v1"
+    assert model_summary["record"] == "ημ.particle-probabilistic.v1"
 
     row = particles[0]
-    assert str(row.get("record", "")) == "ημ.daimoi-probabilistic.v1"
+    assert str(row.get("record", "")) == "ημ.particle-probabilistic.v1"
     assert 0.0 <= float(row.get("message_probability", 0.0)) <= 1.0
     jobs = row.get("job_probabilities", {})
     assert isinstance(jobs, dict)
@@ -93,15 +93,15 @@ def test_probabilistic_builder_emits_job_distribution_and_actions() -> None:
     assert "req" in packet_components[0]
     resource_signature = row.get("resource_signature", {})
     assert isinstance(resource_signature, dict)
-    assert set(resource_signature.keys()) == set(daimoi_module.DAIMOI_RESOURCE_KEYS)
+    assert set(resource_signature.keys()) == set(particle_module.PARTICLE_RESOURCE_KEYS)
     absorb_sampler = row.get("absorb_sampler", {})
     assert isinstance(absorb_sampler, dict)
     assert absorb_sampler.get("method") == "gumbel-max"
 
     packet_contract = model_summary.get("packet_contract", {})
-    assert packet_contract.get("schema_version") == "daimoi.packet-components.v1"
+    assert packet_contract.get("schema_version") == "particle.packet-components.v1"
     absorb_contract = model_summary.get("absorb_sampler", {})
-    assert absorb_contract.get("schema_version") == "daimoi.absorb-sampler.v1"
+    assert absorb_contract.get("schema_version") == "particle.absorb-sampler.v1"
     assert absorb_contract.get("method") == "gumbel-max"
     assert 0.0 <= float(model_summary.get("resource_pressure", 0.0)) <= 1.0
     assert 0.0 <= float(model_summary.get("queue_pressure", 0.0)) <= 1.0
@@ -115,7 +115,7 @@ def test_probabilistic_builder_emits_job_distribution_and_actions() -> None:
 
 
 def test_probabilistic_builder_emits_anti_clump_summary() -> None:
-    _, model_summary = build_probabilistic_daimoi_particles(
+    _, model_summary = build_probabilistic_particles(
         file_graph={"file_nodes": []},
         presence_impacts=[
             {
@@ -195,11 +195,11 @@ def test_anti_clump_metrics_score_cluster_higher_than_spread() -> None:
         for col in range(8):
             spread.append((0.08 + (col * 0.11), 0.08 + (row * 0.11)))
 
-    clustered_metrics = daimoi_module._anti_clump_metrics(
+    clustered_metrics = particle_module._anti_clump_metrics(
         clustered,
         previous_collision_count=0,
     )
-    spread_metrics = daimoi_module._anti_clump_metrics(
+    spread_metrics = particle_module._anti_clump_metrics(
         spread,
         previous_collision_count=0,
     )
@@ -238,13 +238,13 @@ def test_anti_clump_metrics_snr_tracks_field_alignment() -> None:
     aligned_particles = _snr_test_particles(aligned=True)
     off_field_particles = _snr_test_particles(aligned=False)
 
-    aligned_metrics = daimoi_module._anti_clump_metrics(
-        daimoi_module._anti_clump_positions_from_particles(aligned_particles),
+    aligned_metrics = particle_module._anti_clump_metrics(
+        particle_module._anti_clump_positions_from_particles(aligned_particles),
         previous_collision_count=0,
         particles=aligned_particles,
     )
-    off_field_metrics = daimoi_module._anti_clump_metrics(
-        daimoi_module._anti_clump_positions_from_particles(off_field_particles),
+    off_field_metrics = particle_module._anti_clump_metrics(
+        particle_module._anti_clump_positions_from_particles(off_field_particles),
         previous_collision_count=0,
         particles=off_field_particles,
     )
@@ -263,12 +263,12 @@ def test_anti_clump_controller_uses_snr_band_gaps_for_drive() -> None:
     high_snr_particles = _snr_test_particles(aligned=True)
     low_snr_particles = _snr_test_particles(aligned=False)
 
-    high_state = daimoi_module._anti_clump_controller_update(
+    high_state = particle_module._anti_clump_controller_update(
         {},
         particles=high_snr_particles,
         previous_collision_count=0,
     )
-    low_state = daimoi_module._anti_clump_controller_update(
+    low_state = particle_module._anti_clump_controller_update(
         {},
         particles=low_snr_particles,
         previous_collision_count=0,
@@ -281,9 +281,9 @@ def test_anti_clump_controller_uses_snr_band_gaps_for_drive() -> None:
 
 
 def test_anti_clump_scales_raise_slip_and_simplex_for_positive_drive() -> None:
-    low = daimoi_module._anti_clump_scales(-0.8)
-    neutral = daimoi_module._anti_clump_scales(0.0)
-    high = daimoi_module._anti_clump_scales(0.8)
+    low = particle_module._anti_clump_scales(-0.8)
+    neutral = particle_module._anti_clump_scales(0.0)
+    high = particle_module._anti_clump_scales(0.8)
 
     assert float(high.get("friction_slip", 1.0)) > float(
         neutral.get("friction_slip", 1.0)
@@ -304,8 +304,8 @@ def test_anti_clump_scales_raise_slip_and_simplex_for_positive_drive() -> None:
 
 
 def test_anti_clump_controller_applies_drive_slew_limit() -> None:
-    config = daimoi_observer_module.anti_clump_controller_config(
-        observer_config=daimoi_observer_module.anti_clump_observer_config(),
+    config = particle_observer_module.anti_clump_controller_config(
+        observer_config=particle_observer_module.anti_clump_observer_config(),
         update_stride=1,
         smoothing=1.0,
         kp=8.0,
@@ -315,7 +315,7 @@ def test_anti_clump_controller_applies_drive_slew_limit() -> None:
         deadband_enabled=False,
         integral_sign_stable_updates=1,
     )
-    state = daimoi_observer_module.anti_clump_controller_update(
+    state = particle_observer_module.anti_clump_controller_update(
         {
             "tick": 0,
             "drive": 0.0,
@@ -334,8 +334,8 @@ def test_anti_clump_controller_applies_drive_slew_limit() -> None:
 
 
 def test_anti_clump_controller_sign_flip_freezes_integral() -> None:
-    config = daimoi_observer_module.anti_clump_controller_config(
-        observer_config=daimoi_observer_module.anti_clump_observer_config(),
+    config = particle_observer_module.anti_clump_controller_config(
+        observer_config=particle_observer_module.anti_clump_observer_config(),
         update_stride=1,
         deadband_enabled=False,
         integral_leak=0.12,
@@ -343,7 +343,7 @@ def test_anti_clump_controller_sign_flip_freezes_integral() -> None:
         integral_freeze_on_sign_flip=True,
         adaptive_enabled=False,
     )
-    state = daimoi_observer_module.anti_clump_controller_update(
+    state = particle_observer_module.anti_clump_controller_update(
         {
             "tick": 0,
             "drive": 0.15,
@@ -363,8 +363,8 @@ def test_anti_clump_controller_sign_flip_freezes_integral() -> None:
 
 
 def test_anti_clump_controller_adaptive_detunes_under_oscillation() -> None:
-    config = daimoi_observer_module.anti_clump_controller_config(
-        observer_config=daimoi_observer_module.anti_clump_observer_config(),
+    config = particle_observer_module.anti_clump_controller_config(
+        observer_config=particle_observer_module.anti_clump_observer_config(),
         update_stride=1,
         deadband_enabled=False,
         adaptive_enabled=True,
@@ -373,7 +373,7 @@ def test_anti_clump_controller_adaptive_detunes_under_oscillation() -> None:
         osc_sat_frac_hi=0.4,
         integral_sign_stable_updates=1,
     )
-    state = daimoi_observer_module.anti_clump_controller_update(
+    state = particle_observer_module.anti_clump_controller_update(
         {
             "tick": 0,
             "drive": 0.98,
@@ -397,7 +397,7 @@ def test_anti_clump_controller_adaptive_detunes_under_oscillation() -> None:
 
 
 def test_web_objective_profile_recognizes_url_and_resource_nodes() -> None:
-    profile = daimoi_module._web_objective_profile_from_nodes(
+    profile = particle_module._web_objective_profile_from_nodes(
         [
             {
                 "id": "web:url:1",
@@ -436,7 +436,7 @@ def test_job_probabilities_with_crawl_objective_boosts_crawl() -> None:
         "invoke_diffuse_field": 0.14,
         "invoke_truth_gate": 0.15,
     }
-    adjusted = daimoi_module._job_probabilities_with_crawl_objective(
+    adjusted = particle_module._job_probabilities_with_crawl_objective(
         baseline,
         crawl_objective_gain=0.92,
     )
@@ -453,7 +453,7 @@ def test_job_probabilities_with_crawl_objective_boosts_crawl() -> None:
 
 
 def test_absorb_sampler_emits_component_logits_and_gumbel_scores() -> None:
-    components = daimoi_module._packet_components_from_job_probabilities(
+    components = particle_module._packet_components_from_job_probabilities(
         {
             "deliver_message": 0.58,
             "invoke_truth_gate": 0.22,
@@ -461,9 +461,9 @@ def test_absorb_sampler_emits_component_logits_and_gumbel_scores() -> None:
         }
     )
 
-    sample = daimoi_module._sample_absorb_component(
+    sample = particle_module._sample_absorb_component(
         components=components,
-        lens_embedding=daimoi_module._embedding_from_text("truth witness gate"),
+        lens_embedding=particle_module._embedding_from_text("truth witness gate"),
         need_by_resource={
             "cpu": 0.8,
             "gpu": 0.25,
@@ -483,8 +483,8 @@ def test_absorb_sampler_emits_component_logits_and_gumbel_scores() -> None:
         seed="unit-absorb-sampler",
     )
 
-    assert sample.get("record") == "eta-mu.daimoi-absorb-sampler.v1"
-    assert sample.get("schema_version") == "daimoi.absorb-sampler.v1"
+    assert sample.get("record") == "eta-mu.particle-absorb-sampler.v1"
+    assert sample.get("schema_version") == "particle.absorb-sampler.v1"
     assert sample.get("method") == "gumbel-max"
     assert 0.0 <= float(sample.get("beta", 0.0))
     assert float(sample.get("temperature", 0.0)) > 0.0
@@ -503,21 +503,21 @@ def test_absorb_sampler_emits_component_logits_and_gumbel_scores() -> None:
     assert "gumbel_score" in first
 
 
-def test_world_edge_pressure_pushes_probabilistic_daimoi_inward() -> None:
-    left_push = daimoi_module._world_edge_inward_pressure(
+def test_world_edge_pressure_pushes_probabilistic_particle_inward() -> None:
+    left_push = particle_module._world_edge_inward_pressure(
         0.01,
-        edge_band=daimoi_module.DAIMOI_WORLD_EDGE_BAND,
-        pressure=daimoi_module.DAIMOI_WORLD_EDGE_PRESSURE,
+        edge_band=particle_module.PARTICLE_WORLD_EDGE_BAND,
+        pressure=particle_module.PARTICLE_WORLD_EDGE_PRESSURE,
     )
-    center_push = daimoi_module._world_edge_inward_pressure(
+    center_push = particle_module._world_edge_inward_pressure(
         0.5,
-        edge_band=daimoi_module.DAIMOI_WORLD_EDGE_BAND,
-        pressure=daimoi_module.DAIMOI_WORLD_EDGE_PRESSURE,
+        edge_band=particle_module.PARTICLE_WORLD_EDGE_BAND,
+        pressure=particle_module.PARTICLE_WORLD_EDGE_PRESSURE,
     )
-    right_push = daimoi_module._world_edge_inward_pressure(
+    right_push = particle_module._world_edge_inward_pressure(
         0.99,
-        edge_band=daimoi_module.DAIMOI_WORLD_EDGE_BAND,
-        pressure=daimoi_module.DAIMOI_WORLD_EDGE_PRESSURE,
+        edge_band=particle_module.PARTICLE_WORLD_EDGE_BAND,
+        pressure=particle_module.PARTICLE_WORLD_EDGE_PRESSURE,
     )
 
     assert left_push > 0.0
@@ -525,16 +525,16 @@ def test_world_edge_pressure_pushes_probabilistic_daimoi_inward() -> None:
     assert right_push < 0.0
 
 
-def test_world_edge_reflection_deflects_probabilistic_daimoi_from_walls() -> None:
-    left_pos, left_v = daimoi_module._reflect_world_axis(
+def test_world_edge_reflection_deflects_probabilistic_particle_from_walls() -> None:
+    left_pos, left_v = particle_module._reflect_world_axis(
         -0.014,
         -0.02,
-        bounce=daimoi_module.DAIMOI_WORLD_EDGE_BOUNCE,
+        bounce=particle_module.PARTICLE_WORLD_EDGE_BOUNCE,
     )
-    right_pos, right_v = daimoi_module._reflect_world_axis(
+    right_pos, right_v = particle_module._reflect_world_axis(
         1.014,
         0.02,
-        bounce=daimoi_module.DAIMOI_WORLD_EDGE_BOUNCE,
+        bounce=particle_module.PARTICLE_WORLD_EDGE_BOUNCE,
     )
 
     assert 0.0 <= left_pos <= 1.0
@@ -544,27 +544,27 @@ def test_world_edge_reflection_deflects_probabilistic_daimoi_from_walls() -> Non
 
 
 def test_semantic_pair_force_changes_sign_with_similarity() -> None:
-    target = [1.0, 0.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 2))
-    aligned = [1.0, 0.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 2))
-    opposite = [-1.0, 0.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 2))
+    target = [1.0, 0.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 2))
+    aligned = [1.0, 0.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 2))
+    opposite = [-1.0, 0.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 2))
 
-    attract_fx, attract_fy = daimoi_module._semantic_pair_force(
+    attract_fx, attract_fy = particle_module._semantic_pair_force(
         target_unit=target,
         dx=0.04,
         dy=0.0,
         distance_sq=0.04 * 0.04,
         source_vector=aligned,
         source_weight=1.0,
-        strength_base=daimoi_module.DAIMOI_SEMANTIC_PARTICLE_STRENGTH,
+        strength_base=particle_module.PARTICLE_SEMANTIC_STRENGTH,
     )
-    repel_fx, repel_fy = daimoi_module._semantic_pair_force(
+    repel_fx, repel_fy = particle_module._semantic_pair_force(
         target_unit=target,
         dx=0.04,
         dy=0.0,
         distance_sq=0.04 * 0.04,
         source_vector=opposite,
         source_weight=1.0,
-        strength_base=daimoi_module.DAIMOI_SEMANTIC_PARTICLE_STRENGTH,
+        strength_base=particle_module.PARTICLE_SEMANTIC_STRENGTH,
     )
 
     assert attract_fx > 0.0
@@ -580,33 +580,33 @@ def test_barnes_hut_semantic_force_matches_far_cluster_expectation() -> None:
             "x": 0.54,
             "y": 0.5,
             "weight": 1.0,
-            "vector": [1.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 1)),
+            "vector": [1.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 1)),
         },
         {
             "id": "far-a",
             "x": 0.86,
             "y": 0.78,
             "weight": 1.0,
-            "vector": [1.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 1)),
+            "vector": [1.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 1)),
         },
         {
             "id": "far-b",
             "x": 0.9,
             "y": 0.82,
             "weight": 1.0,
-            "vector": [1.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 1)),
+            "vector": [1.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 1)),
         },
     ]
-    semantic_tree = daimoi_module._quadtree_build(
+    semantic_tree = particle_module._quadtree_build(
         semantic_items,
         bounds=(0.0, 0.0, 1.0, 1.0),
         max_items=1,
         max_depth=8,
     )
-    daimoi_module._quadtree_semantic_aggregate(semantic_tree)
+    particle_module._quadtree_semantic_aggregate(semantic_tree)
 
-    target_unit = [1.0] + ([0.0] * (daimoi_module.DAIMOI_EMBED_DIMS - 1))
-    bh_fx, bh_fy = daimoi_module._barnes_hut_semantic_force(
+    target_unit = [1.0] + ([0.0] * (particle_module.PARTICLE_EMBED_DIMS - 1))
+    bh_fx, bh_fy = particle_module._barnes_hut_semantic_force(
         node=semantic_tree,
         target_id="target",
         target_x=0.5,
@@ -614,7 +614,7 @@ def test_barnes_hut_semantic_force_matches_far_cluster_expectation() -> None:
         target_unit=target_unit,
         near_radius=0.08,
         theta=0.75,
-        strength_base=daimoi_module.DAIMOI_SEMANTIC_PARTICLE_STRENGTH,
+        strength_base=particle_module.PARTICLE_SEMANTIC_STRENGTH,
         exclude_ids={"near"},
     )
 
@@ -623,14 +623,14 @@ def test_barnes_hut_semantic_force_matches_far_cluster_expectation() -> None:
     for source in (semantic_items[1], semantic_items[2]):
         dx = float(source["x"]) - 0.5
         dy = float(source["y"]) - 0.5
-        direct_fx, direct_fy = daimoi_module._semantic_pair_force(
+        direct_fx, direct_fy = particle_module._semantic_pair_force(
             target_unit=target_unit,
             dx=dx,
             dy=dy,
             distance_sq=(dx * dx) + (dy * dy),
             source_vector=list(source["vector"]),
             source_weight=1.0,
-            strength_base=daimoi_module.DAIMOI_SEMANTIC_PARTICLE_STRENGTH,
+            strength_base=particle_module.PARTICLE_SEMANTIC_STRENGTH,
         )
         expected_fx += direct_fx
         expected_fy += direct_fy
@@ -641,25 +641,25 @@ def test_barnes_hut_semantic_force_matches_far_cluster_expectation() -> None:
     assert math.isclose(bh_fy, expected_fy, rel_tol=0.2, abs_tol=1e-9)
 
 
-def test_pain_field_daimoi_motion_deflects_off_world_edges() -> None:
-    with simulation_module._DAIMO_DYNAMICS_LOCK:
-        simulation_module._DAIMO_DYNAMICS_CACHE["entities"] = {}
+def test_pain_field_particle_motion_deflects_off_world_edges() -> None:
+    with simulation_module._PARTICLE_DYNAMICS_LOCK:
+        simulation_module._PARTICLE_DYNAMICS_CACHE["entities"] = {}
 
     pain_field = {
         "node_heat": [
             {
-                "node_id": "edge-daimo",
+                "node_id": "edge-particle",
                 "x": 0.002,
                 "y": 0.004,
                 "heat": 0.25,
             }
         ]
     }
-    daimoi_state = {
+    particle_state = {
         "relations": {
             "霊/push": [
                 {
-                    "entity_id": "edge-daimo",
+                    "entity_id": "edge-particle",
                     "fx": -6.0,
                     "fy": -6.0,
                 }
@@ -671,9 +671,9 @@ def test_pain_field_daimoi_motion_deflects_off_world_edges() -> None:
         },
     }
 
-    updated = simulation_module._apply_daimoi_dynamics_to_pain_field(
+    updated = simulation_module._apply_particle_dynamics_to_pain_field(
         pain_field,
-        daimoi_state,
+        particle_state,
     )
     rows = updated.get("node_heat", [])
     assert rows
@@ -686,7 +686,7 @@ def test_pain_field_daimoi_motion_deflects_off_world_edges() -> None:
     assert float(motion.get("edge_pressure", 0.0)) > 0.0
 
 
-def test_simulation_payload_exposes_probabilistic_daimoi_summary() -> None:
+def test_simulation_payload_exposes_probabilistic_particle_summary() -> None:
     simulation = build_simulation_state(
         {
             "items": [],
@@ -717,11 +717,11 @@ def test_simulation_payload_exposes_probabilistic_daimoi_summary() -> None:
     )
 
     dynamics = simulation.get("presence_dynamics", {})
-    assert dynamics.get("daimoi_probabilistic_record") == "ημ.daimoi-probabilistic.v1"
+    assert dynamics.get("particle_probabilistic_record") == "ημ.particle-probabilistic.v1"
 
-    summary = dynamics.get("daimoi_probabilistic", {})
+    summary = dynamics.get("particle_probabilistic", {})
     assert isinstance(summary, dict)
-    assert summary.get("schema_version") == "daimoi.probabilistic.v1"
+    assert summary.get("schema_version") == "particle.probabilistic.v1"
     assert int(summary.get("active", 0)) >= 1
     assert "collisions" in summary
     assert "deflects" in summary
@@ -740,13 +740,13 @@ def test_simulation_payload_exposes_probabilistic_daimoi_summary() -> None:
     assert "vy" in first
 
     packet_contract = summary.get("packet_contract", {})
-    assert packet_contract.get("record") == "eta-mu.daimoi-packet-components.v1"
+    assert packet_contract.get("record") == "eta-mu.particle-packet-components.v1"
     absorb_sampler = summary.get("absorb_sampler", {})
-    assert absorb_sampler.get("record") == "eta-mu.daimoi-absorb-sampler.v1"
+    assert absorb_sampler.get("record") == "eta-mu.particle-absorb-sampler.v1"
 
 
 def test_probabilistic_builder_emits_passive_nexus_rows() -> None:
-    particles, _ = build_probabilistic_daimoi_particles(
+    particles, _ = build_probabilistic_particles(
         file_graph={
             "file_nodes": [
                 {
@@ -782,7 +782,7 @@ def test_probabilistic_builder_emits_passive_nexus_rows() -> None:
     nexus_rows = [row for row in particles if bool(row.get("is_nexus", False))]
     assert nexus_rows
     nexus = nexus_rows[0]
-    assert str(nexus.get("particle_mode", "")) == "static-daimoi"
+    assert str(nexus.get("particle_mode", "")) == "static-particle"
     assert str(nexus.get("presence_role", "")) == "nexus-passive"
     assert float(nexus.get("message_probability", 1.0)) == 0.0
     assert str(nexus.get("source_node_id", "")).strip()
@@ -807,7 +807,7 @@ def test_build_nexus_adjacency_falls_back_to_nearest_neighbors() -> None:
         {"id": "node:b", "x": 0.2, "y": 0.1},
         {"id": "node:c", "x": 0.8, "y": 0.8},
     ]
-    adjacency = daimoi_module._build_nexus_adjacency(
+    adjacency = particle_module._build_nexus_adjacency(
         file_nodes=file_nodes,
         edge_rows=[],
         fallback_neighbors=1,
@@ -821,7 +821,7 @@ def test_build_nexus_adjacency_falls_back_to_nearest_neighbors() -> None:
 
 
 def test_select_downhill_adjacent_nexus_prefers_lower_balance_neighbor() -> None:
-    selected, probability = daimoi_module._select_downhill_adjacent_nexus(
+    selected, probability = particle_module._select_downhill_adjacent_nexus(
         current_node_id="node:root",
         adjacency_by_node={"node:root": ["node:left", "node:right"]},
         node_balance_by_node={
@@ -835,10 +835,10 @@ def test_select_downhill_adjacent_nexus_prefers_lower_balance_neighbor() -> None
             "node:right": (0.65, 0.5),
         },
         target_xy=(0.8, 0.5),
-        semantic_vector=daimoi_module._embedding_from_text("database index lineage"),
+        semantic_vector=particle_module._embedding_from_text("database index lineage"),
         node_vector_by_id={
-            "node:left": daimoi_module._embedding_from_text("archive file path"),
-            "node:right": daimoi_module._embedding_from_text("database index lineage"),
+            "node:left": particle_module._embedding_from_text("archive file path"),
+            "node:right": particle_module._embedding_from_text("database index lineage"),
         },
         previous_node_id="",
     )
@@ -848,7 +848,7 @@ def test_select_downhill_adjacent_nexus_prefers_lower_balance_neighbor() -> None
 
 
 def test_probabilistic_builder_emits_graph_route_fields_for_active_particles() -> None:
-    particles, _ = build_probabilistic_daimoi_particles(
+    particles, _ = build_probabilistic_particles(
         file_graph={
             "file_nodes": [
                 {
@@ -913,22 +913,22 @@ def test_config_payload_exposes_magic_number_constants_by_module() -> None:
     assert payload.get("ok") is True
     modules = payload.get("modules", {})
     assert isinstance(modules, dict)
-    assert {"daimoi_probabilistic", "simulation", "server"}.issubset(
+    assert {"particle_probabilistic", "simulation", "server"}.issubset(
         set(modules.keys())
     )
 
-    daimoi_constants = modules.get("daimoi_probabilistic", {}).get("constants", {})
-    assert float(daimoi_constants.get("NEXUS_DAMPING", 0.0)) == pytest.approx(
-        daimoi_module.NEXUS_DAMPING
+    particle_constants = modules.get("particle_probabilistic", {}).get("constants", {})
+    assert float(particle_constants.get("NEXUS_DAMPING", 0.0)) == pytest.approx(
+        particle_module.NEXUS_DAMPING
     )
-    assert float(daimoi_constants.get("DAIMOI_TRANSFER_LAMBDA", 0.0)) == pytest.approx(
-        daimoi_module.DAIMOI_TRANSFER_LAMBDA
+    assert float(particle_constants.get("PARTICLE_TRANSFER_LAMBDA", 0.0)) == pytest.approx(
+        particle_module.PARTICLE_TRANSFER_LAMBDA
     )
 
     simulation_constants = modules.get("simulation", {}).get("constants", {})
     assert float(
-        simulation_constants.get("SIMULATION_STREAM_DAIMOI_FRICTION", 0.0)
-    ) == pytest.approx(simulation_module.SIMULATION_STREAM_DAIMOI_FRICTION)
+        simulation_constants.get("SIMULATION_STREAM_PARTICLE_FRICTION", 0.0)
+    ) == pytest.approx(simulation_module.SIMULATION_STREAM_PARTICLE_FRICTION)
     assert float(
         simulation_constants.get("SIMULATION_STREAM_NEXUS_FRICTION", 0.0)
     ) == pytest.approx(simulation_module.SIMULATION_STREAM_NEXUS_FRICTION)
@@ -951,32 +951,32 @@ def test_config_payload_rejects_unknown_module_filter() -> None:
 
     assert payload.get("ok") is False
     assert payload.get("error") == "unknown_module"
-    assert "daimoi_probabilistic" in payload.get("available_modules", [])
+    assert "particle_probabilistic" in payload.get("available_modules", [])
 
 
 def test_config_update_and_reset_scalar_constant() -> None:
-    baseline = float(simulation_module.SIMULATION_STREAM_DAIMOI_FRICTION)
+    baseline = float(simulation_module.SIMULATION_STREAM_PARTICLE_FRICTION)
     requested = baseline * 0.75
     expected = max(0.0, min(2.0, requested))
 
     update = server_module._config_apply_update(
         module_name="simulation",
-        key_name="SIMULATION_STREAM_DAIMOI_FRICTION",
+        key_name="SIMULATION_STREAM_PARTICLE_FRICTION",
         path_tokens=[],
         value=requested,
     )
 
     assert update.get("ok") is True
-    assert float(simulation_module.SIMULATION_STREAM_DAIMOI_FRICTION) == pytest.approx(
+    assert float(simulation_module.SIMULATION_STREAM_PARTICLE_FRICTION) == pytest.approx(
         expected
     )
 
     reset = server_module._config_reset_updates(
         module_name="simulation",
-        key_name="SIMULATION_STREAM_DAIMOI_FRICTION",
+        key_name="SIMULATION_STREAM_PARTICLE_FRICTION",
     )
     assert reset.get("ok") is True
-    assert float(simulation_module.SIMULATION_STREAM_DAIMOI_FRICTION) == pytest.approx(
+    assert float(simulation_module.SIMULATION_STREAM_PARTICLE_FRICTION) == pytest.approx(
         baseline
     )
 
@@ -1018,11 +1018,11 @@ def test_config_update_clamps_stream_friction_bounds() -> None:
 
 def test_config_update_and_reset_nested_leaf() -> None:
     baseline = float(
-        daimoi_module._ROLE_PRIOR_WEIGHTS["crawl-routing"]["invoke_graph_crawl"]
+        particle_module._ROLE_PRIOR_WEIGHTS["crawl-routing"]["invoke_graph_crawl"]
     )
 
     update = server_module._config_apply_update(
-        module_name="daimoi_probabilistic",
+        module_name="particle_probabilistic",
         key_name="_ROLE_PRIOR_WEIGHTS",
         path_tokens=["crawl-routing", "invoke_graph_crawl"],
         value=baseline + 0.45,
@@ -1030,25 +1030,25 @@ def test_config_update_and_reset_nested_leaf() -> None:
 
     assert update.get("ok") is True
     assert float(
-        daimoi_module._ROLE_PRIOR_WEIGHTS["crawl-routing"]["invoke_graph_crawl"]
+        particle_module._ROLE_PRIOR_WEIGHTS["crawl-routing"]["invoke_graph_crawl"]
     ) == pytest.approx(baseline + 0.45)
 
     reset = server_module._config_reset_updates(
-        module_name="daimoi_probabilistic",
+        module_name="particle_probabilistic",
         key_name="_ROLE_PRIOR_WEIGHTS",
         path_tokens=["crawl-routing", "invoke_graph_crawl"],
     )
     assert reset.get("ok") is True
     assert float(
-        daimoi_module._ROLE_PRIOR_WEIGHTS["crawl-routing"]["invoke_graph_crawl"]
+        particle_module._ROLE_PRIOR_WEIGHTS["crawl-routing"]["invoke_graph_crawl"]
     ) == pytest.approx(baseline)
 
 
-def test_field_particle_friction_is_split_between_daimoi_and_nexus(
+def test_field_particle_friction_is_split_between_particles_and_nexus(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SIM_TICK_SECONDS", "0.08")
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 0.95)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 0.95)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 0.8)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_FIELD_FORCE", 0.0)
@@ -1078,7 +1078,7 @@ def test_field_particle_friction_is_split_between_daimoi_and_nexus(
         "presence_dynamics": {
             "field_particles": [
                 {
-                    "id": "daimoi",
+                    "id": "particles",
                     "presence_id": "presence.alpha",
                     "x": 0.2,
                     "y": 0.2,
@@ -1107,7 +1107,7 @@ def test_field_particle_friction_is_split_between_daimoi_and_nexus(
 
     rows = simulation.get("presence_dynamics", {}).get("field_particles", [])
     row_by_id = {str(row.get("id", "")): row for row in rows if isinstance(row, dict)}
-    assert float(row_by_id["daimoi"]["vx"]) == pytest.approx(0.19, abs=1e-6)
+    assert float(row_by_id["particles"]["vx"]) == pytest.approx(0.19, abs=1e-6)
     assert float(row_by_id["nexus"]["vx"]) == pytest.approx(0.16, abs=1e-6)
 
 
@@ -1115,7 +1115,7 @@ def test_field_particle_prefers_target_presence_over_origin_attractor(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SIM_TICK_SECONDS", "0.08")
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_FIELD_FORCE", 0.4)
@@ -1173,7 +1173,7 @@ def test_nexus_payload_weighting_increases_semantic_pull(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SIM_TICK_SECONDS", "0.08")
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_FIELD_FORCE", 0.34)
@@ -1253,11 +1253,11 @@ def test_nexus_payload_weighting_increases_semantic_pull(
     assert float(row_by_id["nexus-high"]["vx"]) > float(row_by_id["nexus-low"]["vx"])
 
 
-def test_orbit_damping_reduces_daimoi_tangential_lock(
+def test_orbit_damping_reduces_particle_tangential_lock(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SIM_TICK_SECONDS", "0.08")
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_FIELD_FORCE", 0.0)
@@ -1269,7 +1269,7 @@ def test_orbit_damping_reduces_daimoi_tangential_lock(
         simulation_module, "SIMULATION_STREAM_NOOI_NEXUS_FLOW_GAIN", 0.0
     )
     monkeypatch.setattr(
-        simulation_module, "SIMULATION_STREAM_DAIMOI_ORBIT_DAMPING", 1.4
+        simulation_module, "SIMULATION_STREAM_PARTICLE_ORBIT_DAMPING", 1.4
     )
     simulation_module._reset_nooi_field_state()
 
@@ -1277,7 +1277,7 @@ def test_orbit_damping_reduces_daimoi_tangential_lock(
         "presence_dynamics": {
             "field_particles": [
                 {
-                    "id": "orbiting-daimoi",
+                    "id": "orbiting-particle",
                     "presence_id": "presence.alpha",
                     "x": 0.2,
                     "y": 0.5,
@@ -1305,14 +1305,14 @@ def test_orbit_damping_reduces_daimoi_tangential_lock(
 
     rows = simulation.get("presence_dynamics", {}).get("field_particles", [])
     row_by_id = {str(row.get("id", "")): row for row in rows if isinstance(row, dict)}
-    assert abs(float(row_by_id["orbiting-daimoi"]["vy"])) < 0.3
+    assert abs(float(row_by_id["orbiting-particle"]["vy"])) < 0.3
 
 
 def test_nexus_static_friction_requires_breakaway_drive(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SIM_TICK_SECONDS", "0.08")
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_FIELD_FORCE", 0.26)
@@ -1401,7 +1401,7 @@ def test_backend_stream_motion_overlays_emit_graph_and_presence_positions(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("SIM_TICK_SECONDS", "0.08")
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_FIELD_FORCE", 0.0)
@@ -1414,7 +1414,7 @@ def test_backend_stream_motion_overlays_emit_graph_and_presence_positions(
     )
     simulation_module._reset_nooi_field_state()
 
-    cache = getattr(simulation_module, "_DAIMO_DYNAMICS_CACHE", {})
+    cache = getattr(simulation_module, "_PARTICLE_DYNAMICS_CACHE", {})
     if isinstance(cache, dict):
         cache["graph_nodes"] = {}
         cache["presence_anchors"] = {}
@@ -1500,10 +1500,10 @@ def test_backend_stream_motion_overlays_emit_graph_and_presence_positions(
     assert float(updated_presence_positions["presence.alpha"]["x"]) > first_presence_x
 
 
-def test_advance_particles_flow_with_nooi_for_daimoi_and_nexus(
+def test_advance_particles_flow_with_nooi_for_particles_and_nexus(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(simulation_module, "SIMULATION_DISABLE_DAIMOI", 0.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_DISABLE_PARTICLES", 0.0)
     monkeypatch.setattr(
         simulation_module, "SIMULATION_RANDOM_FIELD_VECTORS_ON_BOOT", 0.0
     )
@@ -1512,7 +1512,7 @@ def test_advance_particles_flow_with_nooi_for_daimoi_and_nexus(
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_JITTER_FORCE", 0.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_MAX_SPEED", 1.0)
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NOOI_FLOW_GAIN", 0.7)
     monkeypatch.setattr(
@@ -1528,7 +1528,7 @@ def test_advance_particles_flow_with_nooi_for_daimoi_and_nexus(
         "presence_dynamics": {
             "field_particles": [
                 {
-                    "id": "daimoi",
+                    "id": "particles",
                     "presence_id": "presence.alpha",
                     "x": 0.2,
                     "y": 0.2,
@@ -1557,14 +1557,14 @@ def test_advance_particles_flow_with_nooi_for_daimoi_and_nexus(
 
     rows = simulation.get("presence_dynamics", {}).get("field_particles", [])
     row_by_id = {str(row.get("id", "")): row for row in rows if isinstance(row, dict)}
-    assert float(row_by_id["daimoi"]["vx"]) > 0.0
+    assert float(row_by_id["particles"]["vx"]) > 0.0
     assert float(row_by_id["nexus"]["vx"]) > 0.0
 
 
-def test_nooi_field_is_influenced_only_by_non_nexus_daimoi(
+def test_nooi_field_is_influenced_only_by_non_nexus_particles(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(simulation_module, "SIMULATION_DISABLE_DAIMOI", 0.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_DISABLE_PARTICLES", 0.0)
     monkeypatch.setattr(
         simulation_module, "SIMULATION_RANDOM_FIELD_VECTORS_ON_BOOT", 0.0
     )
@@ -1573,7 +1573,7 @@ def test_nooi_field_is_influenced_only_by_non_nexus_daimoi(
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_JITTER_FORCE", 0.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_VELOCITY_SCALE", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_MAX_SPEED", 1.0)
-    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_DAIMOI_FRICTION", 1.0)
+    monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_PARTICLE_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NEXUS_FRICTION", 1.0)
     monkeypatch.setattr(simulation_module, "SIMULATION_STREAM_NOOI_FLOW_GAIN", 0.0)
     monkeypatch.setattr(
@@ -1609,11 +1609,11 @@ def test_nooi_field_is_influenced_only_by_non_nexus_daimoi(
     assert len(nooi_nexus) == 0
 
     simulation_module._reset_nooi_field_state()
-    daimoi_only: dict[str, Any] = {
+    particle_only: dict[str, Any] = {
         "presence_dynamics": {
             "field_particles": [
                 {
-                    "id": "daimoi-only",
+                    "id": "particle-only",
                     "presence_id": "presence.alpha",
                     "x": 0.5,
                     "y": 0.5,
@@ -1625,18 +1625,18 @@ def test_nooi_field_is_influenced_only_by_non_nexus_daimoi(
         }
     }
     simulation_module.advance_simulation_field_particles(
-        daimoi_only,
+        particle_only,
         dt_seconds=0.08,
         now_seconds=301.0,
     )
-    nooi_daimoi = (
-        daimoi_only.get("presence_dynamics", {}).get("nooi_field", {}).get("cells", [])
+    nooi_particles = (
+        particle_only.get("presence_dynamics", {}).get("nooi_field", {}).get("cells", [])
     )
-    assert isinstance(nooi_daimoi, list)
-    assert len(nooi_daimoi) > 0
+    assert isinstance(nooi_particles, list)
+    assert len(nooi_particles) > 0
 
 
-def test_nooi_outcome_trail_records_daimoi_id_tick_and_trail_steps() -> None:
+def test_nooi_outcome_trail_records_particle_id_tick_and_trail_steps() -> None:
     simulation_module._reset_nooi_field_state()
 
     for tick_index in (1, 2, 3):
@@ -1662,19 +1662,19 @@ def test_nooi_outcome_trail_records_daimoi_id_tick_and_trail_steps() -> None:
     trails = simulation_module._NOOI_FIELD.outcome_trails(limit=8)
     assert trails
     last = trails[-1]
-    assert str(last.get("daimoi_id", "")) == "field:test:trail-001"
+    assert str(last.get("particle_id", "")) == "field:test:trail-001"
     assert str(last.get("outcome", "")) == "death"
     assert int(last.get("tick", 0)) == 3
     assert int(last.get("trail_steps", 0)) >= 3
 
 
-def test_daimoi_motion_trail_history_is_bounded_by_configured_steps() -> None:
+def test_particle_motion_trail_history_is_bounded_by_configured_steps() -> None:
     simulation_module._reset_nooi_field_state()
-    trail_limit = int(simulation_module._DAIMOI_TRAIL_STEPS)
+    trail_limit = int(simulation_module._PARTICLE_TRAIL_STEPS)
     history: list[dict[str, Any]] = []
 
     for tick in range(trail_limit + 9):
-        _, history = simulation_module._record_daimoi_motion_trail(
+        _, history = simulation_module._record_particle_motion_trail(
             {
                 "id": "field:test:bounded-001",
                 "x": 0.2,
@@ -1742,7 +1742,7 @@ def test_crawler_interaction_triggers_apply_rate_limit_and_deadline(
     )
 
     with simulation_module._WEAVER_INTERACTION_STATE_LOCK:
-        simulation_module._DAIMOI_CRAWL_SEARCH_STATE["field:crawl-ttl"] = {
+        simulation_module._PARTICLE_CRAWL_SEARCH_STATE["field:crawl-ttl"] = {
             "target": "url:gamma|https://example.org/gamma",
             "start_tick": 1,
             "last_seen_monotonic": 0.0,

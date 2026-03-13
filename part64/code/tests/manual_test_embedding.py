@@ -1,8 +1,8 @@
-from code.world_web.daimoi_probabilistic import _embedding_from_text, DAIMOI_EMBED_DIMS
+from code.world_web.particle_probabilistic import _embedding_from_text, PARTICLE_EMBED_DIMS
 from code.world_web.ai import _embed_text
 import time
 
-print(f"Default dims: {DAIMOI_EMBED_DIMS}")
+print(f"Default dims: {PARTICLE_EMBED_DIMS}")
 
 # Test 1: Basic hashing (fallback)
 # If NPU/Ollama is not running, this will fallback to hash
@@ -15,14 +15,14 @@ print(f"Vec1 norm: {sum(x * x for x in vec1)}")
 import sys
 from unittest.mock import MagicMock
 
-# Mock the _embed_text function in daimoi_probabilistic's namespace (which imported it locally)
+# Mock the _embed_text function in particle_probabilistic's namespace (which imported it locally)
 # Actually, since it imports inside the function, we need to mock code.world_web.ai._embed_text
 import code.world_web.ai
 
 code.world_web.ai._embed_text = MagicMock(return_value=[0.1] * 768)
 
 # Clear cache to force re-run
-from code.world_web.daimoi_probabilistic import _semantic_embedding_cached
+from code.world_web.particle_probabilistic import _semantic_embedding_cached
 
 _semantic_embedding_cached.cache_clear()
 

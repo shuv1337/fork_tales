@@ -24,5 +24,5 @@ def test_build_surrounding_nodes_includes_classifier_and_noise() -> None:
 
 
 @pytest.mark.skip(reason="muse_semantic_training_lab.py script was removed")
-def test_score_trial_checks_kind_node_and_routed_daimoi() -> None:
+def test_score_trial_checks_kind_node_and_routed_particle() -> None:
     pass

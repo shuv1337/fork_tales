@@ -50,7 +50,7 @@ def _normalize_query_name(name: Any) -> str:
         "recent": "recently_updated",
         "recently_touched": "recently_updated",
         "touched": "recently_updated",
-        "explain": "explain_daimoi",
+        "explain": "explain_particle",
         "outcomes": "recent_outcomes",
         "crawler": "crawler_status",
         "arxiv": "arxiv_papers",
@@ -435,19 +435,19 @@ def _simulation_sections(
     ]
     outcome_rows = [
         row
-        for row in dynamics.get("daimoi_outcome_trails", [])
+        for row in dynamics.get("particle_outcome_trails", [])
         if isinstance(row, dict)
     ]
     return dynamics, crawler_graph, field_particles, outcome_rows
 
 
-def _query_explain_daimoi(
+def _query_explain_particle(
     simulation: dict[str, Any] | None,
     args: dict[str, Any],
 ) -> dict[str, Any]:
     dynamics, _, field_particles, outcome_rows = _simulation_sections(simulation)
     target_id = str(
-        args.get("daimoi_id", args.get("id", args.get("target", ""))) or ""
+        args.get("particle_id", args.get("id", args.get("target", ""))) or ""
     ).strip()
 
     live_state: dict[str, Any] | None = None
@@ -462,8 +462,8 @@ def _query_explain_daimoi(
 
     matched_outcomes: list[dict[str, Any]] = []
     for row in outcome_rows:
-        row_daimoi_id = str(row.get("daimoi_id", "") or "").strip()
-        if target_id and row_daimoi_id != target_id:
+        row_particle_id = str(row.get("particle_id", "") or "").strip()
+        if target_id and row_particle_id != target_id:
             continue
         matched_outcomes.append(row)
 
@@ -493,7 +493,7 @@ def _query_explain_daimoi(
         reinforcement_direction = "inverse"
 
     return {
-        "daimoi_id": target_id,
+        "particle_id": target_id,
         "status": status,
         "live_state": (
             {
@@ -583,7 +583,7 @@ def _query_recent_outcomes(
         {
             "tick": max(0, _safe_int(row.get("tick", row.get("seq", 0)), 0)),
             "seq": max(0, _safe_int(row.get("seq", 0), 0)),
-            "daimoi_id": str(row.get("daimoi_id", "") or "").strip(),
+            "particle_id": str(row.get("particle_id", "") or "").strip(),
             "outcome": str(row.get("outcome", "") or "").strip().lower(),
             "reason": str(row.get("reason", "") or "").strip(),
             "target_id": str(row.get("graph_node_id", "") or "").strip(),
@@ -1457,7 +1457,7 @@ def run_named_graph_query(
         "url_status": lambda: _query_url_status(nodes, query_args),
         "resource_for_url": lambda: _query_resource_for_url(nodes, edges, query_args),
         "recently_updated": lambda: _query_recently_updated(nodes, query_args),
-        "explain_daimoi": lambda: _query_explain_daimoi(simulation, query_args),
+        "explain_particle": lambda: _query_explain_particle(simulation, query_args),
         "recent_outcomes": lambda: _query_recent_outcomes(simulation, query_args),
         "crawler_status": lambda: _query_crawler_status(simulation),
         "arxiv_papers": lambda: _query_arxiv_papers(simulation, query_args),
@@ -1494,7 +1494,7 @@ def run_named_graph_query(
                 "resource_for_url",
                 "recently_updated",
                 "role_slice",
-                "explain_daimoi",
+                "explain_particle",
                 "recent_outcomes",
                 "crawler_status",
                 "arxiv_papers",
@@ -1709,15 +1709,15 @@ def _facts_recent_events(
         simulation.get("presence_dynamics", {}) if isinstance(simulation, dict) else {}
     )
     if isinstance(dynamics, dict):
-        trails = dynamics.get("daimoi_outcome_trails", [])
+        trails = dynamics.get("particle_outcome_trails", [])
         if isinstance(trails, list):
             for row in trails[-limit:]:
                 if not isinstance(row, dict):
                     continue
                 rows.append(
                     {
-                        "id": f"daimoi:{_safe_int(row.get('seq', 0), 0)}",
-                        "kind": "daimoi_outcome",
+                        "id": f"particles:{_safe_int(row.get('seq', 0), 0)}",
+                        "kind": "particle_outcome",
                         "ts": str(row.get("ts", "") or ""),
                         "outcome": str(row.get("outcome", "") or "").strip().lower(),
                         "target": str(row.get("graph_node_id", "") or "").strip(),
@@ -1909,9 +1909,9 @@ def _facts_table_rows(
         )
     )
 
-    daimoi_table = [
+    particle_table = [
         {
-            "daimoi_id": str(row.get("id", "") or "").strip(),
+            "particle_id": str(row.get("id", "") or "").strip(),
             "owner": str(
                 row.get(
                     "presence_id",
@@ -1933,12 +1933,12 @@ def _facts_table_rows(
         for row in field_particles
         if str(row.get("id", "") or "").strip()
     ]
-    daimoi_table.sort(key=lambda row: str(row.get("daimoi_id", "")))
+    particle_table.sort(key=lambda row: str(row.get("particle_id", "")))
 
     event_collision_table = []
     for row in field_particles:
-        daimoi_id = str(row.get("id", "") or "").strip()
-        if not daimoi_id:
+        particle_id = str(row.get("id", "") or "").strip()
+        if not particle_id:
             continue
         collisions = max(
             0,
@@ -1949,7 +1949,7 @@ def _facts_table_rows(
         event_collision_table.append(
             {
                 "tick": max(0, _safe_int(row.get("age", tick_hint), tick_hint)),
-                "daimoi_id": daimoi_id,
+                "particle_id": particle_id,
                 "target_id": str(row.get("graph_node_id", "") or "").strip(),
                 "collision_count": collisions,
             }
@@ -1957,7 +1957,7 @@ def _facts_table_rows(
     event_collision_table.sort(
         key=lambda row: (
             _safe_int(row.get("tick", 0), 0),
-            str(row.get("daimoi_id", "")),
+            str(row.get("particle_id", "")),
         )
     )
 
@@ -1969,7 +1969,7 @@ def _facts_table_rows(
         outcome_table.append(
             {
                 "tick": max(0, _safe_int(row.get("tick", row.get("seq", 0)), 0)),
-                "daimoi_id": str(row.get("daimoi_id", "") or "").strip(),
+                "particle_id": str(row.get("particle_id", "") or "").strip(),
                 "target_id": str(row.get("graph_node_id", "") or "").strip(),
                 "reason": str(row.get("reason", "") or "").strip(),
                 "intensity": round(
@@ -1982,7 +1982,7 @@ def _facts_table_rows(
     outcome_table.sort(
         key=lambda row: (
             _safe_int(row.get("tick", 0), 0),
-            str(row.get("daimoi_id", "")),
+            str(row.get("particle_id", "")),
             str(row.get("outcome", "")),
         )
     )
@@ -1990,7 +1990,7 @@ def _facts_table_rows(
     event_timeout_table = [
         {
             "tick": max(0, _safe_int(row.get("tick", 0), 0)),
-            "daimoi_id": str(row.get("daimoi_id", "") or "").strip(),
+            "particle_id": str(row.get("particle_id", "") or "").strip(),
             "reason": str(row.get("reason", "") or "").strip(),
         }
         for row in outcome_table
@@ -2092,7 +2092,7 @@ def _facts_table_rows(
     food_table = [
         {
             "tick": max(0, _safe_int(row.get("tick", 0), 0)),
-            "daimoi_id": str(row.get("daimoi_id", "") or "").strip(),
+            "particle_id": str(row.get("particle_id", "") or "").strip(),
             "target_id": str(row.get("target_id", "") or "").strip(),
         }
         for row in outcome_table
@@ -2101,7 +2101,7 @@ def _facts_table_rows(
     death_table = [
         {
             "tick": max(0, _safe_int(row.get("tick", 0), 0)),
-            "daimoi_id": str(row.get("daimoi_id", "") or "").strip(),
+            "particle_id": str(row.get("particle_id", "") or "").strip(),
         }
         for row in outcome_table
         if str(row.get("outcome", "")).strip() == "death"
@@ -2110,7 +2110,7 @@ def _facts_table_rows(
     return {
         "node": node_table,
         "edge": edge_table,
-        "daimoi": daimoi_table,
+        "particles": particle_table,
         "event_collision": event_collision_table,
         "event_timeout": event_timeout_table,
         "capacity": capacity_table,
@@ -2158,8 +2158,8 @@ def build_facts_snapshot(
         else {}
     )
     outcomes = (
-        dynamics.get("daimoi_outcome_summary", {})
-        if isinstance(dynamics.get("daimoi_outcome_summary", {}), dict)
+        dynamics.get("particle_outcome_summary", {})
+        if isinstance(dynamics.get("particle_outcome_summary", {}), dict)
         else {}
     )
     tables = _facts_table_rows(payload, nodes=nodes, edges=edges)
@@ -2177,7 +2177,7 @@ def build_facts_snapshot(
         },
         "github": github_section,
         "dynamics": {
-            "daimoi_outcomes": {
+            "particle_outcomes": {
                 "food": max(0, _safe_int(outcomes.get("food", 0), 0)),
                 "death": max(0, _safe_int(outcomes.get("death", 0), 0)),
                 "total": max(0, _safe_int(outcomes.get("total", 0), 0)),

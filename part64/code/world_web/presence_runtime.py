@@ -47,7 +47,7 @@ redis.call('XADD', KEYS[3], '*', 'event', event_json)
 return {1, tostring(next_ver)}
 """
 
-_DAIMO_UPSERT_SCRIPT = """
+_PARTICLE_UPSERT_SCRIPT = """
 local expected = tonumber(ARGV[1])
 local owner = ARGV[2]
 local did = ARGV[3]
@@ -75,7 +75,7 @@ redis.call('XADD', KEYS[3], '*', 'event', event_json)
 return {1, tostring(next_ver), owner}
 """
 
-_DAIMO_HANDOFF_SCRIPT = """
+_PARTICLE_HANDOFF_SCRIPT = """
 local did = ARGV[1]
 local from_owner = ARGV[2]
 local to_owner = ARGV[3]
@@ -145,16 +145,16 @@ def _presence_ver_key(presence_id: str) -> str:
     return f"p:{presence_id}:ver"
 
 
-def _presence_daimoi_key(presence_id: str) -> str:
-    return f"p:{presence_id}:daimoi"
+def _presence_particle_key(presence_id: str) -> str:
+    return f"p:{presence_id}:particles"
 
 
 def _presence_inbox_key(presence_id: str) -> str:
     return f"p:{presence_id}:inbox"
 
 
-def _daimoi_state_key(daimoi_id: str) -> str:
-    return f"d:{daimoi_id}:state"
+def _particle_state_key(particle_id: str) -> str:
+    return f"d:{particle_id}:state"
 
 
 def _stringify(value: Any) -> str:
@@ -178,8 +178,8 @@ class InMemoryPresenceStorage:
         self._presence_leases: dict[str, dict[str, Any]] = {}
         self._presence_vars: dict[str, dict[str, str]] = {}
         self._presence_ver: dict[str, int] = {}
-        self._presence_daimoi: dict[str, set[str]] = {}
-        self._daimoi_state: dict[str, dict[str, Any]] = {}
+        self._presence_particles: dict[str, set[str]] = {}
+        self._particle_state: dict[str, dict[str, Any]] = {}
         self._bus_events: list[dict[str, Any]] = []
         self._inbox_events: dict[str, list[dict[str, Any]]] = {}
 
@@ -189,8 +189,8 @@ class InMemoryPresenceStorage:
             self._presence_leases = {}
             self._presence_vars = {}
             self._presence_ver = {}
-            self._presence_daimoi = {}
-            self._daimoi_state = {}
+            self._presence_particles = {}
+            self._particle_state = {}
             self._bus_events = []
             self._inbox_events = {}
 
@@ -258,33 +258,33 @@ class InMemoryPresenceStorage:
             self._append_bus_event_locked(dict(event_row))
             return True, next_ver
 
-    def get_daimoi_owner_ver(self, daimoi_id: str) -> tuple[str, int]:
-        did = str(daimoi_id).strip()
+    def get_particle_owner_ver(self, particle_id: str) -> tuple[str, int]:
+        did = str(particle_id).strip()
         if not did:
             return "", 0
         with self._lock:
-            row = self._daimoi_state.get(did, {})
+            row = self._particle_state.get(did, {})
             return (
                 str(row.get("owner", "")).strip(),
                 _safe_int(row.get("ver", 0), 0),
             )
 
-    def upsert_daimoi(
+    def upsert_particle(
         self,
         *,
         owner_presence_id: str,
-        daimoi_id: str,
+        particle_id: str,
         expected_ver: int,
         state_patch: dict[str, Any],
         now_iso: str,
         event_row: dict[str, Any],
     ) -> tuple[bool, str, int]:
         owner = str(owner_presence_id).strip()
-        did = str(daimoi_id).strip()
+        did = str(particle_id).strip()
         if not owner or not did:
             return False, "invalid", 0
         with self._lock:
-            existing = dict(self._daimoi_state.get(did, {}))
+            existing = dict(self._particle_state.get(did, {}))
             current_owner = str(existing.get("owner", "")).strip()
             if current_owner and current_owner != owner:
                 return False, "owner_conflict", _safe_int(existing.get("ver", 0), 0)
@@ -299,27 +299,27 @@ class InMemoryPresenceStorage:
                 "updated_at": str(now_iso),
                 "ver": next_ver,
             }
-            self._daimoi_state[did] = merged
-            self._presence_daimoi.setdefault(owner, set()).add(did)
+            self._particle_state[did] = merged
+            self._presence_particles.setdefault(owner, set()).add(did)
             self._append_bus_event_locked(dict(event_row))
             return True, "ok", next_ver
 
-    def handoff_daimoi(
+    def handoff_particle(
         self,
         *,
-        daimoi_id: str,
+        particle_id: str,
         from_owner_presence_id: str,
         to_owner_presence_id: str,
         now_iso: str,
         event_row: dict[str, Any],
     ) -> tuple[bool, str, int]:
-        did = str(daimoi_id).strip()
+        did = str(particle_id).strip()
         from_owner = str(from_owner_presence_id).strip()
         to_owner = str(to_owner_presence_id).strip()
         if not did or not from_owner or not to_owner:
             return False, "invalid", 0
         with self._lock:
-            existing = dict(self._daimoi_state.get(did, {}))
+            existing = dict(self._particle_state.get(did, {}))
             current_owner = str(existing.get("owner", "")).strip()
             if not current_owner:
                 return False, "missing", 0
@@ -329,9 +329,9 @@ class InMemoryPresenceStorage:
             existing["owner"] = to_owner
             existing["updated_at"] = str(now_iso)
             existing["ver"] = next_ver
-            self._daimoi_state[did] = existing
-            self._presence_daimoi.setdefault(from_owner, set()).discard(did)
-            self._presence_daimoi.setdefault(to_owner, set()).add(did)
+            self._particle_state[did] = existing
+            self._presence_particles.setdefault(from_owner, set()).discard(did)
+            self._presence_particles.setdefault(to_owner, set()).add(did)
             payload = dict(event_row)
             self._append_bus_event_locked(payload)
             self._inbox_events.setdefault(to_owner, []).append(
@@ -372,9 +372,9 @@ class InMemoryPresenceStorage:
                 return []
             return [dict(row) for row in rows[-limit:]]
 
-    def presence_daimoi_ids(self, presence_id: str) -> set[str]:
+    def presence_particle_ids(self, presence_id: str) -> set[str]:
         with self._lock:
-            return set(self._presence_daimoi.get(str(presence_id).strip(), set()))
+            return set(self._presence_particles.get(str(presence_id).strip(), set()))
 
     def _next_stream_id_locked(self) -> str:
         raw = self._next_event_id
@@ -401,8 +401,8 @@ class RedisPresenceStorage:
         self._redis = redis_client
         self._lease_script = self._redis.register_script(_LEASE_SCRIPT)
         self._presence_cas_script = self._redis.register_script(_PRESENCE_CAS_SCRIPT)
-        self._daimoi_upsert_script = self._redis.register_script(_DAIMO_UPSERT_SCRIPT)
-        self._daimoi_handoff_script = self._redis.register_script(_DAIMO_HANDOFF_SCRIPT)
+        self._particle_upsert_script = self._redis.register_script(_PARTICLE_UPSERT_SCRIPT)
+        self._particle_handoff_script = self._redis.register_script(_PARTICLE_HANDOFF_SCRIPT)
 
     def acquire_or_renew_lease(
         self,
@@ -475,25 +475,25 @@ class RedisPresenceStorage:
         ver = _safe_int(result[1], self.get_presence_ver(pid))
         return ok, ver
 
-    def get_daimoi_owner_ver(self, daimoi_id: str) -> tuple[str, int]:
-        did = str(daimoi_id).strip()
+    def get_particle_owner_ver(self, particle_id: str) -> tuple[str, int]:
+        did = str(particle_id).strip()
         if not did:
             return "", 0
-        owner, ver = self._redis.hmget(_daimoi_state_key(did), ["owner", "ver"])
+        owner, ver = self._redis.hmget(_particle_state_key(did), ["owner", "ver"])
         return str(owner or "").strip(), _safe_int(ver, 0)
 
-    def upsert_daimoi(
+    def upsert_particle(
         self,
         *,
         owner_presence_id: str,
-        daimoi_id: str,
+        particle_id: str,
         expected_ver: int,
         state_patch: dict[str, Any],
         now_iso: str,
         event_row: dict[str, Any],
     ) -> tuple[bool, str, int]:
         owner = str(owner_presence_id).strip()
-        did = str(daimoi_id).strip()
+        did = str(particle_id).strip()
         if not owner or not did:
             return False, "invalid", 0
         args: list[str] = [
@@ -506,10 +506,10 @@ class RedisPresenceStorage:
         for key, value in state_patch.items():
             args.append(str(key))
             args.append(_stringify(value))
-        result = self._daimoi_upsert_script(
+        result = self._particle_upsert_script(
             keys=[
-                _daimoi_state_key(did),
-                _presence_daimoi_key(owner),
+                _particle_state_key(did),
+                _presence_particle_key(owner),
                 PRESENCE_RUNTIME_BUS_STREAM,
             ],
             args=args,
@@ -521,25 +521,25 @@ class RedisPresenceStorage:
         ver = _safe_int(result[1 if ok else 2], 0)
         return ok, reason, ver
 
-    def handoff_daimoi(
+    def handoff_particle(
         self,
         *,
-        daimoi_id: str,
+        particle_id: str,
         from_owner_presence_id: str,
         to_owner_presence_id: str,
         now_iso: str,
         event_row: dict[str, Any],
     ) -> tuple[bool, str, int]:
-        did = str(daimoi_id).strip()
+        did = str(particle_id).strip()
         from_owner = str(from_owner_presence_id).strip()
         to_owner = str(to_owner_presence_id).strip()
         if not did or not from_owner or not to_owner:
             return False, "invalid", 0
-        result = self._daimoi_handoff_script(
+        result = self._particle_handoff_script(
             keys=[
-                _daimoi_state_key(did),
-                _presence_daimoi_key(from_owner),
-                _presence_daimoi_key(to_owner),
+                _particle_state_key(did),
+                _presence_particle_key(from_owner),
+                _presence_particle_key(to_owner),
                 _presence_inbox_key(to_owner),
                 PRESENCE_RUNTIME_BUS_STREAM,
             ],
@@ -615,8 +615,8 @@ class RedisPresenceStorage:
             parsed.append({"stream_id": str(stream_id), "event": event_payload})
         return parsed
 
-    def presence_daimoi_ids(self, presence_id: str) -> set[str]:
-        rows = self._redis.smembers(_presence_daimoi_key(str(presence_id).strip()))
+    def presence_particle_ids(self, presence_id: str) -> set[str]:
+        rows = self._redis.smembers(_presence_particle_key(str(presence_id).strip()))
         return {str(row) for row in rows}
 
 
@@ -698,7 +698,7 @@ class PresenceRuntimeManager:
                     "paused": 0,
                     "resumed": 0,
                     "presence_updates": 0,
-                    "daimoi_updates": 0,
+                    "particle_updates": 0,
                     "handoffs": 0,
                     "deduped": 0,
                     "rate_limited": 0,
@@ -796,7 +796,7 @@ class PresenceRuntimeManager:
                     )
 
         presence_updates = 0
-        daimoi_updates = 0
+        particle_updates = 0
         handoffs = 0
         deduped = 0
         rate_limited = 0
@@ -904,15 +904,15 @@ class PresenceRuntimeManager:
             rate_for_presence = 0
 
             for row in rows:
-                daimoi_id = str(row.get("id", "")).strip()
-                if not daimoi_id:
+                particle_id = str(row.get("id", "")).strip()
+                if not particle_id:
                     compliance_blocked += 1
                     self._emit_event(
                         {
                             "kind": "presence.compliance.blocked",
                             "status": "blocked",
                             "presence_id": presence_id,
-                            "reason": "missing_daimoi_id",
+                            "reason": "missing_particle_id",
                             "ts": now_iso,
                         }
                     )
@@ -941,12 +941,12 @@ class PresenceRuntimeManager:
                         f"{b:.5f}",
                     ]
                 )
-                if self._particle_fingerprint.get(daimoi_id) == fingerprint:
+                if self._particle_fingerprint.get(particle_id) == fingerprint:
                     deduped += 1
                     dedupe_for_presence += 1
                     continue
 
-                prev_xy = self._last_particle_xy.get(daimoi_id)
+                prev_xy = self._last_particle_xy.get(particle_id)
                 if prev_xy is None:
                     vel_x = 0.0
                     vel_y = 0.0
@@ -956,21 +956,21 @@ class PresenceRuntimeManager:
                     vel_x = (x - _clamp01(_safe_float(px, x))) / dt
                     vel_y = (y - _clamp01(_safe_float(py, y))) / dt
 
-                owner, owner_ver = self._storage.get_daimoi_owner_ver(daimoi_id)
+                owner, owner_ver = self._storage.get_particle_owner_ver(particle_id)
                 if owner and owner != presence_id:
                     handoff_event = {
-                        "kind": "daimoi.owner.handoff",
+                        "kind": "particles.owner.handoff",
                         "status": "ok",
                         "presence_id": presence_id,
                         "from_owner": owner,
                         "to_owner": presence_id,
-                        "daimoi_id": daimoi_id,
+                        "particle_id": particle_id,
                         "reason": "presence_domain_shift",
                         "ts": now_iso,
                     }
                     handoff_ok, handoff_reason, handoff_ver = (
-                        self._storage.handoff_daimoi(
-                            daimoi_id=daimoi_id,
+                        self._storage.handoff_particle(
+                            particle_id=particle_id,
                             from_owner_presence_id=owner,
                             to_owner_presence_id=presence_id,
                             now_iso=now_iso,
@@ -984,7 +984,7 @@ class PresenceRuntimeManager:
                                 "kind": "presence.compliance.blocked",
                                 "status": "blocked",
                                 "presence_id": presence_id,
-                                "daimoi_id": daimoi_id,
+                                "particle_id": particle_id,
                                 "reason": f"handoff_failed:{handoff_reason}",
                                 "ts": now_iso,
                             }
@@ -1010,34 +1010,34 @@ class PresenceRuntimeManager:
                     "updated_at": now_iso,
                 }
                 upsert_event = {
-                    "kind": "daimoi.state.updated",
+                    "kind": "particles.state.updated",
                     "status": "ok",
                     "presence_id": presence_id,
-                    "daimoi_id": daimoi_id,
+                    "particle_id": particle_id,
                     "expected_ver": owner_ver,
                     "ts": now_iso,
                 }
-                upsert_ok, upsert_reason, upsert_ver = self._storage.upsert_daimoi(
+                upsert_ok, upsert_reason, upsert_ver = self._storage.upsert_particle(
                     owner_presence_id=presence_id,
-                    daimoi_id=daimoi_id,
+                    particle_id=particle_id,
                     expected_ver=owner_ver,
                     state_patch=state_patch,
                     now_iso=now_iso,
                     event_row=upsert_event,
                 )
                 if not upsert_ok and upsert_reason == "cas_conflict":
-                    _, retry_ver = self._storage.get_daimoi_owner_ver(daimoi_id)
+                    _, retry_ver = self._storage.get_particle_owner_ver(particle_id)
                     retry_event = {
-                        "kind": "daimoi.state.cas-retry",
+                        "kind": "particles.state.cas-retry",
                         "status": "retry",
                         "presence_id": presence_id,
-                        "daimoi_id": daimoi_id,
+                        "particle_id": particle_id,
                         "expected_ver": retry_ver,
                         "ts": now_iso,
                     }
-                    upsert_ok, upsert_reason, upsert_ver = self._storage.upsert_daimoi(
+                    upsert_ok, upsert_reason, upsert_ver = self._storage.upsert_particle(
                         owner_presence_id=presence_id,
-                        daimoi_id=daimoi_id,
+                        particle_id=particle_id,
                         expected_ver=retry_ver,
                         state_patch=state_patch,
                         now_iso=now_iso,
@@ -1045,10 +1045,10 @@ class PresenceRuntimeManager:
                     )
 
                 if upsert_ok:
-                    daimoi_updates += 1
+                    particle_updates += 1
                     writes_for_presence += 1
-                    self._particle_fingerprint[daimoi_id] = fingerprint
-                    self._last_particle_xy[daimoi_id] = (x, y, now_secs)
+                    self._particle_fingerprint[particle_id] = fingerprint
+                    self._last_particle_xy[particle_id] = (x, y, now_secs)
                     continue
 
                 compliance_blocked += 1
@@ -1057,8 +1057,8 @@ class PresenceRuntimeManager:
                         "kind": "presence.compliance.blocked",
                         "status": "blocked",
                         "presence_id": presence_id,
-                        "daimoi_id": daimoi_id,
-                        "reason": f"daimoi_write_failed:{upsert_reason}",
+                        "particle_id": particle_id,
+                        "reason": f"particle_write_failed:{upsert_reason}",
                         "observed_ver": upsert_ver,
                         "ts": now_iso,
                     }
@@ -1067,7 +1067,7 @@ class PresenceRuntimeManager:
             if dedupe_for_presence > 0:
                 self._emit_event(
                     {
-                        "kind": "daimoi.write.deduped",
+                        "kind": "particles.write.deduped",
                         "status": "ok",
                         "presence_id": presence_id,
                         "count": dedupe_for_presence,
@@ -1114,7 +1114,7 @@ class PresenceRuntimeManager:
                 "paused_total": paused_total,
                 "resumed": resumed_count,
                 "presence_updates": presence_updates,
-                "daimoi_updates": daimoi_updates,
+                "particle_updates": particle_updates,
                 "handoffs": handoffs,
                 "deduped": deduped,
                 "rate_limited": rate_limited,
@@ -1280,7 +1280,7 @@ def simulation_fingerprint(simulation: dict[str, Any]) -> str:
             + ",".join(
                 [
                     str(runtime.get("backend", "")),
-                    str(runtime_counts.get("daimoi_updates", 0)),
+                    str(runtime_counts.get("particle_updates", 0)),
                     str(runtime_counts.get("handoffs", 0)),
                     str(runtime_counts.get("deduped", 0)),
                 ]
@@ -1293,5 +1293,5 @@ def simulation_fingerprint(simulation: dict[str, Any]) -> str:
             + str(dynamics.get("field_particles_record", ""))
         )
     rows.append("points:" + str(len(simulation.get("points", []))))
-    rows.append("daimoi:" + str(simulation.get("daimoi", {}).get("record", "")))
+    rows.append("particles:" + str(simulation.get("particles", {}).get("record", "")))
     return sha1("\n".join(rows).encode("utf-8")).hexdigest()

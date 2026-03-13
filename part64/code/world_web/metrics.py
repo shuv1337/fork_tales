@@ -1026,7 +1026,7 @@ class RuntimeInfluenceTracker:
         message: str,
         x_ratio: float | None = None,
         y_ratio: float | None = None,
-        embed_daimoi: bool = False,
+        embed_particle: bool = False,
         meta: dict[str, Any] | None = None,
     ) -> None:
         clean_kind = str(kind or "input").strip().lower() or "input"
@@ -1036,7 +1036,7 @@ class RuntimeInfluenceTracker:
             "kind": clean_kind,
             "target": clean_target[:240],
             "message": clean_message[:320],
-            "embed_daimoi": bool(embed_daimoi),
+            "embed_particle": bool(embed_particle),
         }
         if x_ratio is not None:
             payload["x_ratio"] = round(_clamp01(_safe_float(x_ratio, 0.5)), 6)
@@ -1289,7 +1289,7 @@ class RuntimeInfluenceTracker:
                     "message": str(row.get("message", "")),
                     "x_ratio": row.get("x_ratio"),
                     "y_ratio": row.get("y_ratio"),
-                    "embed_daimoi": bool(row.get("embed_daimoi", False)),
+                    "embed_particle": bool(row.get("embed_particle", False)),
                     "meta": (
                         {
                             str(key): value

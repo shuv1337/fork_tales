@@ -12,56 +12,56 @@ from urllib.parse import urlparse
 from functools import lru_cache
 from typing import Any
 
-from . import daimoi_absorb_sampler as daimoi_absorb_sampler_module
-from . import daimoi_collision_semantics as daimoi_collision_semantics_module
-from . import daimoi_components as daimoi_components_module
-from . import daimoi_observer as daimoi_observer_module
-from . import daimoi_packets as daimoi_packets_module
-from . import daimoi_quadtree as daimoi_quadtree_module
-from . import daimoi_resources as daimoi_resources_module
+from . import particle_absorb_sampler as particle_absorb_sampler_module
+from . import particle_collision_semantics as particle_collision_semantics_module
+from . import particle_components as particle_components_module
+from . import particle_observer as particle_observer_module
+from . import particle_packets as particle_packets_module
+from . import particle_quadtree as particle_quadtree_module
+from . import particle_resources as particle_resources_module
 from .constants import (
     ENTITY_MANIFEST,
     FIELD_TO_PRESENCE,
-    _DAIMO_DYNAMICS_CACHE,
-    _DAIMO_DYNAMICS_LOCK,
+    _PARTICLE_DYNAMICS_CACHE,
+    _PARTICLE_DYNAMICS_LOCK,
 )
 from .metrics import _clamp01, _safe_float, _safe_int, _stable_ratio
 
 
-DAIMOI_PROBABILISTIC_RECORD = "ημ.daimoi-probabilistic.v1"
-DAIMOI_PROBABILISTIC_SCHEMA = "daimoi.probabilistic.v1"
-DAIMOI_BEHAVIOR_DEFAULTS = ("deflect", "diffuse")
-DAIMOI_EMBED_DIMS = 24
-DAIMOI_SURFACE_RADIUS = 0.03
-DAIMOI_IMPULSE_REFERENCE = 0.022
-DAIMOI_SIZE_BIAS_BETA = 1.15
-DAIMOI_ALPHA_BASELINE = 1.0
-DAIMOI_ALPHA_MAX = 1_000_000.0
-DAIMOI_TRANSFER_LAMBDA = 0.66
-DAIMOI_REPULSION_MU = (
+PARTICLE_PROBABILISTIC_RECORD = "ημ.particle-probabilistic.v1"
+PARTICLE_PROBABILISTIC_SCHEMA = "particle.probabilistic.v1"
+PARTICLE_BEHAVIOR_DEFAULTS = ("deflect", "diffuse")
+PARTICLE_EMBED_DIMS = 24
+PARTICLE_SURFACE_RADIUS = 0.03
+PARTICLE_IMPULSE_REFERENCE = 0.022
+PARTICLE_SIZE_BIAS_BETA = 1.15
+PARTICLE_ALPHA_BASELINE = 1.0
+PARTICLE_ALPHA_MAX = 1_000_000.0
+PARTICLE_TRANSFER_LAMBDA = 0.66
+PARTICLE_REPULSION_MU = (
     0.48  # Increased from 0.24 for stronger unrelated concept repulsion
 )
-DAIMOI_COLLISION_COUPLING_GAIN = max(
+PARTICLE_COLLISION_COUPLING_GAIN = max(
     0.05,
     min(
         1.0,
         _safe_float(
-            os.getenv("DAIMOI_COLLISION_COUPLING_GAIN", "0.48") or "0.48",
+            os.getenv("PARTICLE_COLLISION_COUPLING_GAIN", "0.48") or "0.48",
             0.48,
         ),
     ),
 )
-DAIMOI_COLLISION_REPULSION_BOOST = max(
+PARTICLE_COLLISION_REPULSION_BOOST = max(
     1.0,
     min(
         3.5,
         _safe_float(
-            os.getenv("DAIMOI_COLLISION_REPULSION_BOOST", "2.2") or "2.2",
+            os.getenv("PARTICLE_COLLISION_REPULSION_BOOST", "2.2") or "2.2",
             2.2,
         ),
     ),
 )
-DAIMOI_DIRECTIVES = (
+PARTICLE_DIRECTIVES = (
     "Prioritize witness continuity over novelty.",
     "Deliver only verifiable claims into the target gate.",
     "Route uncertain packets toward anchor reconciliation.",
@@ -71,7 +71,7 @@ DAIMOI_DIRECTIVES = (
     "Favor file organization when entropy rises.",
     "Escalate to truth gating when conflict is high.",
 )
-DAIMOI_JOB_KEYS = (
+PARTICLE_JOB_KEYS = (
     "deliver_message",
     "invoke_receipt_audit",
     "invoke_truth_gate",
@@ -83,19 +83,19 @@ DAIMOI_JOB_KEYS = (
     "emit_resource_packet",  # New job: emit resource currency
     "absorb_resource",  # New job: absorb resource currency
 )
-DAIMOI_JOB_KEYS_SORTED = tuple(sorted(DAIMOI_JOB_KEYS))
-DAIMOI_JOB_KEYS_SET = set(DAIMOI_JOB_KEYS)
-DAIMOI_NODE_INFLUENCE_RADIUS = 0.32
-DAIMOI_NODE_INFLUENCE_RADIUS_EPS = 1e-8
-DAIMOI_SEMANTIC_CHARGE_ALPHA = 2.4
-DAIMOI_SEMANTIC_CHARGE_SOFTENING = 0.01
-DAIMOI_SEMANTIC_CHARGE_GAIN = 1.0
-DAIMOI_SEMANTIC_PARTICLE_NEAR_RADIUS = 0.11
-DAIMOI_SEMANTIC_BARNES_HUT_THETA = 0.62
-DAIMOI_SEMANTIC_PARTICLE_STRENGTH = 0.00013
-DAIMOI_WORLD_EDGE_BAND = 0.12
-DAIMOI_WORLD_EDGE_PRESSURE = 0.0015
-DAIMOI_WORLD_EDGE_BOUNCE = 0.78
+PARTICLE_JOB_KEYS_SORTED = tuple(sorted(PARTICLE_JOB_KEYS))
+PARTICLE_JOB_KEYS_SET = set(PARTICLE_JOB_KEYS)
+PARTICLE_NODE_INFLUENCE_RADIUS = 0.32
+PARTICLE_NODE_INFLUENCE_RADIUS_EPS = 1e-8
+PARTICLE_SEMANTIC_CHARGE_ALPHA = 2.4
+PARTICLE_SEMANTIC_CHARGE_SOFTENING = 0.01
+PARTICLE_SEMANTIC_CHARGE_GAIN = 1.0
+PARTICLE_SEMANTIC_NEAR_RADIUS = 0.11
+PARTICLE_SEMANTIC_BARNES_HUT_THETA = 0.62
+PARTICLE_SEMANTIC_STRENGTH = 0.00013
+PARTICLE_WORLD_EDGE_BAND = 0.12
+PARTICLE_WORLD_EDGE_PRESSURE = 0.0015
+PARTICLE_WORLD_EDGE_BOUNCE = 0.78
 NEXUS_PASSIVE_ACTION_PROBS = {"deflect": 0.92, "diffuse": 0.08}
 NEXUS_ROUTE_NEIGHBOR_FALLBACK = 2
 NEXUS_ROUTE_BALANCE_RADIUS = 0.12
@@ -111,51 +111,51 @@ NEXUS_GRAVITY_FLOW_GAIN = 0.0037
 NEXUS_DAMPING = 0.89
 NEXUS_SPEED_CAP_BASE = 0.0019
 NEXUS_SPEED_CAP_GRAVITY_GAIN = 0.001
-DAIMOI_ANTI_CLUMP_TARGET = 0.34
-DAIMOI_ANTI_CLUMP_KP = 0.30
-DAIMOI_ANTI_CLUMP_KI = 0.05
-DAIMOI_ANTI_CLUMP_SMOOTHING = 0.20
-DAIMOI_ANTI_CLUMP_UPDATE_STRIDE = 6
-DAIMOI_ANTI_CLUMP_INTEGRAL_LIMIT = 1.5
-DAIMOI_ANTI_CLUMP_DRIVE_LIMIT = 1.0
-DAIMOI_ANTI_CLUMP_GRID_SIZE = 16
-DAIMOI_ANTI_CLUMP_SAMPLE_LIMIT = 96
-DAIMOI_ANTI_CLUMP_COLLISION_RATE_REF = 2.2
-DAIMOI_ANTI_CLUMP_MIN_PARTICLES = 24
-DAIMOI_OBSERVER_SNR_MIN = max(
+PARTICLE_ANTI_CLUMP_TARGET = 0.34
+PARTICLE_ANTI_CLUMP_KP = 0.30
+PARTICLE_ANTI_CLUMP_KI = 0.05
+PARTICLE_ANTI_CLUMP_SMOOTHING = 0.20
+PARTICLE_ANTI_CLUMP_UPDATE_STRIDE = 6
+PARTICLE_ANTI_CLUMP_INTEGRAL_LIMIT = 1.5
+PARTICLE_ANTI_CLUMP_DRIVE_LIMIT = 1.0
+PARTICLE_ANTI_CLUMP_GRID_SIZE = 16
+PARTICLE_ANTI_CLUMP_SAMPLE_LIMIT = 96
+PARTICLE_ANTI_CLUMP_COLLISION_RATE_REF = 2.2
+PARTICLE_ANTI_CLUMP_MIN_PARTICLES = 24
+PARTICLE_OBSERVER_SNR_MIN = max(
     0.05,
-    _safe_float(os.getenv("DAIMOI_OBSERVER_SNR_MIN", "0.85") or "0.85", 0.85),
+    _safe_float(os.getenv("PARTICLE_OBSERVER_SNR_MIN", "0.85") or "0.85", 0.85),
 )
-DAIMOI_OBSERVER_SNR_MAX = max(
-    DAIMOI_OBSERVER_SNR_MIN + 0.05,
-    _safe_float(os.getenv("DAIMOI_OBSERVER_SNR_MAX", "1.65") or "1.65", 1.65),
+PARTICLE_OBSERVER_SNR_MAX = max(
+    PARTICLE_OBSERVER_SNR_MIN + 0.05,
+    _safe_float(os.getenv("PARTICLE_OBSERVER_SNR_MAX", "1.65") or "1.65", 1.65),
 )
-DAIMOI_OBSERVER_SNR_ALPHA = max(
+PARTICLE_OBSERVER_SNR_ALPHA = max(
     0.0,
-    _safe_float(os.getenv("DAIMOI_OBSERVER_SNR_ALPHA", "0.4") or "0.4", 0.4),
+    _safe_float(os.getenv("PARTICLE_OBSERVER_SNR_ALPHA", "0.4") or "0.4", 0.4),
 )
-DAIMOI_OBSERVER_SNR_BETA = max(
+PARTICLE_OBSERVER_SNR_BETA = max(
     0.0,
-    _safe_float(os.getenv("DAIMOI_OBSERVER_SNR_BETA", "0.2") or "0.2", 0.2),
+    _safe_float(os.getenv("PARTICLE_OBSERVER_SNR_BETA", "0.2") or "0.2", 0.2),
 )
-DAIMOI_OBSERVER_SNR_EPS = max(
+PARTICLE_OBSERVER_SNR_EPS = max(
     1e-9,
-    _safe_float(os.getenv("DAIMOI_OBSERVER_SNR_EPS", "1e-6") or "1e-6", 1e-6),
+    _safe_float(os.getenv("PARTICLE_OBSERVER_SNR_EPS", "1e-6") or "1e-6", 1e-6),
 )
-DAIMOI_OBSERVER_HIGH_SNR_PERTURB_GAIN = max(
+PARTICLE_OBSERVER_HIGH_SNR_PERTURB_GAIN = max(
     0.0,
     _safe_float(
-        os.getenv("DAIMOI_OBSERVER_HIGH_SNR_PERTURB_GAIN", "0.34") or "0.34",
+        os.getenv("PARTICLE_OBSERVER_HIGH_SNR_PERTURB_GAIN", "0.34") or "0.34",
         0.34,
     ),
 )
 
-DAIMOI_PACKET_COMPONENT_RECORD = "eta-mu.daimoi-packet-components.v1"
-DAIMOI_PACKET_COMPONENT_SCHEMA = "daimoi.packet-components.v1"
-DAIMOI_ABSORB_SAMPLER_RECORD = "eta-mu.daimoi-absorb-sampler.v1"
-DAIMOI_ABSORB_SAMPLER_SCHEMA = "daimoi.absorb-sampler.v1"
-DAIMOI_ABSORB_SAMPLER_METHOD = "gumbel-max"
-DAIMOI_RESOURCE_KEYS = ("cpu", "gpu", "npu", "ram", "disk", "network")
+PARTICLE_PACKET_COMPONENT_RECORD = "eta-mu.particle-packet-components.v1"
+PARTICLE_PACKET_COMPONENT_SCHEMA = "particle.packet-components.v1"
+PARTICLE_ABSORB_SAMPLER_RECORD = "eta-mu.particle-absorb-sampler.v1"
+PARTICLE_ABSORB_SAMPLER_SCHEMA = "particle.absorb-sampler.v1"
+PARTICLE_ABSORB_SAMPLER_METHOD = "gumbel-max"
+PARTICLE_RESOURCE_KEYS = ("cpu", "gpu", "npu", "ram", "disk", "network")
 _SEMANTIC_EMBED_GUARD_LOCK = threading.Lock()
 _SEMANTIC_EMBED_OFFLINE_UNTIL = 0.0
 _SEMANTIC_EMBED_FAIL_STREAK = 0
@@ -349,7 +349,7 @@ def _rect_intersects_circle(
     y: float,
     radius: float,
 ) -> bool:
-    return daimoi_quadtree_module.rect_intersects_circle(bounds, x, y, radius)
+    return particle_quadtree_module.rect_intersects_circle(bounds, x, y, radius)
 
 
 def _quadtree_build(
@@ -360,7 +360,7 @@ def _quadtree_build(
     max_items: int = 24,
     max_depth: int = 7,
 ) -> dict[str, Any]:
-    return daimoi_quadtree_module.quadtree_build(
+    return particle_quadtree_module.quadtree_build(
         items,
         bounds=bounds,
         depth=depth,
@@ -374,7 +374,7 @@ def _quadtree_build(
 def _quadtree_query_radius(
     node: dict[str, Any], x: float, y: float, radius: float, out: list[dict[str, Any]]
 ) -> None:
-    return daimoi_quadtree_module.quadtree_query_radius(
+    return particle_quadtree_module.quadtree_query_radius(
         node,
         x,
         y,
@@ -385,9 +385,9 @@ def _quadtree_query_radius(
 
 
 def _quadtree_semantic_aggregate(
-    node: dict[str, Any], *, vector_dims: int = DAIMOI_EMBED_DIMS
+    node: dict[str, Any], *, vector_dims: int = PARTICLE_EMBED_DIMS
 ) -> dict[str, Any]:
-    return daimoi_quadtree_module.quadtree_semantic_aggregate(
+    return particle_quadtree_module.quadtree_semantic_aggregate(
         node,
         vector_dims=vector_dims,
         clamp01=_clamp01,
@@ -407,22 +407,22 @@ def _semantic_pair_force(
     source_weight: float,
     strength_base: float,
 ) -> tuple[float, float]:
-    if distance_sq <= DAIMOI_NODE_INFLUENCE_RADIUS_EPS:
+    if distance_sq <= PARTICLE_NODE_INFLUENCE_RADIUS_EPS:
         return 0.0, 0.0
     similarity = _safe_cosine_unit(target_unit, source_vector)
-    charge = math.tanh(similarity * _safe_float(DAIMOI_SEMANTIC_CHARGE_ALPHA, 2.4))
+    charge = math.tanh(similarity * _safe_float(PARTICLE_SEMANTIC_CHARGE_ALPHA, 2.4))
     if abs(charge) <= 1e-8:
         return 0.0, 0.0
 
     softened_dist_sq = distance_sq + max(
         1e-6,
-        _safe_float(DAIMOI_SEMANTIC_CHARGE_SOFTENING, 0.01),
+        _safe_float(PARTICLE_SEMANTIC_CHARGE_SOFTENING, 0.01),
     )
     inv_dist_cubed = 1.0 / (softened_dist_sq * math.sqrt(softened_dist_sq))
     strength = (
-        max(0.0, _safe_float(strength_base, DAIMOI_SEMANTIC_PARTICLE_STRENGTH))
+        max(0.0, _safe_float(strength_base, PARTICLE_SEMANTIC_STRENGTH))
         * max(0.0, _safe_float(source_weight, 1.0))
-        * _safe_float(DAIMOI_SEMANTIC_CHARGE_GAIN, 1.0)
+        * _safe_float(PARTICLE_SEMANTIC_CHARGE_GAIN, 1.0)
     )
     force_scale = strength * charge * inv_dist_cubed
     return dx * force_scale, dy * force_scale
@@ -463,8 +463,8 @@ def _barnes_hut_semantic_force(
     distance_sq = (dx * dx) + (dy * dy)
     distance = math.sqrt(distance_sq) if distance_sq > 1e-12 else 0.0
 
-    near = max(0.0, _safe_float(near_radius, DAIMOI_SEMANTIC_PARTICLE_NEAR_RADIUS))
-    safe_theta = max(0.05, _safe_float(theta, DAIMOI_SEMANTIC_BARNES_HUT_THETA))
+    near = max(0.0, _safe_float(near_radius, PARTICLE_SEMANTIC_NEAR_RADIUS))
+    safe_theta = max(0.05, _safe_float(theta, PARTICLE_SEMANTIC_BARNES_HUT_THETA))
     excludes = exclude_ids or set()
 
     children_raw = node.get("children")
@@ -480,8 +480,8 @@ def _barnes_hut_semantic_force(
     if can_approximate:
         vector_sum_raw = aggregate.get("vector_sum", [])
         vector_sum = vector_sum_raw if isinstance(vector_sum_raw, list) else []
-        mean_vector = [0.0] * DAIMOI_EMBED_DIMS
-        for index in range(min(DAIMOI_EMBED_DIMS, len(vector_sum))):
+        mean_vector = [0.0] * PARTICLE_EMBED_DIMS
+        for index in range(min(PARTICLE_EMBED_DIMS, len(vector_sum))):
             mean_vector[index] = _finite_float(vector_sum[index], 0.0) / total_weight
         return _semantic_pair_force(
             target_unit=target_unit,
@@ -565,8 +565,8 @@ def _world_edge_inward_pressure(
     position: float, *, edge_band: float, pressure: float
 ) -> float:
     pos = _clamp01(_finite_float(position, 0.5))
-    band = max(1e-6, _finite_float(edge_band, DAIMOI_WORLD_EDGE_BAND))
-    force = _finite_float(pressure, DAIMOI_WORLD_EDGE_PRESSURE)
+    band = max(1e-6, _finite_float(edge_band, PARTICLE_WORLD_EDGE_BAND))
+    force = _finite_float(pressure, PARTICLE_WORLD_EDGE_PRESSURE)
     if pos < band:
         return ((band - pos) / band) * force
     far_side = 1.0 - band
@@ -580,7 +580,7 @@ def _reflect_world_axis(
 ) -> tuple[float, float]:
     pos = _finite_float(position, 0.5)
     vel = _finite_float(velocity, 0.0)
-    restitution = max(0.0, min(0.99, _finite_float(bounce, DAIMOI_WORLD_EDGE_BOUNCE)))
+    restitution = max(0.0, min(0.99, _finite_float(bounce, PARTICLE_WORLD_EDGE_BOUNCE)))
     for _ in range(2):
         if pos < 0.0:
             pos = -pos
@@ -646,13 +646,13 @@ def _coerce_vector(value: Any) -> list[float]:
 
 def _state_unit_vector(state: dict[str, Any], key: str) -> list[float]:
     vector = _coerce_vector(state.get(key, []))
-    if len(vector) == DAIMOI_EMBED_DIMS:
+    if len(vector) == PARTICLE_EMBED_DIMS:
         return vector
     return _normalize_vector(vector)
 
 
 def _normalize_vector(
-    values: list[float], *, dims: int = DAIMOI_EMBED_DIMS
+    values: list[float], *, dims: int = PARTICLE_EMBED_DIMS
 ) -> list[float]:
     dims = max(1, int(dims))
     if not values:
@@ -758,7 +758,7 @@ def _tokenize(text: str) -> list[str]:
     return [token for token in re.split(r"[^\w]+", str(text).lower()) if token]
 
 
-def _embedding_from_text(text: str, *, dims: int = DAIMOI_EMBED_DIMS) -> list[float]:
+def _embedding_from_text(text: str, *, dims: int = PARTICLE_EMBED_DIMS) -> list[float]:
     normalized_dims = max(1, int(dims))
 
     # Attempt semantic embedding via AI runtime if available (e.g. Nomic on NPU)
@@ -912,10 +912,10 @@ def _directive_for_particle(presence_id: str, slot_index: int, now: float) -> st
     ratio = _stable_ratio(
         f"{presence_id}|directive|{slot_index}|{tick}", slot_index + 3
     )
-    directive_index = int(math.floor(ratio * len(DAIMOI_DIRECTIVES))) % len(
-        DAIMOI_DIRECTIVES
+    directive_index = int(math.floor(ratio * len(PARTICLE_DIRECTIVES))) % len(
+        PARTICLE_DIRECTIVES
     )
-    return DAIMOI_DIRECTIVES[directive_index]
+    return PARTICLE_DIRECTIVES[directive_index]
 
 
 def _presence_role_and_mode(presence_id: str) -> tuple[str, str]:
@@ -935,11 +935,11 @@ def _initial_job_alpha(
     resource_influence: float,
     slot_index: int,
 ) -> dict[str, float]:
-    alpha = {key: DAIMOI_ALPHA_BASELINE for key in DAIMOI_JOB_KEYS}
+    alpha = {key: PARTICLE_ALPHA_BASELINE for key in PARTICLE_JOB_KEYS}
     role_weights = _ROLE_PRIOR_WEIGHTS.get(role, {})
     for job_key, weight in role_weights.items():
         alpha[job_key] = max(
-            1e-8, alpha.get(job_key, DAIMOI_ALPHA_BASELINE) + _safe_float(weight, 0.0)
+            1e-8, alpha.get(job_key, PARTICLE_ALPHA_BASELINE) + _safe_float(weight, 0.0)
         )
     alpha["deliver_message"] += (click_influence * 2.4) + (world_influence * 0.7)
     alpha["invoke_file_organize"] += file_influence * 2.6
@@ -963,14 +963,14 @@ def _initial_job_alpha(
         # Non-core presences want to absorb resources
         alpha["absorb_resource"] += 1.5 + (resource_influence * 1.0)
 
-    for job_key in DAIMOI_JOB_KEYS:
+    for job_key in PARTICLE_JOB_KEYS:
         jitter = (
             _stable_ratio(f"{presence_id}|{slot_index}|{job_key}", slot_index + 7) - 0.5
         ) * 0.26
         alpha[job_key] = max(
             1e-8,
             _safe_float(
-                alpha.get(job_key, DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE
+                alpha.get(job_key, PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE
             )
             + jitter,
         )
@@ -983,9 +983,9 @@ def _initial_message_alpha(
     click_influence: float,
     world_influence: float,
 ) -> dict[str, float]:
-    deliver = DAIMOI_ALPHA_BASELINE + (click_influence * 2.7) + (world_influence * 0.8)
+    deliver = PARTICLE_ALPHA_BASELINE + (click_influence * 2.7) + (world_influence * 0.8)
     hold = (
-        DAIMOI_ALPHA_BASELINE
+        PARTICLE_ALPHA_BASELINE
         + ((1.0 - click_influence) * 1.9)
         + ((1.0 - file_influence) * 0.4)
     )
@@ -1005,9 +1005,9 @@ def _dirichlet_probabilities(
     for key in keys:
         value = max(
             1e-8,
-            _finite_float(alpha.get(key, DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE),
+            _finite_float(alpha.get(key, PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE),
         )
-        value = min(DAIMOI_ALPHA_MAX, value)
+        value = min(PARTICLE_ALPHA_MAX, value)
         normalized[key] = value
         totals += value
     if totals <= 1e-12:
@@ -1042,34 +1042,34 @@ def _clamp_range(value: Any, lower: float, upper: float) -> float:
 
 
 def _anti_clump_positions_from_particles(particles: Any) -> list[tuple[float, float]]:
-    return daimoi_observer_module.anti_clump_positions_from_particles(particles)
+    return particle_observer_module.anti_clump_positions_from_particles(particles)
 
 
 def _anti_clump_observer_config() -> dict[str, Any]:
-    return daimoi_observer_module.anti_clump_observer_config(
-        sample_limit=DAIMOI_ANTI_CLUMP_SAMPLE_LIMIT,
-        grid_cap=DAIMOI_ANTI_CLUMP_GRID_SIZE,
-        collision_rate_ref=DAIMOI_ANTI_CLUMP_COLLISION_RATE_REF,
-        snr_min=DAIMOI_OBSERVER_SNR_MIN,
-        snr_max=DAIMOI_OBSERVER_SNR_MAX,
-        snr_alpha=DAIMOI_OBSERVER_SNR_ALPHA,
-        snr_beta=DAIMOI_OBSERVER_SNR_BETA,
-        snr_eps=DAIMOI_OBSERVER_SNR_EPS,
+    return particle_observer_module.anti_clump_observer_config(
+        sample_limit=PARTICLE_ANTI_CLUMP_SAMPLE_LIMIT,
+        grid_cap=PARTICLE_ANTI_CLUMP_GRID_SIZE,
+        collision_rate_ref=PARTICLE_ANTI_CLUMP_COLLISION_RATE_REF,
+        snr_min=PARTICLE_OBSERVER_SNR_MIN,
+        snr_max=PARTICLE_OBSERVER_SNR_MAX,
+        snr_alpha=PARTICLE_OBSERVER_SNR_ALPHA,
+        snr_beta=PARTICLE_OBSERVER_SNR_BETA,
+        snr_eps=PARTICLE_OBSERVER_SNR_EPS,
     )
 
 
 def _anti_clump_controller_config() -> dict[str, Any]:
-    return daimoi_observer_module.anti_clump_controller_config(
+    return particle_observer_module.anti_clump_controller_config(
         observer_config=_anti_clump_observer_config(),
-        drive_limit=DAIMOI_ANTI_CLUMP_DRIVE_LIMIT,
-        integral_limit=DAIMOI_ANTI_CLUMP_INTEGRAL_LIMIT,
-        target=DAIMOI_ANTI_CLUMP_TARGET,
-        kp=DAIMOI_ANTI_CLUMP_KP,
-        ki=DAIMOI_ANTI_CLUMP_KI,
-        smoothing=DAIMOI_ANTI_CLUMP_SMOOTHING,
-        update_stride=DAIMOI_ANTI_CLUMP_UPDATE_STRIDE,
-        min_particles=DAIMOI_ANTI_CLUMP_MIN_PARTICLES,
-        high_snr_perturb_gain=DAIMOI_OBSERVER_HIGH_SNR_PERTURB_GAIN,
+        drive_limit=PARTICLE_ANTI_CLUMP_DRIVE_LIMIT,
+        integral_limit=PARTICLE_ANTI_CLUMP_INTEGRAL_LIMIT,
+        target=PARTICLE_ANTI_CLUMP_TARGET,
+        kp=PARTICLE_ANTI_CLUMP_KP,
+        ki=PARTICLE_ANTI_CLUMP_KI,
+        smoothing=PARTICLE_ANTI_CLUMP_SMOOTHING,
+        update_stride=PARTICLE_ANTI_CLUMP_UPDATE_STRIDE,
+        min_particles=PARTICLE_ANTI_CLUMP_MIN_PARTICLES,
+        high_snr_perturb_gain=PARTICLE_OBSERVER_HIGH_SNR_PERTURB_GAIN,
     )
 
 
@@ -1079,7 +1079,7 @@ def _anti_clump_metrics(
     previous_collision_count: int,
     particles: Any | None = None,
 ) -> dict[str, Any]:
-    return daimoi_observer_module.anti_clump_metrics(
+    return particle_observer_module.anti_clump_metrics(
         positions,
         previous_collision_count=previous_collision_count,
         particles=particles,
@@ -1088,7 +1088,7 @@ def _anti_clump_metrics(
 
 
 def _anti_clump_scales(drive: float) -> dict[str, float]:
-    return daimoi_observer_module.anti_clump_scales(drive)
+    return particle_observer_module.anti_clump_scales(drive)
 
 
 def _anti_clump_controller_update(
@@ -1097,7 +1097,7 @@ def _anti_clump_controller_update(
     particles: dict[str, Any],
     previous_collision_count: int,
 ) -> dict[str, Any]:
-    return daimoi_observer_module.anti_clump_controller_update(
+    return particle_observer_module.anti_clump_controller_update(
         controller_state,
         particles=particles,
         previous_collision_count=previous_collision_count,
@@ -1106,9 +1106,9 @@ def _anti_clump_controller_update(
 
 
 def _resource_wallet_by_type(wallet: dict[str, Any] | None) -> dict[str, float]:
-    return daimoi_resources_module.resource_wallet_by_type(
+    return particle_resources_module.resource_wallet_by_type(
         wallet,
-        resource_keys=DAIMOI_RESOURCE_KEYS,
+        resource_keys=PARTICLE_RESOURCE_KEYS,
     )
 
 
@@ -1117,10 +1117,10 @@ def _presence_need_by_resource(
     *,
     queue_ratio: float,
 ) -> dict[str, float]:
-    return daimoi_resources_module.presence_need_by_resource(
+    return particle_resources_module.presence_need_by_resource(
         impact,
         queue_ratio=queue_ratio,
-        resource_keys=DAIMOI_RESOURCE_KEYS,
+        resource_keys=PARTICLE_RESOURCE_KEYS,
     )
 
 
@@ -1134,14 +1134,14 @@ def _component_embedding(job_key: str) -> list[float]:
 
 
 def _component_resource_req(job_key: str) -> dict[str, float]:
-    return daimoi_components_module.component_resource_req(
+    return particle_components_module.component_resource_req(
         job_key,
-        resource_keys=DAIMOI_RESOURCE_KEYS,
+        resource_keys=PARTICLE_RESOURCE_KEYS,
     )
 
 
 def _component_cost(job_key: str) -> float:
-    return daimoi_components_module.component_cost(
+    return particle_components_module.component_cost(
         job_key,
         default_cost=0.3,
     )
@@ -1150,7 +1150,7 @@ def _component_cost(job_key: str) -> float:
 def _packet_components_from_job_probabilities(
     probabilities: dict[str, float],
 ) -> list[dict[str, Any]]:
-    return daimoi_packets_module.packet_components_from_job_probabilities(
+    return particle_packets_module.packet_components_from_job_probabilities(
         probabilities,
         component_resource_req=_component_resource_req,
         component_cost=_component_cost,
@@ -1159,9 +1159,9 @@ def _packet_components_from_job_probabilities(
 
 
 def _packet_resource_signature(components: list[dict[str, Any]]) -> dict[str, float]:
-    return daimoi_packets_module.packet_resource_signature(
+    return particle_packets_module.packet_resource_signature(
         components,
-        resource_keys=DAIMOI_RESOURCE_KEYS,
+        resource_keys=PARTICLE_RESOURCE_KEYS,
     )
 
 
@@ -1172,17 +1172,17 @@ def _packet_component_contract_for_state(
 ) -> dict[str, Any]:
     job_probs = _job_probabilities(state)
     components = _packet_components_from_job_probabilities(job_probs)
-    return daimoi_packets_module.packet_component_contract(
+    return particle_packets_module.packet_component_contract(
         components,
-        resource_keys=DAIMOI_RESOURCE_KEYS,
-        record=DAIMOI_PACKET_COMPONENT_RECORD,
-        schema_version=DAIMOI_PACKET_COMPONENT_SCHEMA,
+        resource_keys=PARTICLE_RESOURCE_KEYS,
+        record=PARTICLE_PACKET_COMPONENT_RECORD,
+        schema_version=PARTICLE_PACKET_COMPONENT_SCHEMA,
         top_k=top_k,
     )
 
 
 def _softmax_probabilities(values: list[float]) -> list[float]:
-    return daimoi_absorb_sampler_module.softmax_probabilities(
+    return particle_absorb_sampler_module.softmax_probabilities(
         values,
         finite_float=_finite_float,
     )
@@ -1196,13 +1196,13 @@ def _sample_absorb_component(
     context: dict[str, Any],
     seed: str,
 ) -> dict[str, Any]:
-    return daimoi_absorb_sampler_module.sample_absorb_component(
+    return particle_absorb_sampler_module.sample_absorb_component(
         components=components,
         lens_embedding=lens_embedding,
         need_by_resource=need_by_resource,
         context=context,
         seed=seed,
-        resource_keys=DAIMOI_RESOURCE_KEYS,
+        resource_keys=PARTICLE_RESOURCE_KEYS,
         component_embedding=_component_embedding,
         component_cost=_component_cost,
         clamp01_finite=_clamp01_finite,
@@ -1219,9 +1219,9 @@ def _sample_absorb_component(
         temp_max=_ABSORB_TEMP_MAX,
         zeta=_ABSORB_ZETA,
         lambda_cost=_ABSORB_LAMBDA_COST,
-        record=DAIMOI_ABSORB_SAMPLER_RECORD,
-        schema_version=DAIMOI_ABSORB_SAMPLER_SCHEMA,
-        method=DAIMOI_ABSORB_SAMPLER_METHOD,
+        record=PARTICLE_ABSORB_SAMPLER_RECORD,
+        schema_version=PARTICLE_ABSORB_SAMPLER_SCHEMA,
+        method=PARTICLE_ABSORB_SAMPLER_METHOD,
     )
 
 
@@ -1235,32 +1235,32 @@ def _dirichlet_transfer(
     keys: tuple[str, ...],
 ) -> dict[str, float]:
     coupling_01 = _clamp01_finite(coupling, 0.0)
-    delta = DAIMOI_TRANSFER_LAMBDA * coupling_01 * _clamp01_finite(transfer_t, 0.0)
-    rho = DAIMOI_REPULSION_MU * coupling_01 * _clamp01_finite(repulsion_u, 0.0)
+    delta = PARTICLE_TRANSFER_LAMBDA * coupling_01 * _clamp01_finite(transfer_t, 0.0)
+    rho = PARTICLE_REPULSION_MU * coupling_01 * _clamp01_finite(repulsion_u, 0.0)
     updated: dict[str, float] = {}
     for key in keys:
         src = max(
             1e-8,
             _finite_float(
-                source_alpha.get(key, DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE
+                source_alpha.get(key, PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE
             ),
         )
         tgt = max(
             1e-8,
             _finite_float(
-                target_alpha.get(key, DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE
+                target_alpha.get(key, PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE
             ),
         )
         mixed = src + (delta * tgt)
-        shifted = ((1.0 - rho) * mixed) + (rho * DAIMOI_ALPHA_BASELINE)
+        shifted = ((1.0 - rho) * mixed) + (rho * PARTICLE_ALPHA_BASELINE)
         updated[key] = min(
-            DAIMOI_ALPHA_MAX, max(1e-8, _finite_float(shifted, DAIMOI_ALPHA_BASELINE))
+            PARTICLE_ALPHA_MAX, max(1e-8, _finite_float(shifted, PARTICLE_ALPHA_BASELINE))
         )
     return updated
 
 
 def _seed_curr_matrix(left: dict[str, Any], right: dict[str, Any]) -> dict[str, float]:
-    return daimoi_collision_semantics_module.seed_curr_matrix(
+    return particle_collision_semantics_module.seed_curr_matrix(
         left,
         right,
         state_unit_vector=_state_unit_vector,
@@ -1271,7 +1271,7 @@ def _seed_curr_matrix(left: dict[str, Any], right: dict[str, Any]) -> dict[str, 
 def _collision_semantic_update(
     left: dict[str, Any], right: dict[str, Any], *, impulse: float
 ) -> dict[str, Any]:
-    return daimoi_collision_semantics_module.collision_semantic_update(
+    return particle_collision_semantics_module.collision_semantic_update(
         left,
         right,
         impulse=impulse,
@@ -1285,46 +1285,46 @@ def _collision_semantic_update(
         blend_vectors=_blend_vectors,
         normalize_vector=_normalize_vector,
         dirichlet_transfer_fn=_dirichlet_transfer,
-        job_keys_set=DAIMOI_JOB_KEYS_SET,
-        job_keys_sorted=DAIMOI_JOB_KEYS_SORTED,
-        job_keys=DAIMOI_JOB_KEYS,
-        alpha_baseline=DAIMOI_ALPHA_BASELINE,
-        alpha_max=DAIMOI_ALPHA_MAX,
-        transfer_lambda=DAIMOI_TRANSFER_LAMBDA,
-        repulsion_mu=DAIMOI_REPULSION_MU,
-        impulse_reference=DAIMOI_IMPULSE_REFERENCE,
-        size_bias_beta=DAIMOI_SIZE_BIAS_BETA,
-        collision_repulsion_boost=DAIMOI_COLLISION_REPULSION_BOOST,
-        collision_coupling_gain=DAIMOI_COLLISION_COUPLING_GAIN,
+        job_keys_set=PARTICLE_JOB_KEYS_SET,
+        job_keys_sorted=PARTICLE_JOB_KEYS_SORTED,
+        job_keys=PARTICLE_JOB_KEYS,
+        alpha_baseline=PARTICLE_ALPHA_BASELINE,
+        alpha_max=PARTICLE_ALPHA_MAX,
+        transfer_lambda=PARTICLE_TRANSFER_LAMBDA,
+        repulsion_mu=PARTICLE_REPULSION_MU,
+        impulse_reference=PARTICLE_IMPULSE_REFERENCE,
+        size_bias_beta=PARTICLE_SIZE_BIAS_BETA,
+        collision_repulsion_boost=PARTICLE_COLLISION_REPULSION_BOOST,
+        collision_coupling_gain=PARTICLE_COLLISION_COUPLING_GAIN,
     )
 
 
 def _job_probabilities(state: dict[str, Any]) -> dict[str, float]:
     alpha_raw = state.get("alpha_pkg", {})
-    if isinstance(alpha_raw, dict) and alpha_raw.keys() <= DAIMOI_JOB_KEYS_SET:
+    if isinstance(alpha_raw, dict) and alpha_raw.keys() <= PARTICLE_JOB_KEYS_SET:
         totals = 0.0
         normalized: dict[str, float] = {}
-        for key in DAIMOI_JOB_KEYS_SORTED:
+        for key in PARTICLE_JOB_KEYS_SORTED:
             value = max(
                 1e-8,
                 _finite_float(
-                    alpha_raw.get(key, DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE
+                    alpha_raw.get(key, PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE
                 ),
             )
-            value = min(DAIMOI_ALPHA_MAX, value)
+            value = min(PARTICLE_ALPHA_MAX, value)
             normalized[key] = value
             totals += value
         if totals <= 1e-12:
-            uniform = 1.0 / max(1, len(DAIMOI_JOB_KEYS_SORTED))
-            return {key: uniform for key in DAIMOI_JOB_KEYS_SORTED}
+            uniform = 1.0 / max(1, len(PARTICLE_JOB_KEYS_SORTED))
+            return {key: uniform for key in PARTICLE_JOB_KEYS_SORTED}
         inv_total = 1.0 / totals
-        return {key: normalized[key] * inv_total for key in DAIMOI_JOB_KEYS_SORTED}
+        return {key: normalized[key] * inv_total for key in PARTICLE_JOB_KEYS_SORTED}
 
     alpha_pkg = {
-        str(key): max(1e-8, _finite_float(value, DAIMOI_ALPHA_BASELINE))
+        str(key): max(1e-8, _finite_float(value, PARTICLE_ALPHA_BASELINE))
         for key, value in dict(alpha_raw if isinstance(alpha_raw, dict) else {}).items()
     }
-    keys = tuple(sorted(set([*DAIMOI_JOB_KEYS, *alpha_pkg.keys()])))
+    keys = tuple(sorted(set([*PARTICLE_JOB_KEYS, *alpha_pkg.keys()])))
     return _dirichlet_probabilities(alpha_pkg, keys=keys)
 
 
@@ -1334,13 +1334,13 @@ def _message_probability(state: dict[str, Any]) -> float:
     deliver = max(
         1e-8,
         _finite_float(
-            alpha_msg.get("deliver", DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE
+            alpha_msg.get("deliver", PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE
         ),
     )
     hold = max(
         1e-8,
         _finite_float(
-            alpha_msg.get("hold", DAIMOI_ALPHA_BASELINE), DAIMOI_ALPHA_BASELINE
+            alpha_msg.get("hold", PARTICLE_ALPHA_BASELINE), PARTICLE_ALPHA_BASELINE
         ),
     )
     total = deliver + hold
@@ -1369,10 +1369,10 @@ def _rounded_distribution(
         if abs(residual) <= (10 ** (-precision)):
             diffuse = round(_clamp01_finite(diffuse + residual, 0.0), precision)
         return {"deflect": deflect, "diffuse": diffuse}
-    if probabilities.keys() <= DAIMOI_JOB_KEYS_SET:
+    if probabilities.keys() <= PARTICLE_JOB_KEYS_SET:
         ordered = [
             (key, _clamp01_finite(probabilities.get(key, 0.0), 0.0))
-            for key in DAIMOI_JOB_KEYS_SORTED
+            for key in PARTICLE_JOB_KEYS_SORTED
         ]
     else:
         ordered = sorted(
@@ -1684,8 +1684,8 @@ def _job_probabilities_with_crawl_objective(
 
     if total <= 1e-12:
         return _dirichlet_probabilities(
-            {key: DAIMOI_ALPHA_BASELINE for key in DAIMOI_JOB_KEYS},
-            keys=DAIMOI_JOB_KEYS_SORTED,
+            {key: PARTICLE_ALPHA_BASELINE for key in PARTICLE_JOB_KEYS},
+            keys=PARTICLE_JOB_KEYS_SORTED,
         )
     for key in list(adjusted.keys()):
         adjusted[key] = adjusted[key] / total
@@ -2157,7 +2157,7 @@ def _spawn_particle(
         "target": target_presence_id,
         "presence_role": role,
         "particle_mode": mode,
-        "behaviors": list(DAIMOI_BEHAVIOR_DEFAULTS),
+        "behaviors": list(PARTICLE_BEHAVIOR_DEFAULTS),
         "directive": directive,
         "seed_text": seed_text,
         "e_seed": e_seed,
@@ -2188,7 +2188,7 @@ def _spawn_chaos_butterfly(
 ) -> dict[str, Any]:
     """Spawn a Chaos Butterfly particle that spreads noise through fields using simplex noise.
 
-    Chaos butterflies are special daimoi particles that:
+    Chaos butterflies are special particles that:
     - Move erratically using simplex noise-based velocity perturbations
     - Inject noise into fields they pass through
     - Influence other particles with chaotic perturbations
@@ -2225,14 +2225,14 @@ def _spawn_chaos_butterfly(
     radius = 0.006  # Small radius
 
     # Chaotic job alpha - favors diffuse and deflect equally (chaos)
-    alpha_pkg = {key: DAIMOI_ALPHA_BASELINE for key in DAIMOI_JOB_KEYS}
+    alpha_pkg = {key: PARTICLE_ALPHA_BASELINE for key in PARTICLE_JOB_KEYS}
     alpha_pkg["invoke_diffuse_field"] = 2.5  # Chaos spreads
     alpha_pkg["deliver_message"] = 0.8  # Unreliable messaging
     alpha_pkg["invoke_truth_gate"] = 0.3  # Chaos avoids truth
 
     alpha_msg = {
-        "deliver": DAIMOI_ALPHA_BASELINE * 0.7,  # Unreliable
-        "hold": DAIMOI_ALPHA_BASELINE * 1.3,  # Chaos holds onto noise
+        "deliver": PARTICLE_ALPHA_BASELINE * 0.7,  # Unreliable
+        "hold": PARTICLE_ALPHA_BASELINE * 1.3,  # Chaos holds onto noise
     }
 
     return {
@@ -2291,13 +2291,13 @@ def _spawn_nexus_particle(
     )
     node_vector = _normalize_vector(list(node.get("vector", [])))
     seed_text = (
-        f"Nexus static daimo {particle_id} owner={owner_presence_id}. "
+        f"Nexus static particle {particle_id} owner={owner_presence_id}. "
         "No agency. Move only with field currents and external collisions."
     )
     if not node_vector:
         node_vector = _embedding_from_text(seed_text)
 
-    alpha_pkg = {key: DAIMOI_ALPHA_BASELINE for key in DAIMOI_JOB_KEYS}
+    alpha_pkg = {key: PARTICLE_ALPHA_BASELINE for key in PARTICLE_JOB_KEYS}
     alpha_msg = {"deliver": 0.8, "hold": 1.2}
     size = 0.72 + (importance * 1.1) + (semantic_bundle_mass * 0.95)
     source_node_id = str(node.get("id", "")).strip()
@@ -2308,7 +2308,7 @@ def _spawn_nexus_particle(
         "origin_presence_id": owner_presence_id,
         "target": owner_presence_id,
         "presence_role": "nexus-passive",
-        "particle_mode": "static-daimoi",
+        "particle_mode": "static-particle",
         "behaviors": ["drift", "collide"],
         "directive": "Move with current; no self-directed agency.",
         "seed_text": seed_text,
@@ -2332,7 +2332,7 @@ def _spawn_nexus_particle(
         "last_collision_matrix": {"ss": 0.0, "sc": 0.0, "cs": 0.0, "cc": 0.0},
         "ts": time.monotonic(),
         "is_nexus": True,
-        "is_static_daimoi": True,
+        "is_static_particle": True,
         "source_node_id": source_node_id,
         "graph_node_id": source_node_id,
         "is_view_compaction_bundle": bool(node.get("is_view_compaction_bundle", False))
@@ -2374,8 +2374,8 @@ def _surface_state(
         return state
     state = {
         "embedding": _normalize_vector([]),
-        "alpha_pkg": {key: DAIMOI_ALPHA_BASELINE for key in DAIMOI_JOB_KEYS},
-        "alpha_msg": {"deliver": DAIMOI_ALPHA_BASELINE, "hold": DAIMOI_ALPHA_BASELINE},
+        "alpha_pkg": {key: PARTICLE_ALPHA_BASELINE for key in PARTICLE_JOB_KEYS},
+        "alpha_msg": {"deliver": PARTICLE_ALPHA_BASELINE, "hold": PARTICLE_ALPHA_BASELINE},
         "deflect_count": 0,
         "diffuse_count": 0,
         "impulse": 0.0,
@@ -2425,7 +2425,7 @@ def _action_probabilities_for_state(state: dict[str, Any]) -> dict[str, float]:
     return _action_probabilities(job_probs, message_prob)
 
 
-def build_probabilistic_daimoi_particles(
+def build_probabilistic_particles(
     *,
     file_graph: dict[str, Any] | None,
     presence_impacts: list[dict[str, Any]],
@@ -2436,8 +2436,8 @@ def build_probabilistic_daimoi_particles(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not presence_impacts:
         return [], {
-            "record": DAIMOI_PROBABILISTIC_RECORD,
-            "schema_version": DAIMOI_PROBABILISTIC_SCHEMA,
+            "record": PARTICLE_PROBABILISTIC_RECORD,
+            "schema_version": PARTICLE_PROBABILISTIC_SCHEMA,
             "active": 0,
             "spawned": 0,
             "collisions": 0,
@@ -2449,18 +2449,18 @@ def build_probabilistic_daimoi_particles(
             "mean_package_entropy": 0.0,
             "mean_message_probability": 0.0,
             "packet_contract": {
-                "record": DAIMOI_PACKET_COMPONENT_RECORD,
-                "schema_version": DAIMOI_PACKET_COMPONENT_SCHEMA,
-                "resource_keys": list(DAIMOI_RESOURCE_KEYS),
+                "record": PARTICLE_PACKET_COMPONENT_RECORD,
+                "schema_version": PARTICLE_PACKET_COMPONENT_SCHEMA,
+                "resource_keys": list(PARTICLE_RESOURCE_KEYS),
             },
             "absorb_sampler": {
-                "record": DAIMOI_ABSORB_SAMPLER_RECORD,
-                "schema_version": DAIMOI_ABSORB_SAMPLER_SCHEMA,
-                "method": DAIMOI_ABSORB_SAMPLER_METHOD,
+                "record": PARTICLE_ABSORB_SAMPLER_RECORD,
+                "schema_version": PARTICLE_ABSORB_SAMPLER_SCHEMA,
+                "method": PARTICLE_ABSORB_SAMPLER_METHOD,
                 "events": 0,
                 "sample_events": [],
             },
-            "behavior_defaults": list(DAIMOI_BEHAVIOR_DEFAULTS),
+            "behavior_defaults": list(PARTICLE_BEHAVIOR_DEFAULTS),
         }
 
     devices = (
@@ -2587,12 +2587,12 @@ def build_probabilistic_daimoi_particles(
     now_seconds_int = _safe_int(now_seconds, 0)
     now_seconds_tenths_int = _safe_int(now_seconds * 10.0, 0)
     now_monotonic = time.monotonic()
-    cpu_daimoi_stop_percent = max(
+    cpu_particle_stop_percent = max(
         0.0,
         min(
             100.0,
             _safe_float(
-                os.getenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "50") or "50",
+                os.getenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "50") or "50",
                 50.0,
             ),
         ),
@@ -2608,8 +2608,8 @@ def build_probabilistic_daimoi_particles(
     absorb_sampler_count = 0
     absorb_sampler_events: list[dict[str, Any]] = []
 
-    with _DAIMO_DYNAMICS_LOCK:
-        runtime = _DAIMO_DYNAMICS_CACHE.get("field_particles", {})
+    with _PARTICLE_DYNAMICS_LOCK:
+        runtime = _PARTICLE_DYNAMICS_CACHE.get("field_particles", {})
         if not isinstance(runtime, dict) or "particles" not in runtime:
             runtime = {
                 "particles": {},
@@ -2792,7 +2792,7 @@ def build_probabilistic_daimoi_particles(
                     devices.get("cpu", {}).get("utilization", usage_percent),
                     usage_percent,
                 )
-                cpu_emitter_blocked = global_cpu_usage >= cpu_daimoi_stop_percent
+                cpu_emitter_blocked = global_cpu_usage >= cpu_particle_stop_percent
                 if cpu_emitter_blocked:
                     target_count = 0
                 else:
@@ -2880,8 +2880,8 @@ def build_probabilistic_daimoi_particles(
                         100.0,
                     )
                     cpu_headroom = _clamp01(
-                        (cpu_daimoi_stop_percent - global_cpu_usage)
-                        / max(1.0, cpu_daimoi_stop_percent)
+                        (cpu_particle_stop_percent - global_cpu_usage)
+                        / max(1.0, cpu_particle_stop_percent)
                     )
                     residual_key = presence_id
                     residual_credit = max(
@@ -2987,7 +2987,7 @@ def build_probabilistic_daimoi_particles(
         for particle_id in chaos_owned_ids:
             active_ids.add(particle_id)
 
-        # Spawn/refresh nexus particles (passive daimo without agency).
+        # Spawn/refresh nexus particles (passive particle without agency).
         prioritized_bundle_nodes = [
             row
             for row in file_nodes
@@ -3049,7 +3049,7 @@ def build_probabilistic_daimoi_particles(
                 )
                 existing["size"] = 0.72 + (importance * 1.1) + (bundle_mass * 0.95)
                 existing["is_nexus"] = True
-                existing["is_static_daimoi"] = True
+                existing["is_static_particle"] = True
                 existing["source_node_id"] = node_id
                 existing["graph_node_id"] = node_id
                 existing["is_view_compaction_bundle"] = bool(
@@ -3182,7 +3182,7 @@ def build_probabilistic_daimoi_particles(
             bounds=(0.0, 0.0, 1.0, 1.0),
             max_items=state_tree_max_items,
         )
-        _quadtree_semantic_aggregate(semantic_tree, vector_dims=DAIMOI_EMBED_DIMS)
+        _quadtree_semantic_aggregate(semantic_tree, vector_dims=PARTICLE_EMBED_DIMS)
 
         nexus_current_stride = 1
         if state_count > 640:
@@ -3728,8 +3728,8 @@ def build_probabilistic_daimoi_particles(
                 near_radius = max(
                     0.03,
                     _safe_float(
-                        DAIMOI_SEMANTIC_PARTICLE_NEAR_RADIUS,
-                        DAIMOI_SEMANTIC_PARTICLE_NEAR_RADIUS,
+                        PARTICLE_SEMANTIC_NEAR_RADIUS,
+                        PARTICLE_SEMANTIC_NEAR_RADIUS,
                     ),
                 )
                 local_sources: list[dict[str, Any]] = []
@@ -3765,7 +3765,7 @@ def build_probabilistic_daimoi_particles(
                             _safe_float(local_source.get("weight", 1.0), 1.0),
                         ),
                         strength_base=(
-                            DAIMOI_SEMANTIC_PARTICLE_STRENGTH
+                            PARTICLE_SEMANTIC_STRENGTH
                             * anti_clump_semantic_scale
                         ),
                     )
@@ -3780,9 +3780,9 @@ def build_probabilistic_daimoi_particles(
                     target_y=py,
                     target_unit=semantic_vector,
                     near_radius=near_radius,
-                    theta=DAIMOI_SEMANTIC_BARNES_HUT_THETA,
+                    theta=PARTICLE_SEMANTIC_BARNES_HUT_THETA,
                     strength_base=(
-                        DAIMOI_SEMANTIC_PARTICLE_STRENGTH * anti_clump_semantic_scale
+                        PARTICLE_SEMANTIC_STRENGTH * anti_clump_semantic_scale
                     ),
                     exclude_ids=excluded_ids,
                 )
@@ -3791,13 +3791,13 @@ def build_probabilistic_daimoi_particles(
 
             fx += _world_edge_inward_pressure(
                 px,
-                edge_band=DAIMOI_WORLD_EDGE_BAND,
-                pressure=DAIMOI_WORLD_EDGE_PRESSURE * anti_clump_edge_scale,
+                edge_band=PARTICLE_WORLD_EDGE_BAND,
+                pressure=PARTICLE_WORLD_EDGE_PRESSURE * anti_clump_edge_scale,
             )
             fy += _world_edge_inward_pressure(
                 py,
-                edge_band=DAIMOI_WORLD_EDGE_BAND,
-                pressure=DAIMOI_WORLD_EDGE_PRESSURE * anti_clump_edge_scale,
+                edge_band=PARTICLE_WORLD_EDGE_BAND,
+                pressure=PARTICLE_WORLD_EDGE_PRESSURE * anti_clump_edge_scale,
             )
 
             if not is_nexus:
@@ -3816,12 +3816,12 @@ def build_probabilistic_daimoi_particles(
             next_x, vx = _reflect_world_axis(
                 next_x,
                 vx,
-                bounce=DAIMOI_WORLD_EDGE_BOUNCE,
+                bounce=PARTICLE_WORLD_EDGE_BOUNCE,
             )
             next_y, vy = _reflect_world_axis(
                 next_y,
                 vy,
-                bounce=DAIMOI_WORLD_EDGE_BOUNCE,
+                bounce=PARTICLE_WORLD_EDGE_BOUNCE,
             )
 
             state["vx"] = vx
@@ -3941,7 +3941,7 @@ def build_probabilistic_daimoi_particles(
                 continue
             left_is_nexus = bool(left.get("is_nexus", False))
             if left_is_nexus:
-                # Nexus collisions are resolved when active daimoi queries neighbors.
+                # Nexus collisions are resolved when active particles query neighbors.
                 continue
             left_x = _safe_float(left.get("x", 0.5), 0.5)
             left_y = _safe_float(left.get("y", 0.5), 0.5)
@@ -4280,7 +4280,7 @@ def build_probabilistic_daimoi_particles(
                 if not right_is_nexus:
                     should_update_semantics = semantic_updates < semantic_budget and (
                         (collision_count % semantic_stride == 0)
-                        or (abs(impulse) >= (DAIMOI_IMPULSE_REFERENCE * 0.9))
+                        or (abs(impulse) >= (PARTICLE_IMPULSE_REFERENCE * 0.9))
                     )
                     if should_update_semantics:
                         semantics = _collision_semantic_update(
@@ -4363,7 +4363,7 @@ def build_probabilistic_daimoi_particles(
 
             best_presence = ""
             best_distance = 1e9
-            contact_limit = DAIMOI_SURFACE_RADIUS + _safe_float(
+            contact_limit = PARTICLE_SURFACE_RADIUS + _safe_float(
                 state.get("radius", 0.014), 0.014
             )
             for presence_id, anchor_x, anchor_y in anchor_entries:
@@ -4420,7 +4420,7 @@ def build_probabilistic_daimoi_particles(
             )
             anchor_embedding = _normalize_vector(list(anchor.get("embedding", [])))
             contact_strength = _clamp01(
-                1.0 - (best_distance / max(1e-6, DAIMOI_SURFACE_RADIUS))
+                1.0 - (best_distance / max(1e-6, PARTICLE_SURFACE_RADIUS))
             )
             packet_contract = _packet_component_contract_for_state(state, top_k=4)
             packet_components = _packet_components_from_job_probabilities(job_probs)
@@ -4446,7 +4446,7 @@ def build_probabilistic_daimoi_particles(
                     ),
                     "message_entropy": _clamp01(
                         _dirichlet_entropy(job_probs)
-                        / max(1.0, math.log(len(DAIMOI_JOB_KEYS)))
+                        / max(1.0, math.log(len(PARTICLE_JOB_KEYS)))
                     ),
                     "queue": queue_pressure,
                     "contact": contact_strength,
@@ -4514,16 +4514,16 @@ def build_probabilistic_daimoi_particles(
                 surface_alpha_pkg = dict(surface.get("alpha_pkg", {}))
                 state_alpha_pkg = dict(state.get("alpha_pkg", {}))
                 if (
-                    surface_alpha_pkg.keys() <= DAIMOI_JOB_KEYS_SET
-                    and state_alpha_pkg.keys() <= DAIMOI_JOB_KEYS_SET
+                    surface_alpha_pkg.keys() <= PARTICLE_JOB_KEYS_SET
+                    and state_alpha_pkg.keys() <= PARTICLE_JOB_KEYS_SET
                 ):
-                    transfer_keys = DAIMOI_JOB_KEYS_SORTED
+                    transfer_keys = PARTICLE_JOB_KEYS_SORTED
                 else:
                     transfer_keys = tuple(
                         sorted(
                             set(
                                 [
-                                    *DAIMOI_JOB_KEYS,
+                                    *PARTICLE_JOB_KEYS,
                                     *surface_alpha_pkg.keys(),
                                     *state_alpha_pkg.keys(),
                                 ]
@@ -4635,7 +4635,7 @@ def build_probabilistic_daimoi_particles(
         prev_ema = _safe_float(runtime.get("tick_ms_ema", tick_ms), tick_ms)
         runtime["tick_ms"] = tick_ms
         runtime["tick_ms_ema"] = round((prev_ema * 0.72) + (tick_ms * 0.28), 3)
-        _DAIMO_DYNAMICS_CACHE["field_particles"] = runtime
+        _PARTICLE_DYNAMICS_CACHE["field_particles"] = runtime
 
         output_rows: list[dict[str, Any]] = []
         active_states: list[Any] = []
@@ -4753,14 +4753,14 @@ def build_probabilistic_daimoi_particles(
                 continue
             is_nexus = bool(state.get("is_nexus", False))
             if is_nexus:
-                role, mode = "nexus-passive", "static-daimoi"
+                role, mode = "nexus-passive", "static-particle"
             else:
                 role, mode = _presence_role_and_mode(owner_id)
             vector = _state_unit_vector(state, "e_curr")
             hue = (math.degrees(math.atan2(vector[1], vector[0])) + 360.0) % 360.0
             if is_nexus:
                 message_prob = 0.0
-                job_probs = {key: 0.0 for key in DAIMOI_JOB_KEYS}
+                job_probs = {key: 0.0 for key in PARTICLE_JOB_KEYS}
                 action_probs = dict(NEXUS_PASSIVE_ACTION_PROBS)
             else:
                 message_prob = _message_probability(state)
@@ -4846,7 +4846,7 @@ def build_probabilistic_daimoi_particles(
                             / float(max(1, len(need_preview)))
                         ),
                         "message_entropy": _clamp01(
-                            package_entropy / max(1.0, math.log(len(DAIMOI_JOB_KEYS)))
+                            package_entropy / max(1.0, math.log(len(PARTICLE_JOB_KEYS)))
                         ),
                         "queue": queue_pressure,
                         "contact": 0.0,
@@ -4856,13 +4856,13 @@ def build_probabilistic_daimoi_particles(
 
             absorb_sampler_row = {
                 "record": str(
-                    absorb_sample.get("record", DAIMOI_ABSORB_SAMPLER_RECORD)
+                    absorb_sample.get("record", PARTICLE_ABSORB_SAMPLER_RECORD)
                 ),
                 "schema_version": str(
-                    absorb_sample.get("schema_version", DAIMOI_ABSORB_SAMPLER_SCHEMA)
+                    absorb_sample.get("schema_version", PARTICLE_ABSORB_SAMPLER_SCHEMA)
                 ),
                 "method": str(
-                    absorb_sample.get("method", DAIMOI_ABSORB_SAMPLER_METHOD)
+                    absorb_sample.get("method", PARTICLE_ABSORB_SAMPLER_METHOD)
                 ),
                 "selected_component_id": str(
                     absorb_sample.get("selected_component_id", "")
@@ -4954,10 +4954,10 @@ def build_probabilistic_daimoi_particles(
                 "presence_role": role,
                 "particle_mode": mode,
                 "is_nexus": is_nexus,
-                "record": DAIMOI_PROBABILISTIC_RECORD,
-                "schema_version": DAIMOI_PROBABILISTIC_SCHEMA,
-                "packet_record": DAIMOI_PACKET_COMPONENT_RECORD,
-                "packet_schema_version": DAIMOI_PACKET_COMPONENT_SCHEMA,
+                "record": PARTICLE_PROBABILISTIC_RECORD,
+                "schema_version": PARTICLE_PROBABILISTIC_SCHEMA,
+                "packet_record": PARTICLE_PACKET_COMPONENT_RECORD,
+                "packet_schema_version": PARTICLE_PACKET_COMPONENT_SCHEMA,
                 "x": round(_clamp01(_safe_float(state.get("x", 0.5), 0.5)), 5),
                 "y": round(_clamp01(_safe_float(state.get("y", 0.5), 0.5)), 5),
                 "size": round(max(0.6, _safe_float(state.get("size", 1.0), 1.0)), 5),
@@ -4989,7 +4989,7 @@ def build_probabilistic_daimoi_particles(
                     }
                 ),
                 "behavior_actions": list(
-                    state.get("behaviors", list(DAIMOI_BEHAVIOR_DEFAULTS))
+                    state.get("behaviors", list(PARTICLE_BEHAVIOR_DEFAULTS))
                 ),
                 "top_job": max(
                     sorted(job_probs.keys()),
@@ -5058,18 +5058,18 @@ def build_probabilistic_daimoi_particles(
     )
     anti_clump_drive = _safe_float(anti_clump_snapshot.get("drive", 0.0), 0.0)
     anti_clump_scale_snapshot = _anti_clump_scales(anti_clump_drive)
-    anti_clump_summary = daimoi_observer_module.anti_clump_summary_from_snapshot(
+    anti_clump_summary = particle_observer_module.anti_clump_summary_from_snapshot(
         anti_clump_snapshot,
-        target=DAIMOI_ANTI_CLUMP_TARGET,
+        target=PARTICLE_ANTI_CLUMP_TARGET,
         drive=anti_clump_drive,
         scales=anti_clump_scale_snapshot,
-        snr_default_min=DAIMOI_OBSERVER_SNR_MIN,
-        snr_default_max=DAIMOI_OBSERVER_SNR_MAX,
+        snr_default_min=PARTICLE_OBSERVER_SNR_MIN,
+        snr_default_max=PARTICLE_OBSERVER_SNR_MAX,
     )
 
     summary = {
-        "record": DAIMOI_PROBABILISTIC_RECORD,
-        "schema_version": DAIMOI_PROBABILISTIC_SCHEMA,
+        "record": PARTICLE_PROBABILISTIC_RECORD,
+        "schema_version": PARTICLE_PROBABILISTIC_SCHEMA,
         "active": active_count,
         "spawned": int(spawned_count),
         "collisions": int(collision_count),
@@ -5083,20 +5083,20 @@ def build_probabilistic_daimoi_particles(
         "mean_package_entropy": round(mean_entropy, 6),
         "mean_message_probability": round(mean_message_prob, 6),
         "packet_contract": {
-            "record": DAIMOI_PACKET_COMPONENT_RECORD,
-            "schema_version": DAIMOI_PACKET_COMPONENT_SCHEMA,
-            "resource_keys": list(DAIMOI_RESOURCE_KEYS),
+            "record": PARTICLE_PACKET_COMPONENT_RECORD,
+            "schema_version": PARTICLE_PACKET_COMPONENT_SCHEMA,
+            "resource_keys": list(PARTICLE_RESOURCE_KEYS),
             "top_k": 4,
         },
         "absorb_sampler": {
-            "record": DAIMOI_ABSORB_SAMPLER_RECORD,
-            "schema_version": DAIMOI_ABSORB_SAMPLER_SCHEMA,
-            "method": DAIMOI_ABSORB_SAMPLER_METHOD,
+            "record": PARTICLE_ABSORB_SAMPLER_RECORD,
+            "schema_version": PARTICLE_ABSORB_SAMPLER_SCHEMA,
+            "method": PARTICLE_ABSORB_SAMPLER_METHOD,
             "events": int(absorb_sampler_count),
             "sample_events": absorb_sampler_events,
         },
         "matrix_mean": matrix_mean,
-        "behavior_defaults": list(DAIMOI_BEHAVIOR_DEFAULTS),
+        "behavior_defaults": list(PARTICLE_BEHAVIOR_DEFAULTS),
         "resource_pressure": round(resource_pressure, 6),
         "queue_pressure": round(queue_pressure, 6),
         "compute_pressure": round(compute_pressure, 6),
@@ -5138,9 +5138,9 @@ def build_probabilistic_daimoi_particles(
     return output_rows, summary
 
 
-def reset_probabilistic_daimoi_state_for_tests() -> None:
-    with _DAIMO_DYNAMICS_LOCK:
-        _DAIMO_DYNAMICS_CACHE["field_particles"] = {
+def reset_probabilistic_particle_state_for_tests() -> None:
+    with _PARTICLE_DYNAMICS_LOCK:
+        _PARTICLE_DYNAMICS_CACHE["field_particles"] = {
             "particles": {},
             "surfaces": {},
             "field_cells": {},
@@ -5161,8 +5161,8 @@ def run_probabilistic_collision_stress(
         "e_seed": _embedding_from_text("stress left seed"),
         "e_curr": _embedding_from_text("stress left current"),
         "alpha_pkg": {
-            key: DAIMOI_ALPHA_BASELINE + (_stable_ratio(f"left|{key}", 5) * 2.0)
-            for key in DAIMOI_JOB_KEYS
+            key: PARTICLE_ALPHA_BASELINE + (_stable_ratio(f"left|{key}", 5) * 2.0)
+            for key in PARTICLE_JOB_KEYS
         },
         "alpha_msg": {"deliver": 2.2, "hold": 1.4},
         "last_collision_matrix": {},
@@ -5173,8 +5173,8 @@ def run_probabilistic_collision_stress(
         "e_seed": _embedding_from_text("stress right seed"),
         "e_curr": _embedding_from_text("stress right current"),
         "alpha_pkg": {
-            key: DAIMOI_ALPHA_BASELINE + (_stable_ratio(f"right|{key}", 9) * 2.0)
-            for key in DAIMOI_JOB_KEYS
+            key: PARTICLE_ALPHA_BASELINE + (_stable_ratio(f"right|{key}", 9) * 2.0)
+            for key in PARTICLE_JOB_KEYS
         },
         "alpha_msg": {"deliver": 1.8, "hold": 2.1},
         "last_collision_matrix": {},
@@ -5204,7 +5204,7 @@ def run_probabilistic_collision_stress(
                     nan_count += 1
                 if value_float < 0.0:
                     negative_alpha_count += 1
-            probabilities = _dirichlet_probabilities(alpha_pkg, keys=DAIMOI_JOB_KEYS)
+            probabilities = _dirichlet_probabilities(alpha_pkg, keys=PARTICLE_JOB_KEYS)
             prob_sum = sum(_safe_float(value, 0.0) for value in probabilities.values())
             max_probability_sum_error = max(
                 max_probability_sum_error, abs(prob_sum - 1.0)

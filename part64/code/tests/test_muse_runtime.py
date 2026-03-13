@@ -22,7 +22,7 @@ def _manager(*, turns_per_minute: int = 24) -> MuseRuntimeManager:
         max_manifests_per_muse=48,
         audio_intent_enabled=True,
         audio_min_score=0.55,
-        audio_daimoi_fanout=3,
+        audio_particle_fanout=3,
         audio_max_candidates=32,
         audio_target_presence_id="receipt_river",
         image_target_presence_id="mage_of_receipts",
@@ -395,7 +395,7 @@ def test_muse_tool_request_maps_natural_language_github_threat_radar() -> None:
     assert "CVE-2026-1234" in reply
 
 
-def test_muse_tool_request_maps_natural_language_daimoi_outcome_queries() -> None:
+def test_muse_tool_request_maps_natural_language_particle_outcome_queries() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -413,19 +413,19 @@ def test_muse_tool_request_maps_natural_language_daimoi_outcome_queries() -> Non
 
     payload = manager.send_message(
         muse_id=DEFAULT_MUSE_ID,
-        text="why did daimoi field:witness_thread:001 die? show recent outcomes",
+        text="why did particle field:observer_thread:001 die? show recent outcomes",
         mode="deterministic",
         token_budget=900,
-        idempotency_key="daimoi-natural-1",
-        graph_revision="graph:v-daimoi-natural",
+        idempotency_key="particle-natural-1",
+        graph_revision="graph:v-particle-natural",
         surrounding_nodes=[],
         tool_callback=_tool_callback,
         reply_builder=_reply_builder,
-        seed="seed-daimoi-natural",
+        seed="seed-particle-natural",
     )
     assert payload["ok"] is True
     assert any(
-        call.startswith("graph_query:explain_daimoi field:witness_thread:001")
+        call.startswith("graph_query:explain_particle field:witness_thread:001")
         for call in tool_calls
     )
     assert any(call.startswith("graph_query:recent_outcomes") for call in tool_calls)
@@ -476,7 +476,7 @@ def test_chaos_pinned_node_is_explicit_context() -> None:
     assert "node:seeded:chaos" in explicit_selected
 
 
-def test_play_song_path_requests_audio_and_routes_daimoi() -> None:
+def test_play_song_path_requests_audio_and_routes_particle() -> None:
     manager = _manager()
     payload = manager.send_message(
         muse_id="chaos",
@@ -528,17 +528,17 @@ def test_play_song_path_requests_audio_and_routes_daimoi() -> None:
     assert any(
         str(row.get("intent", "")) == "audio.play"
         and str(row.get("target_node_id", "")) == "audio:witness-thread"
-        for row in payload.get("daimoi", [])
+        for row in payload.get("particles", [])
         if isinstance(row, dict)
     )
 
     kinds = [row["kind"] for row in manager.list_events(limit=400)]
     assert "muse.audio.intent.detected" in kinds
-    assert "muse.daimoi.audio.collided" in kinds
+    assert "agent.particles.audio.collided" in kinds
     assert "audio.play.requested" in kinds
 
 
-def test_open_image_path_requests_image_and_routes_daimoi() -> None:
+def test_open_image_path_requests_image_and_routes_particle() -> None:
     manager = _manager()
     payload = manager.send_message(
         muse_id="stability",
@@ -590,13 +590,13 @@ def test_open_image_path_requests_image_and_routes_daimoi() -> None:
     assert any(
         str(row.get("intent", "")) == "image.open"
         and str(row.get("target_node_id", "")) == "image:cover"
-        for row in payload.get("daimoi", [])
+        for row in payload.get("particles", [])
         if isinstance(row, dict)
     )
 
     kinds = [row["kind"] for row in manager.list_events(limit=400)]
     assert "muse.image.intent.detected" in kinds
-    assert "muse.daimoi.image.collided" in kinds
+    assert "agent.particles.image.collided" in kinds
     assert "image.open.requested" in kinds
 
 
@@ -791,7 +791,7 @@ def test_concept_seed_focus_boosts_simple_prompt_targeting() -> None:
             *base_nodes,
             {
                 "id": "seed.audio.ritual",
-                "kind": "daimon",
+                "kind": "particle",
                 "presence_type": "concept_seed",
                 "label": "Audio Ritual Seed",
                 "text": "concept seed for canticle",

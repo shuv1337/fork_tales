@@ -4,7 +4,7 @@ import math
 from array import array
 from typing import Any
 
-from .constants import DAIMO_DT_SECONDS
+from .constants import PARTICLE_DT_SECONDS
 
 # Nooi Field Constants
 NOOI_GRID_COLS = 64
@@ -96,7 +96,7 @@ class NooiField:
         reason: str,
         graph_node_id: str,
         ts: str,
-        daimoi_id: str = "",
+        particle_id: str = "",
         tick: int = 0,
         trail_steps: int = 0,
     ) -> None:
@@ -105,8 +105,8 @@ class NooiField:
             return
         self._trail_seq += 1
         row = {
-            "record": "eta-mu.daimoi-outcome.v1",
-            "schema_version": "daimoi.outcome.v1",
+            "record": "eta-mu.particle-outcome.v1",
+            "schema_version": "particle.outcome.v1",
             "seq": int(self._trail_seq),
             "outcome": clean_outcome,
             "x": round(min(1.0, max(0.0, float(x))), 6),
@@ -115,7 +115,7 @@ class NooiField:
             "vy": round(float(vy), 6),
             "intensity": round(max(0.0, float(intensity)), 6),
             "presence_id": str(presence_id or "").strip(),
-            "daimoi_id": str(daimoi_id or "").strip(),
+            "particle_id": str(particle_id or "").strip(),
             "graph_node_id": str(graph_node_id or "").strip(),
             "reason": str(reason or "").strip(),
             "tick": max(0, int(tick)),

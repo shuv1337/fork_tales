@@ -13,7 +13,7 @@ def _reset_simulation_runtime_state() -> None:
     simulation_module.reset_simulation_bootstrap_state()
 
 
-def test_simulation_resource_cores_emit_resource_daimoi_to_subsim_wallets(
+def test_simulation_resource_cores_emit_resource_particle_to_subsim_wallets(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setenv("SIM_PARTICLE_BACKEND", "python")
@@ -79,18 +79,18 @@ def test_simulation_resource_cores_emit_resource_daimoi_to_subsim_wallets(
     )
 
     dynamics = simulation.get("presence_dynamics", {})
-    resource_daimoi = dynamics.get("resource_daimoi", {})
-    assert resource_daimoi.get("record") == "eta-mu.resource-daimoi-flow.v1"
-    assert int(resource_daimoi.get("emitter_rows", 0)) >= 1
-    assert int(resource_daimoi.get("delivered_packets", 0)) >= 1
-    assert float(resource_daimoi.get("total_transfer", 0.0)) > 0.0
+    resource_particle = dynamics.get("resource_particle", {})
+    assert resource_particle.get("record") == "eta-mu.resource-particle-flow.v1"
+    assert int(resource_particle.get("emitter_rows", 0)) >= 1
+    assert int(resource_particle.get("delivered_packets", 0)) >= 1
+    assert float(resource_particle.get("total_transfer", 0.0)) > 0.0
 
     field_particles = dynamics.get("field_particles", [])
     core_emitters = [
         row
         for row in field_particles
         if str(row.get("presence_id", "")).startswith("presence.core.")
-        and bool(row.get("resource_daimoi", False))
+        and bool(row.get("resource_particle", False))
     ]
     assert core_emitters
     assert all(
@@ -110,7 +110,7 @@ def test_simulation_resource_cores_emit_resource_daimoi_to_subsim_wallets(
     wallet = subsim.get("resource_wallet", {}) if isinstance(subsim, dict) else {}
     assert isinstance(wallet, dict)
     recipient_credit = 0.0
-    for row in resource_daimoi.get("recipients", []):
+    for row in resource_particle.get("recipients", []):
         if str(row.get("presence_id", "")).strip() != "presence.sim.sim-alpha":
             continue
         recipient_credit = float(row.get("credited", 0.0))
@@ -124,7 +124,7 @@ def test_simulation_core_emitters_use_coupled_wallets(
 ) -> None:
     monkeypatch.setenv("SIM_PARTICLE_BACKEND", "python")
     monkeypatch.setenv("SIMULATION_CORE_RESOURCES", "cpu,ram")
-    monkeypatch.setenv("SIMULATION_RESET_DAIMOI_ON_BOOT", "1")
+    monkeypatch.setenv("SIMULATION_RESET_PARTICLES_ON_BOOT", "1")
     monkeypatch.setattr(
         simulation_module,
         "_resource_monitor_snapshot",
@@ -179,7 +179,7 @@ def test_simulation_core_emitters_use_coupled_wallets(
         row
         for row in particles
         if str(row.get("presence_id", "")).strip() == "presence.core.cpu"
-        and bool(row.get("resource_daimoi", False))
+        and bool(row.get("resource_particle", False))
     ]
     assert cpu_emitters
 
@@ -189,7 +189,7 @@ def test_simulation_core_emitters_use_coupled_wallets(
         if str(row.get("presence_id", "")).strip() == "presence.core.ram"
     ]
     assert ram_rows
-    assert any(bool(row.get("resource_daimoi", False)) for row in ram_rows)
+    assert any(bool(row.get("resource_particle", False)) for row in ram_rows)
     assert any(str(row.get("resource_type", "")).strip() == "ram" for row in ram_rows)
 
     non_core_rows = [
@@ -211,7 +211,7 @@ def test_simulation_minimal_presence_profile_uses_concept_and_cpu_presences(
     monkeypatch.setenv("SIM_PARTICLE_BACKEND", "python")
     monkeypatch.setenv("SIMULATION_PRESENCE_PROFILE", "concept_cpu")
     monkeypatch.setenv("SIMULATION_CORE_RESOURCES", "cpu")
-    monkeypatch.setenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "75")
+    monkeypatch.setenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "75")
     monkeypatch.setattr(
         simulation_module,
         "_resource_monitor_snapshot",
@@ -268,13 +268,13 @@ def test_simulation_minimal_presence_profile_uses_concept_and_cpu_presences(
     assert policy.get("cpu_core_emitter_enabled") is True
     assert policy.get("core_resource_emitters") == ["cpu"]
 
-def test_simulation_cpu_daimoi_gate_disables_cpu_core_emitter_at_threshold(
+def test_simulation_cpu_particle_gate_disables_cpu_core_emitter_at_threshold(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setenv("SIM_PARTICLE_BACKEND", "python")
     monkeypatch.setenv("SIMULATION_PRESENCE_PROFILE", "concept_cpu")
     monkeypatch.setenv("SIMULATION_CORE_RESOURCES", "cpu")
-    monkeypatch.setenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "75")
+    monkeypatch.setenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "75")
     monkeypatch.setattr(
         simulation_module,
         "_resource_monitor_snapshot",
@@ -327,7 +327,7 @@ def test_simulation_cpu_daimoi_gate_disables_cpu_core_emitter_at_threshold(
 
     policy = dynamics.get("emission_policy", {})
     assert policy.get("cpu_core_emitter_enabled") is False
-    assert policy.get("cpu_daimoi_stop_percent") == 75.0
+    assert policy.get("cpu_particle_stop_percent") == 75.0
 
 def test_simulation_cpu_sentinel_idles_below_burn_threshold(
     monkeypatch: Any,
@@ -336,7 +336,7 @@ def test_simulation_cpu_sentinel_idles_below_burn_threshold(
     monkeypatch.setenv("SIMULATION_PRESENCE_PROFILE", "concept_cpu")
     monkeypatch.setenv("SIMULATION_CORE_RESOURCES", "cpu")
     monkeypatch.setenv("SIMULATION_CPU_SENTINEL_BURN_START_PERCENT", "90")
-    monkeypatch.setenv("SIMULATION_RESET_DAIMOI_ON_BOOT", "0")
+    monkeypatch.setenv("SIMULATION_RESET_PARTICLES_ON_BOOT", "0")
     monkeypatch.setattr(
         simulation_module,
         "_resource_monitor_snapshot",
@@ -406,7 +406,7 @@ def test_simulation_cpu_sentinel_burns_wallet_above_threshold(
     monkeypatch.setenv("SIMULATION_PRESENCE_PROFILE", "concept_cpu")
     monkeypatch.setenv("SIMULATION_CORE_RESOURCES", "cpu")
     monkeypatch.setenv("SIMULATION_CPU_SENTINEL_BURN_START_PERCENT", "90")
-    monkeypatch.setenv("SIMULATION_RESET_DAIMOI_ON_BOOT", "0")
+    monkeypatch.setenv("SIMULATION_RESET_PARTICLES_ON_BOOT", "0")
     monkeypatch.setattr(
         simulation_module,
         "_resource_monitor_snapshot",
@@ -492,18 +492,18 @@ def test_simulation_cpu_sentinel_burns_wallet_above_threshold(
 def test_simulation_cpu_sentinel_forces_cpu_resource_targets_when_hot(
     monkeypatch: Any,
 ) -> None:
-    monkeypatch.setenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "99")
+    monkeypatch.setenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "99")
     monkeypatch.setattr(
         simulation_module,
-        "_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT",
+        "_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT",
         90.0,
     )
     monkeypatch.setattr(
         simulation_module,
-        "_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI",
+        "_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES",
         True,
     )
-    monkeypatch.setitem(simulation_module._RESOURCE_DAIMOI_WALLET_CAP, "cpu", 1.0)
+    monkeypatch.setitem(simulation_module._RESOURCE_PARTICLE_WALLET_CAP, "cpu", 1.0)
 
     field_particles = [
         {
@@ -539,7 +539,7 @@ def test_simulation_cpu_sentinel_forces_cpu_resource_targets_when_hot(
         },
     ]
 
-    summary = simulation_module._apply_resource_daimoi_emissions(
+    summary = simulation_module._apply_resource_particle_emissions(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 96.0}}},
@@ -549,7 +549,7 @@ def test_simulation_cpu_sentinel_forces_cpu_resource_targets_when_hot(
     assert summary.get("cpu_sentinel_attractor_active") is True
     assert int(float(summary.get("cpu_sentinel_forced_packets", 0) or 0.0)) > 0
 
-    assert bool(field_particles[0].get("resource_daimoi", False)) is True
+    assert bool(field_particles[0].get("resource_particle", False)) is True
     assert str(field_particles[0].get("resource_type", "")).strip() == "cpu"
     assert (
         str(field_particles[0].get("resource_target_presence_id", "")).strip()
@@ -606,7 +606,7 @@ def test_simulation_global_cpu_cutoff_disables_all_core_emitters() -> None:
         },
     ]
 
-    summary = simulation_module._apply_resource_daimoi_emissions(
+    summary = simulation_module._apply_resource_particle_emissions(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 96.0}}},
@@ -657,7 +657,7 @@ def test_resource_emission_credits_wallet_denoms() -> None:
         },
     ]
 
-    summary = simulation_module._apply_resource_daimoi_emissions(
+    summary = simulation_module._apply_resource_particle_emissions(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 22.0}}},
@@ -703,7 +703,7 @@ def test_resource_action_consumption_supports_coupled_wallet_affordability() -> 
             },
         }
     ]
-    summary = simulation_module._apply_resource_daimoi_action_consumption(
+    summary = simulation_module._apply_resource_particle_action_consumption(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 42.0}}},
@@ -764,7 +764,7 @@ def test_resource_action_consumption_uses_wallet_denoms_greedy_subset() -> None:
         }
     ]
 
-    summary = simulation_module._apply_resource_daimoi_action_consumption(
+    summary = simulation_module._apply_resource_particle_action_consumption(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 28.0}}},
@@ -824,7 +824,7 @@ def test_resource_action_consumption_blocks_without_partial_spend() -> None:
         }
     ]
 
-    summary = simulation_module._apply_resource_daimoi_action_consumption(
+    summary = simulation_module._apply_resource_particle_action_consumption(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 32.0}}},
@@ -897,7 +897,7 @@ def test_resource_action_consumption_control_budget_degrades_complexity(
         }
     ]
 
-    summary = simulation_module._apply_resource_daimoi_action_consumption(
+    summary = simulation_module._apply_resource_particle_action_consumption(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={"devices": {"cpu": {"utilization": 32.0}}},
@@ -941,7 +941,7 @@ def test_resource_sentinel_burn_prefers_focus_resource_under_pressure() -> None:
         }
     ]
 
-    summary = simulation_module._apply_resource_daimoi_action_consumption(
+    summary = simulation_module._apply_resource_particle_action_consumption(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat={

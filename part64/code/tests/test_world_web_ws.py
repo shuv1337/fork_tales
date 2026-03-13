@@ -627,7 +627,7 @@ def test_simulation_ws_split_delta_by_worker_splits_presence_dynamics() -> None:
         "patch": {
             "timestamp": "2026-02-21T17:55:00Z",
             "total": 2,
-            "daimoi": {"active": 1},
+            "particles": {"active": 1},
             "presence_dynamics": {
                 "field_particles": [{"id": "dm-1"}],
                 "graph_node_positions": {"node-1": {"x": 0.3, "y": 0.7}},
@@ -639,7 +639,7 @@ def test_simulation_ws_split_delta_by_worker_splits_presence_dynamics() -> None:
         "changed_keys": [
             "timestamp",
             "total",
-            "daimoi",
+            "particles",
             "presence_dynamics",
         ],
     }
@@ -652,13 +652,13 @@ def test_simulation_ws_split_delta_by_worker_splits_presence_dynamics() -> None:
     }
 
     assert "sim-core" in by_worker
-    assert "sim-daimoi" in by_worker
+    assert "sim-particles" in by_worker
     assert "sim-particles" in by_worker
     assert "sim-resource" in by_worker
     assert "sim-interaction" in by_worker
 
     assert by_worker["sim-core"]["patch"].get("total") == 2
-    assert by_worker["sim-daimoi"]["patch"].get("daimoi") == {"active": 1}
+    assert by_worker["sim-particles"]["patch"].get("particles") == {"active": 1}
     assert by_worker["sim-particles"]["patch"].get("presence_dynamics", {}).get(
         "field_particles", []
     ) == [{"id": "dm-1"}]
@@ -675,7 +675,7 @@ def test_simulation_ws_split_delta_by_worker_splits_presence_dynamics() -> None:
         "user_presence", {}
     ) == {"id": "user"}
 
-    assert by_worker["sim-daimoi"]["patch"].get("timestamp") == "2026-02-21T17:55:00Z"
+    assert by_worker["sim-particles"]["patch"].get("timestamp") == "2026-02-21T17:55:00Z"
 
 def test_simulation_ws_split_delta_by_worker_routes_tick_telemetry_to_core() -> None:
     from code.world_web import server as server_module

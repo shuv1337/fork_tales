@@ -26,7 +26,7 @@ from typing import Any
 from .constants import ENTITY_MANIFEST, USER_PRESENCE_ID
 from .metrics import _safe_float, _safe_int, _clamp01, _stable_ratio
 
-_RESOURCE_DAIMOI_TYPES: tuple[str, ...] = (
+_RESOURCE_PARTICLE_TYPES: tuple[str, ...] = (
     "cpu",
     "ram",
     "disk",
@@ -34,7 +34,7 @@ _RESOURCE_DAIMOI_TYPES: tuple[str, ...] = (
     "gpu",
     "npu",
 )
-_RESOURCE_DAIMOI_TYPE_ALIASES: dict[str, str] = {
+_RESOURCE_PARTICLE_TYPE_ALIASES: dict[str, str] = {
     "gpu1": "gpu",
     "gpu2": "gpu",
     "gpu_intel": "gpu",
@@ -44,7 +44,7 @@ _RESOURCE_DAIMOI_TYPE_ALIASES: dict[str, str] = {
     "netup": "network",
     "netdown": "network",
 }
-_RESOURCE_DAIMOI_WALLET_FLOOR: dict[str, float] = {
+_RESOURCE_PARTICLE_WALLET_FLOOR: dict[str, float] = {
     "cpu": 6.0,
     "ram": 6.0,
     "disk": 4.0,
@@ -52,7 +52,7 @@ _RESOURCE_DAIMOI_WALLET_FLOOR: dict[str, float] = {
     "gpu": 5.0,
     "npu": 5.0,
 }
-_RESOURCE_DAIMOI_WALLET_CAP: dict[str, float] = {
+_RESOURCE_PARTICLE_WALLET_CAP: dict[str, float] = {
     "cpu": 48.0,
     "ram": 48.0,
     "disk": 32.0,
@@ -60,62 +60,62 @@ _RESOURCE_DAIMOI_WALLET_CAP: dict[str, float] = {
     "gpu": 40.0,
     "npu": 40.0,
 }
-_RESOURCE_DAIMOI_DENOM_QUANTUM = max(
+_RESOURCE_PARTICLE_DENOM_QUANTUM = max(
     1e-6,
     min(
         0.1,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_DENOM_QUANTUM", "0.000001")
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_DENOM_QUANTUM", "0.000001")
             or "0.000001",
             0.000001,
         ),
     ),
 )
-_RESOURCE_DAIMOI_DENOM_OVERPAY_PENALTY = max(
+_RESOURCE_PARTICLE_DENOM_OVERPAY_PENALTY = max(
     0.0,
     min(
         2.0,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_DENOM_OVERPAY_PENALTY", "0.18")
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_DENOM_OVERPAY_PENALTY", "0.18")
             or "0.18",
             0.18,
         ),
     ),
 )
-_RESOURCE_DAIMOI_DENOM_GREEDY_STEP_LIMIT = max(
+_RESOURCE_PARTICLE_DENOM_GREEDY_STEP_LIMIT = max(
     8,
     min(
         4096,
         int(
             _safe_float(
-                os.getenv("SIMULATION_RESOURCE_DAIMOI_DENOM_GREEDY_STEP_LIMIT", "256")
+                os.getenv("SIMULATION_RESOURCE_PARTICLE_DENOM_GREEDY_STEP_LIMIT", "256")
                 or "256",
                 256.0,
             )
         ),
     ),
 )
-_RESOURCE_DAIMOI_MIX_EPSILON_BASE = max(
+_RESOURCE_PARTICLE_MIX_EPSILON_BASE = max(
     0.001,
     min(
         0.45,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_MIX_EPSILON", "0.12") or "0.12",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_MIX_EPSILON", "0.12") or "0.12",
             0.12,
         ),
     ),
 )
-_RESOURCE_DAIMOI_MIX_PRESSURE_GAIN = max(
+_RESOURCE_PARTICLE_MIX_PRESSURE_GAIN = max(
     0.0,
     min(
         1.0,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_MIX_PRESSURE_GAIN", "0.35") or "0.35",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_MIX_PRESSURE_GAIN", "0.35") or "0.35",
             0.35,
         ),
     ),
 )
-_RESOURCE_DAIMOI_PRESSURE_SOFT_PERCENT_DEFAULT = max(
+_RESOURCE_PARTICLE_PRESSURE_SOFT_PERCENT_DEFAULT = max(
     0.0,
     min(
         100.0,
@@ -125,7 +125,7 @@ _RESOURCE_DAIMOI_PRESSURE_SOFT_PERCENT_DEFAULT = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_PRESSURE_HARD_PERCENT_DEFAULT = max(
+_RESOURCE_PARTICLE_PRESSURE_HARD_PERCENT_DEFAULT = max(
     0.0,
     min(
         100.0,
@@ -135,97 +135,97 @@ _RESOURCE_DAIMOI_PRESSURE_HARD_PERCENT_DEFAULT = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_DEBT_LOCK = threading.Lock()
-_RESOURCE_DAIMOI_DEBT_STATE: dict[str, float] = {
-    resource_type: 0.0 for resource_type in _RESOURCE_DAIMOI_TYPES
+_RESOURCE_PARTICLE_DEBT_LOCK = threading.Lock()
+_RESOURCE_PARTICLE_DEBT_STATE: dict[str, float] = {
+    resource_type: 0.0 for resource_type in _RESOURCE_PARTICLE_TYPES
 }
-_RESOURCE_DAIMOI_DEBT_LAST_MONOTONIC = time.monotonic()
-_RESOURCE_DAIMOI_VELOCITY_LOCK = threading.Lock()
-_RESOURCE_DAIMOI_VELOCITY_STATE: dict[str, Any] = {
+_RESOURCE_PARTICLE_DEBT_LAST_MONOTONIC = time.monotonic()
+_RESOURCE_PARTICLE_VELOCITY_LOCK = threading.Lock()
+_RESOURCE_PARTICLE_VELOCITY_STATE: dict[str, Any] = {
     "last_monotonic": time.monotonic(),
-    "usage_prev": {resource_type: 0.0 for resource_type in _RESOURCE_DAIMOI_TYPES},
+    "usage_prev": {resource_type: 0.0 for resource_type in _RESOURCE_PARTICLE_TYPES},
 }
-_RESOURCE_DAIMOI_EMIT_BASE_RATE = max(
+_RESOURCE_PARTICLE_EMIT_BASE_RATE = max(
     0.0,
     min(
         0.2,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_EMIT_BASE_RATE", "0.0025")
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_EMIT_BASE_RATE", "0.0025")
             or "0.0025",
             0.0025,
         ),
     ),
 )
-_RESOURCE_DAIMOI_EMIT_ALPHA = max(
+_RESOURCE_PARTICLE_EMIT_ALPHA = max(
     0.0,
     min(
         0.8,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_EMIT_ALPHA", "0.016") or "0.016",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_EMIT_ALPHA", "0.016") or "0.016",
             0.016,
         ),
     ),
 )
-_RESOURCE_DAIMOI_EMIT_BETA = max(
+_RESOURCE_PARTICLE_EMIT_BETA = max(
     0.0,
     min(
         0.8,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_EMIT_BETA", "0.010") or "0.010",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_EMIT_BETA", "0.010") or "0.010",
             0.010,
         ),
     ),
 )
-_RESOURCE_DAIMOI_EMIT_GAMMA = max(
+_RESOURCE_PARTICLE_EMIT_GAMMA = max(
     0.0,
     min(
         0.8,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_EMIT_GAMMA", "0.012") or "0.012",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_EMIT_GAMMA", "0.012") or "0.012",
             0.012,
         ),
     ),
 )
-_RESOURCE_DAIMOI_ACTION_BASE_COST = 0.00001
-_RESOURCE_DAIMOI_ACTION_COST_MAX = 0.0028
-_RESOURCE_DAIMOI_ACTION_SATISFIED_RATIO = 0.85
-_RESOURCE_DAIMOI_ACTION_RISK_PREMIUM = max(
+_RESOURCE_PARTICLE_ACTION_BASE_COST = 0.00001
+_RESOURCE_PARTICLE_ACTION_COST_MAX = 0.0028
+_RESOURCE_PARTICLE_ACTION_SATISFIED_RATIO = 0.85
+_RESOURCE_PARTICLE_ACTION_RISK_PREMIUM = max(
     0.0,
     min(
         4.0,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_ACTION_RISK_PREMIUM", "0.55")
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_ACTION_RISK_PREMIUM", "0.55")
             or "0.55",
             0.55,
         ),
     ),
 )
-_RESOURCE_DAIMOI_ACTION_UTILITY_ETA = max(
+_RESOURCE_PARTICLE_ACTION_UTILITY_ETA = max(
     0.0,
     min(
         8.0,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_ACTION_UTILITY_ETA", "1.0") or "1.0",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_ACTION_UTILITY_ETA", "1.0") or "1.0",
             1.0,
         ),
     ),
 )
-_RESOURCE_DAIMOI_ACTION_UTILITY_XI = max(
+_RESOURCE_PARTICLE_ACTION_UTILITY_XI = max(
     0.0,
     min(
         8.0,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_ACTION_UTILITY_XI", "1.0") or "1.0",
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_ACTION_UTILITY_XI", "1.0") or "1.0",
             1.0,
         ),
     ),
 )
-_RESOURCE_DAIMOI_ACTION_UTILITY_KAPPA = max(
+_RESOURCE_PARTICLE_ACTION_UTILITY_KAPPA = max(
     0.0,
     min(
         8.0,
         _safe_float(
-            os.getenv("SIMULATION_RESOURCE_DAIMOI_ACTION_UTILITY_KAPPA", "0.55")
+            os.getenv("SIMULATION_RESOURCE_PARTICLE_ACTION_UTILITY_KAPPA", "0.55")
             or "0.55",
             0.55,
         ),
@@ -276,14 +276,14 @@ _RESOURCE_CTL_BUDGET_STATE: dict[str, Any] = {
     "last_monotonic": time.monotonic(),
     "budget": dict(_RESOURCE_CTL_BUDGET_CAP_DEFAULT),
 }
-_RESOURCE_DAIMOI_CPU_SENTINEL_ID = "health_sentinel_cpu"
-_RESOURCE_DAIMOI_SENTINEL_RESOURCE_BY_ID: dict[str, str] = {
+_RESOURCE_PARTICLE_CPU_SENTINEL_ID = "health_sentinel_cpu"
+_RESOURCE_PARTICLE_SENTINEL_RESOURCE_BY_ID: dict[str, str] = {
     "health_sentinel_cpu": "cpu",
     "health_sentinel_gpu1": "gpu",
     "health_sentinel_gpu2": "gpu",
     "health_sentinel_npu0": "npu",
 }
-_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT = max(
+_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT = max(
     0.0,
     min(
         100.0,
@@ -293,7 +293,7 @@ _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_MAX_MULTIPLIER = max(
+_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_MAX_MULTIPLIER = max(
     1.0,
     min(
         128.0,
@@ -303,8 +303,8 @@ _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_MAX_MULTIPLIER = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX = max(
-    _RESOURCE_DAIMOI_ACTION_COST_MAX,
+_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_COST_MAX = max(
+    _RESOURCE_PARTICLE_ACTION_COST_MAX,
     min(
         4.0,
         _safe_float(
@@ -313,21 +313,21 @@ _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT = max(
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT = max(
     0.0,
     min(
         100.0,
         _safe_float(
             os.getenv(
                 "SIMULATION_CPU_SENTINEL_ATTRACTOR_START_PERCENT",
-                str(_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT),
+                str(_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT),
             )
-            or str(_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT),
-            _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT,
+            or str(_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT),
+            _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT,
         ),
     ),
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_GAIN = max(
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_GAIN = max(
     0.0,
     min(
         8.0,
@@ -337,7 +337,7 @@ _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_GAIN = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST = max(
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST = max(
     1.0,
     min(
         24.0,
@@ -348,8 +348,8 @@ _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST = max(
         ),
     ),
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI = str(
-    os.getenv("SIMULATION_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI", "1") or "1"
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES = str(
+    os.getenv("SIMULATION_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES", "1") or "1"
 ).strip().lower() in {"1", "true", "yes", "on"}
 
 
@@ -357,9 +357,9 @@ def _canonical_resource_type(resource_type: str) -> str:
     key = str(resource_type or "").strip().lower()
     if not key:
         return ""
-    if key in _RESOURCE_DAIMOI_TYPES:
+    if key in _RESOURCE_PARTICLE_TYPES:
         return key
-    return str(_RESOURCE_DAIMOI_TYPE_ALIASES.get(key, "")).strip().lower()
+    return str(_RESOURCE_PARTICLE_TYPE_ALIASES.get(key, "")).strip().lower()
 
 
 def _core_resource_type_from_presence_id(presence_id: str) -> str:
@@ -408,9 +408,9 @@ def _resource_vector_total(vector: dict[str, float]) -> float:
 
 
 def _resource_vector_quantized(vector: dict[str, float]) -> dict[str, float]:
-    quantum = max(1e-9, _safe_float(_RESOURCE_DAIMOI_DENOM_QUANTUM, 0.000001))
+    quantum = max(1e-9, _safe_float(_RESOURCE_PARTICLE_DENOM_QUANTUM, 0.000001))
     quantized: dict[str, float] = {}
-    for resource_name in _RESOURCE_DAIMOI_TYPES:
+    for resource_name in _RESOURCE_PARTICLE_TYPES:
         value = max(0.0, _safe_float(vector.get(resource_name, 0.0), 0.0))
         if value <= 1e-12:
             continue
@@ -511,15 +511,15 @@ def _wallet_denoms_payment_plan(
 
     remaining = {k: max(0.0, _safe_float(v, 0.0)) for k, v in required.items()}
     spent_vector: dict[str, float] = {
-        resource_name: 0.0 for resource_name in _RESOURCE_DAIMOI_TYPES
+        resource_name: 0.0 for resource_name in _RESOURCE_PARTICLE_TYPES
     }
     selected_by_index: dict[int, int] = {}
-    epsilon = max(1e-9, _safe_float(_RESOURCE_DAIMOI_DENOM_QUANTUM, 0.000001) * 0.5)
+    epsilon = max(1e-9, _safe_float(_RESOURCE_PARTICLE_DENOM_QUANTUM, 0.000001) * 0.5)
     overpay_penalty = max(
-        0.0, _safe_float(_RESOURCE_DAIMOI_DENOM_OVERPAY_PENALTY, 0.18)
+        0.0, _safe_float(_RESOURCE_PARTICLE_DENOM_OVERPAY_PENALTY, 0.18)
     )
     step_limit = max(
-        8, int(_safe_float(_RESOURCE_DAIMOI_DENOM_GREEDY_STEP_LIMIT, 256.0))
+        8, int(_safe_float(_RESOURCE_PARTICLE_DENOM_GREEDY_STEP_LIMIT, 256.0))
     )
     steps = 0
 
@@ -547,7 +547,7 @@ def _wallet_denoms_payment_plan(
             useful_cover = 0.0
             overpay = 0.0
             total = 0.0
-            for resource_name in _RESOURCE_DAIMOI_TYPES:
+            for resource_name in _RESOURCE_PARTICLE_TYPES:
                 amount = max(0.0, _safe_float(vector.get(resource_name, 0.0), 0.0))
                 if amount <= 1e-12:
                     continue
@@ -571,7 +571,7 @@ def _wallet_denoms_payment_plan(
             break
 
         selected_by_index[best_idx] = selected_by_index.get(best_idx, 0) + 1
-        for resource_name in _RESOURCE_DAIMOI_TYPES:
+        for resource_name in _RESOURCE_PARTICLE_TYPES:
             amount = max(0.0, _safe_float(best_vector.get(resource_name, 0.0), 0.0))
             if amount <= 1e-12:
                 continue
@@ -715,7 +715,7 @@ def _resource_pressure_thresholds(resource_type: str) -> tuple[float, float]:
             min(
                 100.0,
                 _safe_float(
-                    os.getenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "50") or "50",
+                    os.getenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "50") or "50",
                     50.0,
                 ),
             ),
@@ -739,10 +739,10 @@ def _resource_pressure_thresholds(resource_type: str) -> tuple[float, float]:
                 _safe_float(
                     os.getenv(
                         "SIMULATION_RESOURCE_PRESSURE_SOFT_PERCENT",
-                        str(_RESOURCE_DAIMOI_PRESSURE_SOFT_PERCENT_DEFAULT),
+                        str(_RESOURCE_PARTICLE_PRESSURE_SOFT_PERCENT_DEFAULT),
                     )
-                    or str(_RESOURCE_DAIMOI_PRESSURE_SOFT_PERCENT_DEFAULT),
-                    _RESOURCE_DAIMOI_PRESSURE_SOFT_PERCENT_DEFAULT,
+                    or str(_RESOURCE_PARTICLE_PRESSURE_SOFT_PERCENT_DEFAULT),
+                    _RESOURCE_PARTICLE_PRESSURE_SOFT_PERCENT_DEFAULT,
                 ),
             ),
         )
@@ -753,10 +753,10 @@ def _resource_pressure_thresholds(resource_type: str) -> tuple[float, float]:
                 _safe_float(
                     os.getenv(
                         "SIMULATION_RESOURCE_PRESSURE_HARD_PERCENT",
-                        str(_RESOURCE_DAIMOI_PRESSURE_HARD_PERCENT_DEFAULT),
+                        str(_RESOURCE_PARTICLE_PRESSURE_HARD_PERCENT_DEFAULT),
                     )
-                    or str(_RESOURCE_DAIMOI_PRESSURE_HARD_PERCENT_DEFAULT),
-                    _RESOURCE_DAIMOI_PRESSURE_HARD_PERCENT_DEFAULT,
+                    or str(_RESOURCE_PARTICLE_PRESSURE_HARD_PERCENT_DEFAULT),
+                    _RESOURCE_PARTICLE_PRESSURE_HARD_PERCENT_DEFAULT,
                 ),
             ),
         )
@@ -808,39 +808,39 @@ def _resource_pressure_ratio(
 def _resource_debt_vector_update(
     resource_heartbeat: dict[str, Any],
 ) -> dict[str, float]:
-    global _RESOURCE_DAIMOI_DEBT_LAST_MONOTONIC
+    global _RESOURCE_PARTICLE_DEBT_LAST_MONOTONIC
     now = time.monotonic()
-    with _RESOURCE_DAIMOI_DEBT_LOCK:
+    with _RESOURCE_PARTICLE_DEBT_LOCK:
         dt_seconds = max(
             0.001,
-            min(2.0, now - _safe_float(_RESOURCE_DAIMOI_DEBT_LAST_MONOTONIC, now)),
+            min(2.0, now - _safe_float(_RESOURCE_PARTICLE_DEBT_LAST_MONOTONIC, now)),
         )
-        _RESOURCE_DAIMOI_DEBT_LAST_MONOTONIC = now
+        _RESOURCE_PARTICLE_DEBT_LAST_MONOTONIC = now
 
         updated: dict[str, float] = {}
-        for resource_type in _RESOURCE_DAIMOI_TYPES:
+        for resource_type in _RESOURCE_PARTICLE_TYPES:
             usage = _resource_usage_percent(resource_type, resource_heartbeat)
             soft, hard = _resource_pressure_thresholds(resource_type)
             overload = max(0.0, usage - soft)
             overload_norm = overload / max(1.0, hard - soft)
             next_value = max(
                 0.0,
-                _safe_float(_RESOURCE_DAIMOI_DEBT_STATE.get(resource_type, 0.0), 0.0)
+                _safe_float(_RESOURCE_PARTICLE_DEBT_STATE.get(resource_type, 0.0), 0.0)
                 + (dt_seconds * overload_norm),
             )
-            _RESOURCE_DAIMOI_DEBT_STATE[resource_type] = next_value
+            _RESOURCE_PARTICLE_DEBT_STATE[resource_type] = next_value
             updated[resource_type] = next_value
         return updated
 
 
 def _resource_debt_snapshot() -> dict[str, float]:
-    with _RESOURCE_DAIMOI_DEBT_LOCK:
+    with _RESOURCE_PARTICLE_DEBT_LOCK:
         return {
             resource_type: max(
                 0.0,
-                _safe_float(_RESOURCE_DAIMOI_DEBT_STATE.get(resource_type, 0.0), 0.0),
+                _safe_float(_RESOURCE_PARTICLE_DEBT_STATE.get(resource_type, 0.0), 0.0),
             )
-            for resource_type in _RESOURCE_DAIMOI_TYPES
+            for resource_type in _RESOURCE_PARTICLE_TYPES
         }
 
 
@@ -851,20 +851,20 @@ def _resource_velocity_vector(
 ) -> dict[str, float]:
     now = time.monotonic()
     queue_push = _clamp01(_safe_float(queue_ratio, 0.0))
-    with _RESOURCE_DAIMOI_VELOCITY_LOCK:
+    with _RESOURCE_PARTICLE_VELOCITY_LOCK:
         last = _safe_float(
-            _RESOURCE_DAIMOI_VELOCITY_STATE.get("last_monotonic", now),
+            _RESOURCE_PARTICLE_VELOCITY_STATE.get("last_monotonic", now),
             now,
         )
         dt_seconds = max(0.001, min(2.0, now - last))
-        _RESOURCE_DAIMOI_VELOCITY_STATE["last_monotonic"] = now
+        _RESOURCE_PARTICLE_VELOCITY_STATE["last_monotonic"] = now
 
-        previous_raw = _RESOURCE_DAIMOI_VELOCITY_STATE.get("usage_prev", {})
+        previous_raw = _RESOURCE_PARTICLE_VELOCITY_STATE.get("usage_prev", {})
         previous_usage = previous_raw if isinstance(previous_raw, dict) else {}
         next_usage: dict[str, float] = {}
         velocity: dict[str, float] = {}
 
-        for resource_type in _RESOURCE_DAIMOI_TYPES:
+        for resource_type in _RESOURCE_PARTICLE_TYPES:
             usage_now = _resource_usage_percent(resource_type, resource_heartbeat)
             usage_prev = _safe_float(
                 previous_usage.get(resource_type, usage_now), usage_now
@@ -879,7 +879,7 @@ def _resource_velocity_vector(
             velocity[resource_type] = velocity_signal
             next_usage[resource_type] = usage_now
 
-        _RESOURCE_DAIMOI_VELOCITY_STATE["usage_prev"] = next_usage
+        _RESOURCE_PARTICLE_VELOCITY_STATE["usage_prev"] = next_usage
         return velocity
 
 
@@ -907,11 +907,11 @@ def _resource_emission_rate(
             0.2,
             _safe_float(
                 os.getenv(
-                    f"SIMULATION_{resource_name.upper()}_DAIMOI_EMIT_BASE_RATE",
-                    str(_RESOURCE_DAIMOI_EMIT_BASE_RATE),
+                    f"SIMULATION_{resource_name.upper()}_PARTICLE_EMIT_BASE_RATE",
+                    str(_RESOURCE_PARTICLE_EMIT_BASE_RATE),
                 )
-                or str(_RESOURCE_DAIMOI_EMIT_BASE_RATE),
-                _RESOURCE_DAIMOI_EMIT_BASE_RATE,
+                or str(_RESOURCE_PARTICLE_EMIT_BASE_RATE),
+                _RESOURCE_PARTICLE_EMIT_BASE_RATE,
             ),
         ),
     )
@@ -921,11 +921,11 @@ def _resource_emission_rate(
             0.8,
             _safe_float(
                 os.getenv(
-                    f"SIMULATION_{resource_name.upper()}_DAIMOI_EMIT_ALPHA",
-                    str(_RESOURCE_DAIMOI_EMIT_ALPHA),
+                    f"SIMULATION_{resource_name.upper()}_PARTICLE_EMIT_ALPHA",
+                    str(_RESOURCE_PARTICLE_EMIT_ALPHA),
                 )
-                or str(_RESOURCE_DAIMOI_EMIT_ALPHA),
-                _RESOURCE_DAIMOI_EMIT_ALPHA,
+                or str(_RESOURCE_PARTICLE_EMIT_ALPHA),
+                _RESOURCE_PARTICLE_EMIT_ALPHA,
             ),
         ),
     )
@@ -935,11 +935,11 @@ def _resource_emission_rate(
             0.8,
             _safe_float(
                 os.getenv(
-                    f"SIMULATION_{resource_name.upper()}_DAIMOI_EMIT_BETA",
-                    str(_RESOURCE_DAIMOI_EMIT_BETA),
+                    f"SIMULATION_{resource_name.upper()}_PARTICLE_EMIT_BETA",
+                    str(_RESOURCE_PARTICLE_EMIT_BETA),
                 )
-                or str(_RESOURCE_DAIMOI_EMIT_BETA),
-                _RESOURCE_DAIMOI_EMIT_BETA,
+                or str(_RESOURCE_PARTICLE_EMIT_BETA),
+                _RESOURCE_PARTICLE_EMIT_BETA,
             ),
         ),
     )
@@ -949,11 +949,11 @@ def _resource_emission_rate(
             0.8,
             _safe_float(
                 os.getenv(
-                    f"SIMULATION_{resource_name.upper()}_DAIMOI_EMIT_GAMMA",
-                    str(_RESOURCE_DAIMOI_EMIT_GAMMA),
+                    f"SIMULATION_{resource_name.upper()}_PARTICLE_EMIT_GAMMA",
+                    str(_RESOURCE_PARTICLE_EMIT_GAMMA),
                 )
-                or str(_RESOURCE_DAIMOI_EMIT_GAMMA),
-                _RESOURCE_DAIMOI_EMIT_GAMMA,
+                or str(_RESOURCE_PARTICLE_EMIT_GAMMA),
+                _RESOURCE_PARTICLE_EMIT_GAMMA,
             ),
         ),
     )
@@ -975,7 +975,7 @@ def _resource_ctl_budget_cap_vector() -> dict[str, float]:
         ),
     )
     caps: dict[str, float] = {}
-    for resource_name in _RESOURCE_DAIMOI_TYPES:
+    for resource_name in _RESOURCE_PARTICLE_TYPES:
         default_cap = max(
             0.01,
             _safe_float(_RESOURCE_CTL_BUDGET_CAP_DEFAULT.get(resource_name, 1.0), 1.0),
@@ -1010,7 +1010,7 @@ def _resource_ctl_budget_recharge_vector(caps: dict[str, float]) -> dict[str, fl
         ),
     )
     recharge: dict[str, float] = {}
-    for resource_name in _RESOURCE_DAIMOI_TYPES:
+    for resource_name in _RESOURCE_PARTICLE_TYPES:
         default_rate = max(
             0.0,
             _safe_float(
@@ -1053,7 +1053,7 @@ def _resource_ctl_budget_prepare(
         budget_raw = _RESOURCE_CTL_BUDGET_STATE.get("budget", {})
         budget = budget_raw if isinstance(budget_raw, dict) else {}
         next_budget: dict[str, float] = {}
-        for resource_name in _RESOURCE_DAIMOI_TYPES:
+        for resource_name in _RESOURCE_PARTICLE_TYPES:
             current = max(
                 0.0,
                 _safe_float(
@@ -1082,7 +1082,7 @@ def _resource_ctl_budget_prepare(
             _safe_float(next_budget.get(resource_name, 0.0), 0.0)
             / max(1e-6, _safe_float(caps.get(resource_name, 1.0), 1.0))
         )
-        for resource_name in _RESOURCE_DAIMOI_TYPES
+        for resource_name in _RESOURCE_PARTICLE_TYPES
     ]
     budget_ratio = min(ratio_values) if ratio_values else 0.0
 
@@ -1123,7 +1123,7 @@ def _resource_ctl_budget_commit(overhead_vector: dict[str, float]) -> dict[str, 
         budget_raw = _RESOURCE_CTL_BUDGET_STATE.get("budget", {})
         budget = budget_raw if isinstance(budget_raw, dict) else {}
         updated: dict[str, float] = {}
-        for resource_name in _RESOURCE_DAIMOI_TYPES:
+        for resource_name in _RESOURCE_PARTICLE_TYPES:
             current = max(0.0, _safe_float(budget.get(resource_name, 0.0), 0.0))
             spent = max(0.0, _safe_float(overhead_vector.get(resource_name, 0.0), 0.0))
             updated[resource_name] = max(0.0, current - spent)
@@ -1146,7 +1146,7 @@ def _resource_need_ratio(
 
     wallet = _normalize_resource_wallet(impact)
     balance = max(0.0, _safe_float(wallet.get(kind, 0.0), 0.0))
-    floor = max(0.1, _safe_float(_RESOURCE_DAIMOI_WALLET_FLOOR.get(kind, 4.0), 4.0))
+    floor = max(0.1, _safe_float(_RESOURCE_PARTICLE_WALLET_FLOOR.get(kind, 4.0), 4.0))
     deficit_ratio = _clamp01((floor - balance) / floor)
     base_need = _clamp01(_safe_float(affected_by.get("resource", 0.0), 0.0))
     queue_push = _clamp01(_safe_float(queue_ratio, 0.0))
@@ -1165,7 +1165,7 @@ def _resource_need_ratio(
 
 def _resource_pressure_vector(resource_heartbeat: dict[str, Any]) -> dict[str, float]:
     pressures: dict[str, float] = {}
-    for resource_type in _RESOURCE_DAIMOI_TYPES:
+    for resource_type in _RESOURCE_PARTICLE_TYPES:
         usage = _resource_usage_percent(resource_type, resource_heartbeat)
         soft, hard = _resource_pressure_thresholds(resource_type)
         pressures[resource_type] = _resource_pressure_ratio(
@@ -1192,11 +1192,11 @@ def _resource_mixing_weights(
             0.45,
             _safe_float(
                 os.getenv(
-                    "SIMULATION_RESOURCE_DAIMOI_MIX_EPSILON",
-                    str(_RESOURCE_DAIMOI_MIX_EPSILON_BASE),
+                    "SIMULATION_RESOURCE_PARTICLE_MIX_EPSILON",
+                    str(_RESOURCE_PARTICLE_MIX_EPSILON_BASE),
                 )
-                or str(_RESOURCE_DAIMOI_MIX_EPSILON_BASE),
-                _RESOURCE_DAIMOI_MIX_EPSILON_BASE,
+                or str(_RESOURCE_PARTICLE_MIX_EPSILON_BASE),
+                _RESOURCE_PARTICLE_MIX_EPSILON_BASE,
             ),
         ),
     )
@@ -1206,11 +1206,11 @@ def _resource_mixing_weights(
             1.0,
             _safe_float(
                 os.getenv(
-                    "SIMULATION_RESOURCE_DAIMOI_MIX_PRESSURE_GAIN",
-                    str(_RESOURCE_DAIMOI_MIX_PRESSURE_GAIN),
+                    "SIMULATION_RESOURCE_PARTICLE_MIX_PRESSURE_GAIN",
+                    str(_RESOURCE_PARTICLE_MIX_PRESSURE_GAIN),
                 )
-                or str(_RESOURCE_DAIMOI_MIX_PRESSURE_GAIN),
-                _RESOURCE_DAIMOI_MIX_PRESSURE_GAIN,
+                or str(_RESOURCE_PARTICLE_MIX_PRESSURE_GAIN),
+                _RESOURCE_PARTICLE_MIX_PRESSURE_GAIN,
             ),
         ),
     )
@@ -1221,7 +1221,7 @@ def _resource_mixing_weights(
     )
 
     weights: dict[str, float] = {}
-    for resource_type in _RESOURCE_DAIMOI_TYPES:
+    for resource_type in _RESOURCE_PARTICLE_TYPES:
         resource_pressure = _clamp01(
             _safe_float(pressure_map.get(resource_type, 0.0), 0.0)
         )
@@ -1261,7 +1261,7 @@ def _resource_payment_plan(
     weights = _resource_mixing_weights(focus_resource, pressure=pressure)
     balances: dict[str, float] = {
         resource_type: max(0.0, _safe_float(wallet.get(resource_type, 0.0), 0.0))
-        for resource_type in _RESOURCE_DAIMOI_TYPES
+        for resource_type in _RESOURCE_PARTICLE_TYPES
     }
 
     affordable_credit = 0.0
@@ -1327,16 +1327,16 @@ def _resource_action_contract_estimate(
     sentinel_usage_by_presence: dict[str, float] | None = None,
     cpu_sentinel_burn_threshold: float | None = None,
 ) -> dict[str, Any]:
-    sentinel_resource = _RESOURCE_DAIMOI_SENTINEL_RESOURCE_BY_ID.get(presence_id, "")
+    sentinel_resource = _RESOURCE_PARTICLE_SENTINEL_RESOURCE_BY_ID.get(presence_id, "")
     is_resource_sentinel = bool(sentinel_resource)
     focus_resource = sentinel_resource if is_resource_sentinel else "cpu"
     threshold = (
         _safe_float(
             cpu_sentinel_burn_threshold,
-            _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT,
+            _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT,
         )
         if cpu_sentinel_burn_threshold is not None
-        else _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT
+        else _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT
     )
     sentinel_usage_map = (
         sentinel_usage_by_presence
@@ -1365,7 +1365,7 @@ def _resource_action_contract_estimate(
     drift_signal = _clamp01(abs(_safe_float(row.get("drift_score", 0.0), 0.0)))
 
     base_cost = (
-        _RESOURCE_DAIMOI_ACTION_BASE_COST
+        _RESOURCE_PARTICLE_ACTION_BASE_COST
         + (influence_power * 0.00086)
         + (message_probability * 0.00054)
         + (route_probability * 0.00032)
@@ -1373,8 +1373,8 @@ def _resource_action_contract_estimate(
         + (queue_push * 0.00028)
     )
     base_cost = min(
-        _RESOURCE_DAIMOI_ACTION_COST_MAX,
-        max(_RESOURCE_DAIMOI_ACTION_BASE_COST, base_cost),
+        _RESOURCE_PARTICLE_ACTION_COST_MAX,
+        max(_RESOURCE_PARTICLE_ACTION_BASE_COST, base_cost),
     )
 
     sentinel_burn_intensity = 0.0
@@ -1385,12 +1385,12 @@ def _resource_action_contract_estimate(
         )
         sentinel_burn_multiplier = 1.0 + (
             sentinel_burn_intensity
-            * (_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_MAX_MULTIPLIER - 1.0)
+            * (_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_MAX_MULTIPLIER - 1.0)
         )
         base_cost = min(
-            _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX,
+            _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_COST_MAX,
             max(
-                _RESOURCE_DAIMOI_ACTION_BASE_COST, base_cost * sentinel_burn_multiplier
+                _RESOURCE_PARTICLE_ACTION_BASE_COST, base_cost * sentinel_burn_multiplier
             ),
         )
 
@@ -1401,15 +1401,15 @@ def _resource_action_contract_estimate(
         + (queue_push * 0.14)
     )
     risk_multiplier = 1.0 + (
-        _RESOURCE_DAIMOI_ACTION_RISK_PREMIUM * action_risk * focus_pressure
+        _RESOURCE_PARTICLE_ACTION_RISK_PREMIUM * action_risk * focus_pressure
     )
     debt_multiplier = 1.0 + (focus_debt_norm * 0.38)
     desired_cost = min(
-        _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX
+        _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_COST_MAX
         if is_resource_sentinel
-        else _RESOURCE_DAIMOI_ACTION_COST_MAX,
+        else _RESOURCE_PARTICLE_ACTION_COST_MAX,
         max(
-            _RESOURCE_DAIMOI_ACTION_BASE_COST,
+            _RESOURCE_PARTICLE_ACTION_BASE_COST,
             base_cost * risk_multiplier * debt_multiplier,
         ),
     )
@@ -1421,10 +1421,10 @@ def _resource_action_contract_estimate(
     )
 
     risk_component_factor = (
-        _RESOURCE_DAIMOI_ACTION_RISK_PREMIUM * action_risk * desired_cost
+        _RESOURCE_PARTICLE_ACTION_RISK_PREMIUM * action_risk * desired_cost
     )
     payment_vector_raw: dict[str, float] = {}
-    for resource_name in _RESOURCE_DAIMOI_TYPES:
+    for resource_name in _RESOURCE_PARTICLE_TYPES:
         expected_component = max(
             0.0,
             _safe_float(expected_cost_vector.get(resource_name, 0.0), 0.0),
@@ -1450,22 +1450,22 @@ def _resource_action_contract_estimate(
 
     reclaim_term = sum(
         (
-            _RESOURCE_DAIMOI_ACTION_UTILITY_ETA
+            _RESOURCE_PARTICLE_ACTION_UTILITY_ETA
             * _clamp01(_safe_float(resource_pressure.get(resource_name, 0.0), 0.0))
             * max(0.0, _safe_float(reclaim_vector.get(resource_name, 0.0), 0.0))
         )
-        for resource_name in _RESOURCE_DAIMOI_TYPES
+        for resource_name in _RESOURCE_PARTICLE_TYPES
     )
     cost_term = sum(
         (
-            _RESOURCE_DAIMOI_ACTION_UTILITY_XI
+            _RESOURCE_PARTICLE_ACTION_UTILITY_XI
             * _clamp01(_safe_float(resource_pressure.get(resource_name, 0.0), 0.0))
             * max(0.0, _safe_float(payment_vector.get(resource_name, 0.0), 0.0))
         )
-        for resource_name in _RESOURCE_DAIMOI_TYPES
+        for resource_name in _RESOURCE_PARTICLE_TYPES
     )
     utility = (
-        reclaim_term - cost_term - (_RESOURCE_DAIMOI_ACTION_UTILITY_KAPPA * action_risk)
+        reclaim_term - cost_term - (_RESOURCE_PARTICLE_ACTION_UTILITY_KAPPA * action_risk)
     )
 
     return {
@@ -1511,7 +1511,7 @@ def _resource_action_utility(
     return _safe_float(contract.get("utility", 0.0), 0.0)
 
 
-def _apply_resource_daimoi_emissions(
+def _apply_resource_particle_emissions(
     *,
     field_particles: list[dict[str, Any]],
     presence_impacts: list[dict[str, Any]],
@@ -1538,7 +1538,7 @@ def _apply_resource_daimoi_emissions(
         ),
     )
     cpu_sentinel_attractor_active = (
-        cpu_utilization >= _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT
+        cpu_utilization >= _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT
     )
     resource_pressure_by_type = _resource_pressure_vector(resource_heartbeat)
     resource_debt = _resource_debt_vector_update(resource_heartbeat)
@@ -1548,8 +1548,8 @@ def _apply_resource_daimoi_emissions(
     )
 
     summary: dict[str, Any] = {
-        "record": "eta-mu.resource-daimoi-flow.v1",
-        "schema_version": "resource.daimoi.flow.v1",
+        "record": "eta-mu.resource-particle-flow.v1",
+        "schema_version": "resource.particle.flow.v1",
         "emitter_rows": 0,
         "delivered_packets": 0,
         "total_transfer": 0.0,
@@ -1557,9 +1557,9 @@ def _apply_resource_daimoi_emissions(
         "recipients": [],
         "queue_ratio": round(_clamp01(_safe_float(queue_ratio, 0.0)), 6),
         "cpu_utilization": round(cpu_utilization, 2),
-        "cpu_sentinel_id": _RESOURCE_DAIMOI_CPU_SENTINEL_ID,
+        "cpu_sentinel_id": _RESOURCE_PARTICLE_CPU_SENTINEL_ID,
         "cpu_sentinel_attractor_threshold": round(
-            _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT,
+            _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT,
             2,
         ),
         "cpu_sentinel_attractor_active": bool(cpu_sentinel_attractor_active),
@@ -1608,7 +1608,7 @@ def _apply_resource_daimoi_emissions(
         min(
             100.0,
             _safe_float(
-                os.getenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "50") or "50",
+                os.getenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "50") or "50",
                 50.0,
             ),
         ),
@@ -1631,7 +1631,7 @@ def _apply_resource_daimoi_emissions(
 
     # Ambient mint for core emitters. This is intentionally slow and pressure-aware:
     # emitters replenish from live headroom/pressure/debt and do not use hard caps.
-    core_minted_totals: dict[str, float] = {key: 0.0 for key in _RESOURCE_DAIMOI_TYPES}
+    core_minted_totals: dict[str, float] = {key: 0.0 for key in _RESOURCE_PARTICLE_TYPES}
     for impact in presence_impacts:
         if not isinstance(impact, dict):
             continue
@@ -1674,14 +1674,14 @@ def _apply_resource_daimoi_emissions(
         if value > 1e-8
     }
 
-    resource_totals: dict[str, float] = {key: 0.0 for key in _RESOURCE_DAIMOI_TYPES}
+    resource_totals: dict[str, float] = {key: 0.0 for key in _RESOURCE_PARTICLE_TYPES}
     recipient_totals: dict[str, float] = {}
-    lambda_totals: dict[str, float] = {key: 0.0 for key in _RESOURCE_DAIMOI_TYPES}
-    lambda_counts: dict[str, int] = {key: 0 for key in _RESOURCE_DAIMOI_TYPES}
+    lambda_totals: dict[str, float] = {key: 0.0 for key in _RESOURCE_PARTICLE_TYPES}
+    lambda_counts: dict[str, int] = {key: 0 for key in _RESOURCE_PARTICLE_TYPES}
     packet_count = 0
     emitter_rows = 0
     cpu_sentinel_forced_packets = 0
-    cpu_sentinel_impact = impact_by_id.get(_RESOURCE_DAIMOI_CPU_SENTINEL_ID)
+    cpu_sentinel_impact = impact_by_id.get(_RESOURCE_PARTICLE_CPU_SENTINEL_ID)
 
     for row in field_particles:
         if not isinstance(row, dict):
@@ -1691,7 +1691,7 @@ def _apply_resource_daimoi_emissions(
         presence_id = str(row.get("presence_id", "")).strip()
         if presence_id == USER_PRESENCE_ID:
             continue
-        if presence_id == _RESOURCE_DAIMOI_CPU_SENTINEL_ID:
+        if presence_id == _RESOURCE_PARTICLE_CPU_SENTINEL_ID:
             row["resource_emit_disabled"] = True
             row["resource_emit_disabled_reason"] = "cpu_sentinel_sink"
             continue
@@ -1717,14 +1717,14 @@ def _apply_resource_daimoi_emissions(
 
         resource_floor = max(
             0.1,
-            _safe_float(_RESOURCE_DAIMOI_WALLET_FLOOR.get(resource_type, 4.0), 4.0),
+            _safe_float(_RESOURCE_PARTICLE_WALLET_FLOOR.get(resource_type, 4.0), 4.0),
         )
         resource_pressure = _clamp01(source_balance / max(1e-6, resource_floor))
         if source_balance <= 1e-8:
             continue
 
         if resource_type != "cpu":
-            emitter_cpu_cost = _RESOURCE_DAIMOI_ACTION_BASE_COST
+            emitter_cpu_cost = _RESOURCE_PARTICLE_ACTION_BASE_COST
             emitter_cpu_payment = _resource_payment_plan(
                 wallet=emitter_wallet,
                 focus_resource="cpu",
@@ -1734,7 +1734,7 @@ def _apply_resource_daimoi_emissions(
             )
             if _safe_float(
                 emitter_cpu_payment.get("effective_credit", 0.0), 0.0
-            ) + 1e-9 < (emitter_cpu_cost * _RESOURCE_DAIMOI_ACTION_SATISFIED_RATIO):
+            ) + 1e-9 < (emitter_cpu_cost * _RESOURCE_PARTICLE_ACTION_SATISFIED_RATIO):
                 row["resource_action_blocked"] = True
                 row["resource_block_reason"] = "resource_wallet_required_for_emit"
                 row["resource_emit_affordability"] = round(
@@ -1811,7 +1811,7 @@ def _apply_resource_daimoi_emissions(
             cpu_sentinel_attractor_active
             and resource_type == "cpu"
             and isinstance(cpu_sentinel_impact, dict)
-            and presence_id != _RESOURCE_DAIMOI_CPU_SENTINEL_ID
+            and presence_id != _RESOURCE_PARTICLE_CPU_SENTINEL_ID
         ):
             forced_target_id = str(cpu_sentinel_impact.get("id", "")).strip()
             if forced_target_id:
@@ -1881,7 +1881,7 @@ def _apply_resource_daimoi_emissions(
             recipient_totals.get(best_target_id, 0.0) + credit_total
         )
 
-        row["resource_daimoi"] = True
+        row["resource_particle"] = True
         row["resource_type"] = resource_type
         row["resource_emit_amount"] = round(credited, 6)
         row["resource_emit_credit_total"] = round(credit_total, 6)
@@ -1985,7 +1985,7 @@ def _apply_resource_daimoi_emissions(
     return summary
 
 
-def _apply_resource_daimoi_action_consumption(
+def _apply_resource_particle_action_consumption(
     *,
     field_particles: list[dict[str, Any]],
     presence_impacts: list[dict[str, Any]],
@@ -2018,10 +2018,10 @@ def _apply_resource_daimoi_action_consumption(
             _safe_float(
                 os.getenv(
                     "SIMULATION_CPU_SENTINEL_BURN_START_PERCENT",
-                    str(_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT),
+                    str(_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT),
                 )
-                or str(_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT),
-                _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT,
+                or str(_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT),
+                _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT,
             ),
         ),
     )
@@ -2030,21 +2030,21 @@ def _apply_resource_daimoi_action_consumption(
     for (
         sentinel_id,
         sentinel_resource,
-    ) in _RESOURCE_DAIMOI_SENTINEL_RESOURCE_BY_ID.items():
+    ) in _RESOURCE_PARTICLE_SENTINEL_RESOURCE_BY_ID.items():
         usage = _resource_usage_percent(sentinel_resource, resource_heartbeat)
         sentinel_usage_by_presence[sentinel_id] = usage
         sentinel_burn_active_by_presence[sentinel_id] = (
             usage >= cpu_sentinel_burn_threshold
         )
     cpu_sentinel_burn_active = bool(
-        sentinel_burn_active_by_presence.get(_RESOURCE_DAIMOI_CPU_SENTINEL_ID, False)
+        sentinel_burn_active_by_presence.get(_RESOURCE_PARTICLE_CPU_SENTINEL_ID, False)
     )
     resource_pressure = _resource_pressure_vector(resource_heartbeat)
     resource_debt = _resource_debt_snapshot()
 
     summary: dict[str, Any] = {
-        "record": "eta-mu.resource-daimoi-consumption.v1",
-        "schema_version": "resource.daimoi.consumption.v1",
+        "record": "eta-mu.resource-particle-consumption.v1",
+        "schema_version": "resource.particle.consumption.v1",
         "action_packets": 0,
         "blocked_packets": 0,
         "consumed_total": 0.0,
@@ -2054,17 +2054,17 @@ def _apply_resource_daimoi_action_consumption(
         "active_presences": [],
         "queue_ratio": round(_clamp01(_safe_float(queue_ratio, 0.0)), 6),
         "cpu_utilization": round(cpu_utilization, 2),
-        "cpu_sentinel_id": _RESOURCE_DAIMOI_CPU_SENTINEL_ID,
+        "cpu_sentinel_id": _RESOURCE_PARTICLE_CPU_SENTINEL_ID,
         "cpu_sentinel_burn_threshold": round(
             cpu_sentinel_burn_threshold,
             2,
         ),
         "cpu_sentinel_burn_max_multiplier": round(
-            _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_MAX_MULTIPLIER,
+            _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_MAX_MULTIPLIER,
             6,
         ),
         "cpu_sentinel_burn_cost_max": round(
-            _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX,
+            _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_COST_MAX,
             6,
         ),
         "cpu_sentinel_burn_active": bool(cpu_sentinel_burn_active),
@@ -2107,14 +2107,14 @@ def _apply_resource_daimoi_action_consumption(
 
     queue_push = _clamp01(_safe_float(queue_ratio, 0.0))
     consumed_by_resource: dict[str, float] = {
-        key: 0.0 for key in _RESOURCE_DAIMOI_TYPES
+        key: 0.0 for key in _RESOURCE_PARTICLE_TYPES
     }
     consumed_by_presence: dict[str, float] = {}
     debt_by_presence: dict[str, float] = {}
     blocked_by_presence: dict[str, int] = {}
     blocked_packets = 0
     action_packets = 0
-    ctl_overhead: dict[str, float] = {key: 0.0 for key in _RESOURCE_DAIMOI_TYPES}
+    ctl_overhead: dict[str, float] = {key: 0.0 for key in _RESOURCE_PARTICLE_TYPES}
 
     ordered_rows = [row for row in field_particles if isinstance(row, dict)]
     control_budget = _resource_ctl_budget_prepare(
@@ -2190,7 +2190,7 @@ def _apply_resource_daimoi_action_consumption(
         if not isinstance(impact, dict):
             continue
 
-        sentinel_resource = _RESOURCE_DAIMOI_SENTINEL_RESOURCE_BY_ID.get(
+        sentinel_resource = _RESOURCE_PARTICLE_SENTINEL_RESOURCE_BY_ID.get(
             presence_id,
             "",
         )
@@ -2199,7 +2199,7 @@ def _apply_resource_daimoi_action_consumption(
             sentinel_usage_by_presence.get(
                 presence_id,
                 cpu_utilization
-                if presence_id == _RESOURCE_DAIMOI_CPU_SENTINEL_ID
+                if presence_id == _RESOURCE_PARTICLE_CPU_SENTINEL_ID
                 else 0.0,
             ),
             0.0,
@@ -2220,7 +2220,7 @@ def _apply_resource_daimoi_action_consumption(
                 cpu_sentinel_burn_threshold,
                 2,
             )
-            if presence_id == _RESOURCE_DAIMOI_CPU_SENTINEL_ID:
+            if presence_id == _RESOURCE_PARTICLE_CPU_SENTINEL_ID:
                 row["resource_sentinel_cpu_utilization"] = round(cpu_utilization, 2)
             top_job = str(row.get("top_job", "")).strip()
             if top_job in {"", "observe"}:
@@ -2245,7 +2245,7 @@ def _apply_resource_daimoi_action_consumption(
             or "cpu"
         )
         desired_cost = max(
-            _RESOURCE_DAIMOI_ACTION_BASE_COST,
+            _RESOURCE_PARTICLE_ACTION_BASE_COST,
             _safe_float(contract.get("desired_cost", 0.0), 0.0),
         )
         action_risk = _clamp01(_safe_float(contract.get("action_risk", 0.0), 0.0))
@@ -2290,7 +2290,7 @@ def _apply_resource_daimoi_action_consumption(
                 ),
                 6,
             )
-            if presence_id == _RESOURCE_DAIMOI_CPU_SENTINEL_ID:
+            if presence_id == _RESOURCE_PARTICLE_CPU_SENTINEL_ID:
                 row["resource_sentinel_cpu_utilization"] = round(cpu_utilization, 2)
             row["resource_sentinel_burn_threshold"] = round(
                 _safe_float(
@@ -2440,7 +2440,7 @@ def _apply_resource_daimoi_action_consumption(
             )
             consume_breakdown_raw = payment.get("breakdown", {})
             satisfied = desired_cost <= 1e-9 or effective_credit_raw >= (
-                desired_cost * _RESOURCE_DAIMOI_ACTION_SATISFIED_RATIO
+                desired_cost * _RESOURCE_PARTICLE_ACTION_SATISFIED_RATIO
             )
             if satisfied and isinstance(consume_breakdown_raw, dict):
                 for cost_resource, cost_value in consume_breakdown_raw.items():
@@ -2600,15 +2600,15 @@ def _apply_resource_daimoi_action_consumption(
 
 
 def reset_resource_runtime_state() -> None:
-    global _RESOURCE_DAIMOI_DEBT_LAST_MONOTONIC
-    with _RESOURCE_DAIMOI_DEBT_LOCK:
-        _RESOURCE_DAIMOI_DEBT_LAST_MONOTONIC = time.monotonic()
-        for resource_type in _RESOURCE_DAIMOI_TYPES:
-            _RESOURCE_DAIMOI_DEBT_STATE[resource_type] = 0.0
-    with _RESOURCE_DAIMOI_VELOCITY_LOCK:
-        _RESOURCE_DAIMOI_VELOCITY_STATE["last_monotonic"] = time.monotonic()
-        _RESOURCE_DAIMOI_VELOCITY_STATE["usage_prev"] = {
-            resource_type: 0.0 for resource_type in _RESOURCE_DAIMOI_TYPES
+    global _RESOURCE_PARTICLE_DEBT_LAST_MONOTONIC
+    with _RESOURCE_PARTICLE_DEBT_LOCK:
+        _RESOURCE_PARTICLE_DEBT_LAST_MONOTONIC = time.monotonic()
+        for resource_type in _RESOURCE_PARTICLE_TYPES:
+            _RESOURCE_PARTICLE_DEBT_STATE[resource_type] = 0.0
+    with _RESOURCE_PARTICLE_VELOCITY_LOCK:
+        _RESOURCE_PARTICLE_VELOCITY_STATE["last_monotonic"] = time.monotonic()
+        _RESOURCE_PARTICLE_VELOCITY_STATE["usage_prev"] = {
+            resource_type: 0.0 for resource_type in _RESOURCE_PARTICLE_TYPES
         }
     with _RESOURCE_CTL_BUDGET_LOCK:
         _RESOURCE_CTL_BUDGET_STATE["last_monotonic"] = time.monotonic()

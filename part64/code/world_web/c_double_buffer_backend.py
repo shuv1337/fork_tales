@@ -15,9 +15,9 @@ import time
 from pathlib import Path
 from typing import Any
 
-from . import daimoi_observer as daimoi_observer_module
-from .daimoi_probabilistic import (
-    DAIMOI_ANTI_CLUMP_TARGET,
+from . import particle_observer as particle_observer_module
+from .particle_probabilistic import (
+    PARTICLE_ANTI_CLUMP_TARGET,
     _anti_clump_controller_update,
     _anti_clump_scales,
 )
@@ -4736,17 +4736,17 @@ def build_double_buffer_field_particles(
         0.0,
     )
 
-    cpu_daimoi_stop_percent = max(
+    cpu_particle_stop_percent = max(
         0.0,
         min(
             100.0,
             _safe_float(
-                os.getenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "50") or "50",
+                os.getenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "50") or "50",
                 50.0,
             ),
         ),
     )
-    cpu_core_emitter_enabled = cpu_util < cpu_daimoi_stop_percent
+    cpu_core_emitter_enabled = cpu_util < cpu_particle_stop_percent
     if not cpu_core_emitter_enabled:
         presence_ids = [
             pid for pid in presence_ids if not str(pid).startswith("presence.core.")
@@ -5417,7 +5417,7 @@ def build_double_buffer_field_particles(
         )
 
         particle_mode = (
-            "static-daimoi"
+            "static-particle"
             if is_nexus
             else ("chaos-butterfly" if is_chaos else "neutral")
         )
@@ -5877,7 +5877,7 @@ def build_double_buffer_field_particles(
                 "g": round(g, 5),
                 "b": round(b, 5),
                 "record": "eta-mu.field-particles.cdb.v1",
-                "schema_version": "daimoi.probabilistic.cdb.v1",
+                "schema_version": "particle.probabilistic.cdb.v1",
                 "owner_presence_id": presence_id,
                 "target_presence_id": "",
                 "top_job": "observe",
@@ -5897,7 +5897,7 @@ def build_double_buffer_field_particles(
                 "action_probabilities": action_probabilities,
                 "behavior_actions": ["deflect", "diffuse"],
                 "is_nexus": is_nexus,
-                "is_static_daimoi": is_nexus,
+                "is_static_particle": is_nexus,
                 "source_node_id": (
                     graph_node_id
                     if graph_node_id
@@ -5995,9 +5995,9 @@ def build_double_buffer_field_particles(
         "noise_gain": graph_noise_gain,
         "route_damp": graph_route_damp,
     }
-    anti_clump_summary = daimoi_observer_module.anti_clump_summary_from_snapshot(
+    anti_clump_summary = particle_observer_module.anti_clump_summary_from_snapshot(
         anti_clump_runtime,
-        target=DAIMOI_ANTI_CLUMP_TARGET,
+        target=PARTICLE_ANTI_CLUMP_TARGET,
         drive=anti_clump_drive,
         scales=anti_clump_scale_summary,
         scale_order=(
@@ -6037,8 +6037,8 @@ def build_double_buffer_field_particles(
 
     active_count = len(rows)
     summary = {
-        "record": "eta-mu.daimoi-probabilistic.cdb.v1",
-        "schema_version": "daimoi.probabilistic.cdb.v1",
+        "record": "eta-mu.particle-probabilistic.cdb.v1",
+        "schema_version": "particle.probabilistic.cdb.v1",
         "active": int(active_count),
         "spawned": 0,
         "collisions": int(collision_count),
@@ -6144,7 +6144,7 @@ def build_double_buffer_field_particles(
         ),
         "cpu_utilization": round(_safe_float(cpu_util, 0.0), 2),
         "cpu_core_emitter_enabled": bool(cpu_core_emitter_enabled),
-        "cpu_daimoi_stop_percent": round(cpu_daimoi_stop_percent, 2),
+        "cpu_particle_stop_percent": round(cpu_particle_stop_percent, 2),
         "matrix_mean": {"ss": 0.0, "sc": 0.0, "cs": 0.0, "cc": 0.0},
         "behavior_defaults": ["deflect", "diffuse"],
         "clump_score": anti_clump_summary["clump_score"],

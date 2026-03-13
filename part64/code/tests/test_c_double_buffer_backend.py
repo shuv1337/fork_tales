@@ -88,7 +88,7 @@ def test_c_double_buffer_builder_maps_numeric_ids_to_rows(monkeypatch: Any) -> N
     assert len(rows) == 3
     assert rows[0]["id"] == "cdb:0"
     assert rows[0]["is_nexus"] is True
-    assert rows[0]["particle_mode"] == "static-daimoi"
+    assert rows[0]["particle_mode"] == "static-particle"
     assert float(rows[0].get("semantic_text_chars", 0.0)) >= 0.0
     assert float(rows[0].get("semantic_mass", 0.0)) > 0.0
     assert float(rows[0].get("resource_wallet_total", 0.0)) >= 0.0
@@ -392,7 +392,7 @@ def test_c_double_buffer_builder_disables_cpu_core_emitter_when_cpu_hot(
         return fake_engine
 
     monkeypatch.setattr(c_double_buffer_backend, "_get_engine", fake_get_engine)
-    monkeypatch.setenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "75")
+    monkeypatch.setenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "75")
 
     rows, summary = c_double_buffer_backend.build_double_buffer_field_particles(
         file_graph={"file_nodes": []},
@@ -409,7 +409,7 @@ def test_c_double_buffer_builder_disables_cpu_core_emitter_when_cpu_hot(
     assert rows
     assert all(str(row.get("presence_id", "")) != "presence.core.cpu" for row in rows)
     assert summary.get("cpu_core_emitter_enabled") is False
-    assert summary.get("cpu_daimoi_stop_percent") == 75.0
+    assert summary.get("cpu_particle_stop_percent") == 75.0
 
 
 def test_c_double_buffer_builder_prioritizes_core_emitters_when_cpu_cool(
@@ -422,7 +422,7 @@ def test_c_double_buffer_builder_prioritizes_core_emitters_when_cpu_cool(
         return fake_engine
 
     monkeypatch.setattr(c_double_buffer_backend, "_get_engine", fake_get_engine)
-    monkeypatch.setenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "75")
+    monkeypatch.setenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "75")
 
     rows, summary = c_double_buffer_backend.build_double_buffer_field_particles(
         file_graph={"file_nodes": []},

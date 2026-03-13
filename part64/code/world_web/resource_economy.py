@@ -15,8 +15,8 @@ DEFAULT_BASE_CPU_NANO = 250_000_000  # 0.25 CPU floor when limits unavailable
 DEFAULT_BASE_MEM_BYTES = 512 * 1024 * 1024  # 512 MB floor when limits unavailable
 
 # Conversion Rates
-DAIMOI_TO_CPU_NANO = 100_000_000  # 1 CPU Daimoi = 0.1 CPU core
-DAIMOI_TO_MEM_BYTES = 128 * 1024 * 1024  # 1 RAM Daimoi = 128 MB RAM
+PARTICLE_TO_CPU_NANO = 100_000_000  # 1 CPU Particle = 0.1 CPU core
+PARTICLE_TO_MEM_BYTES = 128 * 1024 * 1024  # 1 RAM Particle = 128 MB RAM
 
 # Consumption Rates (per tick)
 CPU_DECAY_RATE = 0.005
@@ -211,8 +211,8 @@ def process_resource_cycle(
             _safe_int(economy_raw.get("base_mem_bytes"), DEFAULT_BASE_MEM_BYTES),
         )
 
-        target_cpu_nano = int(MIN_CPU_NANO + (cpu_credit * DAIMOI_TO_CPU_NANO))
-        target_mem_bytes = int(MIN_MEM_BYTES + (ram_credit * DAIMOI_TO_MEM_BYTES))
+        target_cpu_nano = int(MIN_CPU_NANO + (cpu_credit * PARTICLE_TO_CPU_NANO))
+        target_mem_bytes = int(MIN_MEM_BYTES + (ram_credit * PARTICLE_TO_MEM_BYTES))
         target_cpu_nano = max(base_cpu_nano, target_cpu_nano)
         target_mem_bytes = max(base_mem_bytes, target_mem_bytes)
 

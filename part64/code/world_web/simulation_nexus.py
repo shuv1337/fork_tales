@@ -314,7 +314,7 @@ def _build_unified_nexus_graph(
 # - NexusNode / NexusEdge / NexusGraph
 # - Field / FieldRegistry
 # - Presence (unified)
-# - Daimon (unified)
+# - Particle (unified)
 #
 # Nexus graph and field dynamics concepts are implemented below.
 # ============================================================================
@@ -345,7 +345,7 @@ _NEXUS_ROLE_MAP: dict[str, str] = {
     "web:url": "web:url",
     "web:resource": "web:resource",
     "obs:event": "obs:event",
-    "daimoi": "daimoi",
+    "particles": "particles",
     "nexus": "nexus",
     "fact": "fact",
 }
@@ -816,7 +816,7 @@ def _build_field_registry(
         },
     }
 
-    # Build flow field (placeholder - would track daimon movement)
+    # Build flow field (placeholder - would track particle movement)
     fields["flow"] = {
         "kind": "flow",
         "record": "ημ.shared-field.v1",

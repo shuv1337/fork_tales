@@ -43,7 +43,7 @@ import urllib.error
 from urllib.parse import parse_qs, quote, unquote, urlparse
 from urllib.request import Request, urlopen
 
-from . import daimoi_probabilistic as daimoi_probabilistic_module
+from . import particle_probabilistic as particle_probabilistic_module
 from . import simulation as simulation_module
 from .ai import (
     _apply_embedding_provider_options,
@@ -265,7 +265,7 @@ def _query_variant_terms(query_text: str) -> list[str]:
     return variants
 
 
-def _build_search_daimoi_meta(
+def _build_search_particle_meta(
     query_text: str,
     *,
     target: str,
@@ -310,8 +310,8 @@ def _build_search_daimoi_meta(
         component_rows.append(component)
 
     return {
-        "record": "ημ.user-search-daimoi.v1",
-        "schema_version": "user.search.daimoi.v1",
+        "record": "ημ.user-search-particle.v1",
+        "schema_version": "user.search.particle.v1",
         "query": variants[0],
         "variant_count": len(variants),
         "embed_model": str(model or "").strip(),
@@ -728,7 +728,7 @@ _SIMULATION_WS_PARTICLE_LITE_KEYS: tuple[str, ...] = (
     "b",
     "vx",
     "vy",
-    "resource_daimoi",
+    "resource_particle",
     "resource_type",
     "resource_consume_type",
     "top_job",
@@ -738,8 +738,8 @@ _SIMULATION_WS_PARTICLE_LITE_KEYS: tuple[str, ...] = (
     "influence_power",
     "route_resource_focus",
 )
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_LOCK = threading.Lock()
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE: dict[str, Any] = {
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_LOCK = threading.Lock()
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_STATE: dict[str, Any] = {
     "positions": {},
     "score": 0.0,
     "raw_score": 0.0,
@@ -750,75 +750,75 @@ _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE: dict[str, Any] = {
     "shared_nodes": 0,
     "sampled_nodes": 0,
 }
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_NODE_LIMIT = max(
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_NODE_LIMIT = max(
     64,
     int(
         float(
-            os.getenv("SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_NODE_LIMIT", "2048")
+            os.getenv("SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_NODE_LIMIT", "2048")
             or "2048"
         )
     ),
 )
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_DISTANCE_REF = max(
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_DISTANCE_REF = max(
     0.001,
     float(
-        os.getenv("SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_DISTANCE_REF", "0.02")
+        os.getenv("SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_DISTANCE_REF", "0.02")
         or "0.02"
     ),
 )
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_EMA_ALPHA = max(
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_EMA_ALPHA = max(
     0.01,
     min(
         1.0,
         float(
-            os.getenv("SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_EMA_ALPHA", "0.2")
+            os.getenv("SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_EMA_ALPHA", "0.2")
             or "0.2"
         ),
     ),
 )
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_NOISE_GAIN = max(
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_NOISE_GAIN = max(
     0.0,
     min(
         2.0,
         float(
-            os.getenv("SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_NOISE_GAIN", "0.8")
+            os.getenv("SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_NOISE_GAIN", "0.8")
             or "0.8"
         ),
     ),
 )
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_ROUTE_DAMP = max(
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_ROUTE_DAMP = max(
     0.0,
     min(
         0.8,
         float(
-            os.getenv("SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_ROUTE_DAMP", "0.3")
+            os.getenv("SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_ROUTE_DAMP", "0.3")
             or "0.3"
         ),
     ),
 )
-_SIMULATION_WS_DAIMOI_LIVE_METRICS_MIN_INTERVAL_SECONDS = max(
+_SIMULATION_WS_PARTICLE_LIVE_METRICS_MIN_INTERVAL_SECONDS = max(
     0.0,
     _safe_float(
-        os.getenv("SIMULATION_WS_DAIMOI_LIVE_METRICS_MIN_INTERVAL_SECONDS", "0.45")
+        os.getenv("SIMULATION_WS_PARTICLE_LIVE_METRICS_MIN_INTERVAL_SECONDS", "0.45")
         or "0.45",
         0.45,
     ),
 )
-_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS = max(
+_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS = max(
     0.0,
     _safe_float(
         os.getenv(
-            "SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS",
+            "SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS",
             "0.55",
         )
         or "0.55",
         0.55,
     ),
 )
-_SIMULATION_WS_DAIMOI_METRICS_MIN_SLACK_MS = max(
+_SIMULATION_WS_PARTICLE_METRICS_MIN_SLACK_MS = max(
     0.0,
     _safe_float(
-        os.getenv("SIMULATION_WS_DAIMOI_METRICS_MIN_SLACK_MS", "3.5") or "3.5", 3.5
+        os.getenv("SIMULATION_WS_PARTICLE_METRICS_MIN_SLACK_MS", "3.5") or "3.5", 3.5
     ),
 )
 
@@ -924,12 +924,12 @@ def _runtime_health_payload(part_root: Path) -> dict[str, Any]:
 
 
 _CONFIG_MODULE_SPECS: dict[str, dict[str, Any]] = {
-    "daimoi_probabilistic": {
-        "module": daimoi_probabilistic_module,
+    "particle_probabilistic": {
+        "module": particle_probabilistic_module,
         "prefixes": (
-            "DAIMOI_",
+            "PARTICLE_",
             "NEXUS_",
-            "_DAIMOI_",
+            "_PARTICLE_",
             "_ABSORB_",
             "_ROLE_PRIOR_WEIGHTS",
         ),
@@ -939,7 +939,7 @@ _CONFIG_MODULE_SPECS: dict[str, dict[str, Any]] = {
         "module": simulation_module,
         "prefixes": (
             "SIMULATION_",
-            "_RESOURCE_DAIMOI_",
+            "_RESOURCE_PARTICLE_",
         ),
         "exact_names": (),
     },
@@ -1137,7 +1137,7 @@ def _config_coerce_numeric_like(reference: Any, value: float | int) -> float | i
 
 
 _CONFIG_SCALAR_LIMITS: dict[tuple[str, str], tuple[float, float]] = {
-    ("simulation", "SIMULATION_STREAM_DAIMOI_FRICTION"): (0.0, 2.0),
+    ("simulation", "SIMULATION_STREAM_PARTICLE_FRICTION"): (0.0, 2.0),
     ("simulation", "SIMULATION_STREAM_NEXUS_FRICTION"): (0.0, 2.0),
     ("simulation", "SIMULATION_STREAM_FRICTION"): (0.0, 2.0),
 }
@@ -2231,7 +2231,7 @@ def _simulation_ws_placeholder_payload(
             "emission_policy": {},
             "presence_impacts": [],
             "field_particles": [],
-            "daimoi_probabilistic": {},
+            "particle_probabilistic": {},
         },
         "perspective": perspective,
     }
@@ -2370,9 +2370,9 @@ def _simulation_ws_compact_field_particles_with_nodes(
             0.0,
             _safe_float(row.get("package_entropy", 0.0), 0.0),
         )
-        daimoi_energy = max(
+        particle_energy = max(
             0.0,
-            _safe_float(row.get("daimoi_energy", 0.0), 0.0),
+            _safe_float(row.get("particle_energy", 0.0), 0.0),
             message_probability + (package_entropy * 0.35),
         )
         semantic_mass = max(
@@ -2397,7 +2397,7 @@ def _simulation_ws_compact_field_particles_with_nodes(
                 "route_y": round(max(0.0, min(1.0, route_y)), 5),
                 "semantic_text_chars": round(semantic_text_chars, 3),
                 "semantic_mass": round(semantic_mass, 6),
-                "daimoi_energy": round(daimoi_energy, 6),
+                "particle_energy": round(particle_energy, 6),
                 "message_probability": round(message_probability, 6),
                 "package_entropy": round(package_entropy, 6),
                 "collision_count": int(
@@ -2477,7 +2477,7 @@ def _simulation_ws_extract_stream_particles(
         node_text_chars=node_text_chars or {},
     )
     dynamics["field_particles"] = compact_rows
-    _simulation_ws_ensure_daimoi_summary(simulation_payload)
+    _simulation_ws_ensure_particle_summary(simulation_payload)
     simulation_payload["presence_dynamics"] = dynamics
     return compact_rows
 
@@ -2646,7 +2646,7 @@ def _simulation_ws_graph_node_position_map(
         return {}
 
     mapped: dict[str, tuple[float, float]] = {}
-    limit = max(1, int(_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_NODE_LIMIT))
+    limit = max(1, int(_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_NODE_LIMIT))
     for node_id, row in node_positions.items():
         if len(mapped) >= limit:
             break
@@ -2663,8 +2663,8 @@ def _simulation_ws_graph_node_position_map(
 def _simulation_ws_graph_variability_update(node_positions: Any) -> dict[str, Any]:
     current_positions = _simulation_ws_graph_node_position_map(node_positions)
 
-    with _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_LOCK:
-        previous_state = dict(_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE)
+    with _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_LOCK:
+        previous_state = dict(_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_STATE)
         previous_positions_raw = previous_state.get("positions", {})
         previous_positions = (
             dict(previous_positions_raw)
@@ -2676,7 +2676,7 @@ def _simulation_ws_graph_variability_update(node_positions: Any) -> dict[str, An
         moved_count = 0
         moved_threshold = max(
             0.0005,
-            _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_DISTANCE_REF * 0.35,
+            _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_DISTANCE_REF * 0.35,
         )
         for node_id, (cx, cy) in current_positions.items():
             prior = previous_positions.get(node_id)
@@ -2707,11 +2707,11 @@ def _simulation_ws_graph_variability_update(node_positions: Any) -> dict[str, An
 
         mean_term = _ws_clamp01(
             mean_displacement
-            / max(1e-6, _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_DISTANCE_REF)
+            / max(1e-6, _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_DISTANCE_REF)
         )
         p90_term = _ws_clamp01(
             p90_displacement
-            / max(1e-6, _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_DISTANCE_REF * 1.8)
+            / max(1e-6, _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_DISTANCE_REF * 1.8)
         )
         active_term = _ws_clamp01(active_share / 0.45)
         raw_score = _ws_clamp01(
@@ -2719,7 +2719,7 @@ def _simulation_ws_graph_variability_update(node_positions: Any) -> dict[str, An
         )
 
         alpha = _ws_clamp01(
-            _safe_float(_SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_EMA_ALPHA, 0.2)
+            _safe_float(_SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_EMA_ALPHA, 0.2)
         )
         previous_score = _ws_clamp01(
             _safe_float(previous_state.get("score", raw_score), raw_score)
@@ -2732,8 +2732,8 @@ def _simulation_ws_graph_variability_update(node_positions: Any) -> dict[str, An
             ),
         )
 
-        _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE.clear()
-        _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_STATE.update(
+        _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_STATE.clear()
+        _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_STATE.update(
             {
                 "positions": dict(current_positions),
                 "score": score,
@@ -2759,7 +2759,7 @@ def _simulation_ws_graph_variability_update(node_positions: Any) -> dict[str, An
         }
 
 
-def _simulation_ws_daimoi_live_metrics(
+def _simulation_ws_particle_live_metrics(
     rows: Any,
     *,
     default_target: float,
@@ -2768,11 +2768,11 @@ def _simulation_ws_daimoi_live_metrics(
         return {}
 
     positions_fn = getattr(
-        daimoi_probabilistic_module,
+        particle_probabilistic_module,
         "_anti_clump_positions_from_particles",
         None,
     )
-    metrics_fn = getattr(daimoi_probabilistic_module, "_anti_clump_metrics", None)
+    metrics_fn = getattr(particle_probabilistic_module, "_anti_clump_metrics", None)
     if not callable(positions_fn) or not callable(metrics_fn):
         return {}
 
@@ -2888,7 +2888,7 @@ def _simulation_ws_daimoi_live_metrics(
     }
 
 
-def _simulation_ws_ensure_daimoi_summary(
+def _simulation_ws_ensure_particle_summary(
     payload: dict[str, Any],
     *,
     include_live_metrics: bool = True,
@@ -2900,7 +2900,7 @@ def _simulation_ws_ensure_daimoi_summary(
     if not isinstance(dynamics, dict):
         return
 
-    summary_raw = dynamics.get("daimoi_probabilistic", {})
+    summary_raw = dynamics.get("particle_probabilistic", {})
     summary = dict(summary_raw) if isinstance(summary_raw, dict) else {}
 
     anti_raw = summary.get("anti_clump", {})
@@ -2912,7 +2912,7 @@ def _simulation_ws_ensure_daimoi_summary(
     scales = dict(scales_raw) if isinstance(scales_raw, dict) else {}
 
     default_target = _safe_float(
-        getattr(daimoi_probabilistic_module, "DAIMOI_ANTI_CLUMP_TARGET", 0.33),
+        getattr(particle_probabilistic_module, "PARTICLE_ANTI_CLUMP_TARGET", 0.33),
         0.33,
     )
     anti_target = _ws_clamp01(
@@ -2922,7 +2922,7 @@ def _simulation_ws_ensure_daimoi_summary(
     rows = dynamics.get("field_particles", [])
     live_metrics: dict[str, Any] = {}
     if include_live_metrics:
-        live_metrics = _simulation_ws_daimoi_live_metrics(
+        live_metrics = _simulation_ws_particle_live_metrics(
             rows,
             default_target=anti_target,
         )
@@ -2977,14 +2977,14 @@ def _simulation_ws_ensure_daimoi_summary(
         1.0,
         min(
             2.2,
-            1.0 + (graph_score * _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_NOISE_GAIN),
+            1.0 + (graph_score * _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_NOISE_GAIN),
         ),
     )
     route_damp = max(
         0.55,
         min(
             1.0,
-            1.0 - (graph_score * _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_ROUTE_DAMP),
+            1.0 - (graph_score * _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_ROUTE_DAMP),
         ),
     )
 
@@ -3288,11 +3288,11 @@ def _simulation_ws_ensure_daimoi_summary(
     summary["anti_clump_drive"] = round(anti_drive, 6)
     summary["snr"] = round(max(0.0, _safe_float(anti.get("snr", 0.0), 0.0)), 6)
     summary["anti_clump"] = anti
-    dynamics["daimoi_probabilistic"] = summary
+    dynamics["particle_probabilistic"] = summary
     payload["presence_dynamics"] = dynamics
 
 
-def _simulation_ws_payload_missing_daimoi_summary(payload: dict[str, Any]) -> bool:
+def _simulation_ws_payload_missing_particle_summary(payload: dict[str, Any]) -> bool:
     if not isinstance(payload, dict):
         return True
     if "presence_dynamics" not in payload:
@@ -3300,11 +3300,11 @@ def _simulation_ws_payload_missing_daimoi_summary(payload: dict[str, Any]) -> bo
     dynamics = payload.get("presence_dynamics", {})
     if not isinstance(dynamics, dict) or not dynamics:
         return True
-    _simulation_ws_ensure_daimoi_summary(payload)
+    _simulation_ws_ensure_particle_summary(payload)
     dynamics = payload.get("presence_dynamics", {})
     if not isinstance(dynamics, dict):
         return True
-    summary = dynamics.get("daimoi_probabilistic", {})
+    summary = dynamics.get("particle_probabilistic", {})
     if not isinstance(summary, dict) or not summary:
         return True
     if "clump_score" not in summary and "anti_clump" not in summary:
@@ -4467,8 +4467,8 @@ def _simulation_ws_worker_for_top_level_key(key: str) -> str:
         return "sim-projection"
     if clean in {"field_particles", "pain_field"}:
         return "sim-particles"
-    if clean in {"daimoi", "entities", "echoes"}:
-        return "sim-daimoi"
+    if clean in {"particles", "entities", "echoes"}:
+        return "sim-particles"
     if clean in {"presence_dynamics"}:
         return "sim-presence"
     return "sim-misc"
@@ -4489,7 +4489,7 @@ def _simulation_ws_worker_for_presence_key(key: str) -> str:
         "compute_jobs_180s",
         "compute_summary",
         "compute_jobs",
-        "resource_daimoi",
+        "resource_particle",
         "resource_consumption",
         "river_flow",
     }:
@@ -4501,17 +4501,17 @@ def _simulation_ws_worker_for_presence_key(key: str) -> str:
         "recent_file_paths",
         "user_presence",
         "user_input_messages",
-        "user_embedded_daimoi_count",
+        "user_embedded_particle_count",
     }:
         return "sim-interaction"
     if clean in {
-        "daimoi_probabilistic",
-        "daimoi_probabilistic_record",
-        "daimoi_behavior_defaults",
+        "particle_probabilistic",
+        "particle_probabilistic_record",
+        "particle_behavior_defaults",
         "ghost",
         "fork_tax",
     }:
-        return "sim-daimoi"
+        return "sim-particles"
     return "sim-presence"
 
 
@@ -4603,7 +4603,7 @@ def _simulation_ws_split_delta_by_worker(
         "sim-resource": 2,
         "sim-interaction": 3,
         "sim-presence": 4,
-        "sim-daimoi": 5,
+        "sim-particles": 5,
         "sim-projection": 6,
         "sim-misc": 7,
     }
@@ -4737,7 +4737,7 @@ def _simulation_http_runtime_reference_mtime(part_root: Path) -> float:
         part_root / "code" / "world_web" / "server.py",
         part_root / "code" / "world_web" / "simulation.py",
         part_root / "code" / "world_web" / "c_double_buffer_backend.py",
-        part_root / "code" / "world_web" / "daimoi_probabilistic.py",
+        part_root / "code" / "world_web" / "particle_probabilistic.py",
         part_root / "code" / "world_web" / "native" / "libc_double_buffer_sim.so",
     ]
     newest = 0.0
@@ -6140,8 +6140,8 @@ class WorldHandler(BaseHTTPRequestHandler):
                 query_args["limit"] = max(1, int(_safe_float(query_arg, 24.0)))
             elif query_name == "role_slice" and query_arg:
                 query_args["role"] = query_arg
-            elif query_name == "explain_daimoi" and query_arg:
-                query_args["daimoi_id"] = query_arg
+            elif query_name == "explain_particle" and query_arg:
+                query_args["particle_id"] = query_arg
             elif query_name == "recent_outcomes":
                 if query_arg:
                     parts = [piece for piece in query_arg.split(" ") if piece]
@@ -7070,8 +7070,8 @@ class WorldHandler(BaseHTTPRequestHandler):
         last_projection_delta_broadcast = 0.0
         last_graph_position_broadcast = 0.0
         last_cached_simulation_timestamp = ""
-        last_daimoi_live_metrics_refresh = 0.0
-        last_daimoi_graph_variability_refresh = 0.0
+        last_particle_live_metrics_refresh = 0.0
+        last_particle_graph_variability_refresh = 0.0
         last_ws_stream_cache_store = 0.0
         stream_particles: list[dict[str, Any]] = []
         last_muse_poll = 0.0
@@ -7236,7 +7236,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                     needs_live_bootstrap = bool(
                         cached_payload is None
                         or (not stream_particles)
-                        or _simulation_ws_payload_missing_daimoi_summary(
+                        or _simulation_ws_payload_missing_particle_summary(
                             simulation_delta_payload
                         )
                         or _simulation_ws_payload_missing_graph_payload(
@@ -7510,7 +7510,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                                 and (
                                     cached_payload is None
                                     or (not stream_particles)
-                                    or _simulation_ws_payload_missing_daimoi_summary(
+                                    or _simulation_ws_payload_missing_particle_summary(
                                         simulation_delta_payload
                                     )
                                     or _simulation_ws_payload_missing_graph_payload(
@@ -8016,50 +8016,50 @@ class WorldHandler(BaseHTTPRequestHandler):
                         simulation_payload["generated_at"] = tick_timestamp
                         dynamics_state = simulation_payload.get("presence_dynamics", {})
                         summary_state = (
-                            dynamics_state.get("daimoi_probabilistic", {})
+                            dynamics_state.get("particle_probabilistic", {})
                             if isinstance(dynamics_state, dict)
                             else {}
                         )
                         summary_ready = isinstance(summary_state, dict) and bool(
                             summary_state
                         )
-                        daimoi_slack_ms = tick_slack_ms()
-                        allow_daimoi_refresh = (
-                            daimoi_slack_ms
-                            >= _SIMULATION_WS_DAIMOI_METRICS_MIN_SLACK_MS
+                        particle_slack_ms = tick_slack_ms()
+                        allow_particle_refresh = (
+                            particle_slack_ms
+                            >= _SIMULATION_WS_PARTICLE_METRICS_MIN_SLACK_MS
                             and ingestion_pressure < 0.85
                         )
                         live_metrics_due = (
-                            _SIMULATION_WS_DAIMOI_LIVE_METRICS_MIN_INTERVAL_SECONDS
+                            _SIMULATION_WS_PARTICLE_LIVE_METRICS_MIN_INTERVAL_SECONDS
                             <= 0.0
                             or (
-                                now_monotonic - last_daimoi_live_metrics_refresh
-                                >= _SIMULATION_WS_DAIMOI_LIVE_METRICS_MIN_INTERVAL_SECONDS
+                                now_monotonic - last_particle_live_metrics_refresh
+                                >= _SIMULATION_WS_PARTICLE_LIVE_METRICS_MIN_INTERVAL_SECONDS
                             )
                         )
                         graph_variability_due = (
-                            _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS
+                            _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS
                             <= 0.0
                             or (
-                                now_monotonic - last_daimoi_graph_variability_refresh
-                                >= _SIMULATION_WS_DAIMOI_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS
+                                now_monotonic - last_particle_graph_variability_refresh
+                                >= _SIMULATION_WS_PARTICLE_GRAPH_VARIABILITY_MIN_INTERVAL_SECONDS
                             )
                         )
                         include_live_metrics = (not summary_ready) or (
-                            allow_daimoi_refresh and live_metrics_due
+                            allow_particle_refresh and live_metrics_due
                         )
                         include_graph_variability = (not summary_ready) or (
-                            allow_daimoi_refresh and graph_variability_due
+                            allow_particle_refresh and graph_variability_due
                         )
-                        _simulation_ws_ensure_daimoi_summary(
+                        _simulation_ws_ensure_particle_summary(
                             simulation_payload,
                             include_live_metrics=include_live_metrics,
                             include_graph_variability=include_graph_variability,
                         )
                         if include_live_metrics:
-                            last_daimoi_live_metrics_refresh = now_monotonic
+                            last_particle_live_metrics_refresh = now_monotonic
                         if include_graph_variability:
-                            last_daimoi_graph_variability_refresh = now_monotonic
+                            last_particle_graph_variability_refresh = now_monotonic
                         dynamics = simulation_payload.get("presence_dynamics", {})
                         if isinstance(dynamics, dict):
                             dynamics["generated_at"] = tick_timestamp
@@ -8155,23 +8155,23 @@ class WorldHandler(BaseHTTPRequestHandler):
                             tick_changed_keys.append(
                                 "presence_dynamics.field_particles"
                             )
-                        daimoi_summary = (
-                            dynamics.get("daimoi_probabilistic", {})
+                        particle_summary = (
+                            dynamics.get("particle_probabilistic", {})
                             if isinstance(dynamics, dict)
                             else {}
                         )
-                        if isinstance(daimoi_summary, dict) and daimoi_summary:
+                        if isinstance(particle_summary, dict) and particle_summary:
                             anti_payload = (
-                                daimoi_summary.get("anti_clump", {})
+                                particle_summary.get("anti_clump", {})
                                 if isinstance(
-                                    daimoi_summary.get("anti_clump", {}), dict
+                                    particle_summary.get("anti_clump", {}), dict
                                 )
                                 else {}
                             )
-                            dynamics_patch["daimoi_probabilistic"] = {
+                            dynamics_patch["particle_probabilistic"] = {
                                 "clump_score": _ws_clamp01(
                                     _safe_float(
-                                        daimoi_summary.get("clump_score", 0.0), 0.0
+                                        particle_summary.get("clump_score", 0.0), 0.0
                                     )
                                 ),
                                 "anti_clump_drive": max(
@@ -8179,7 +8179,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                                     min(
                                         1.0,
                                         _safe_float(
-                                            daimoi_summary.get("anti_clump_drive", 0.0),
+                                            particle_summary.get("anti_clump_drive", 0.0),
                                             0.0,
                                         ),
                                     ),
@@ -8187,7 +8187,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                                 "anti_clump": anti_payload,
                             }
                             tick_changed_keys.append(
-                                "presence_dynamics.daimoi_probabilistic"
+                                "presence_dynamics.particle_probabilistic"
                             )
                         graph_position_heartbeat_due = (
                             _SIMULATION_WS_GRAPH_POSITION_HEARTBEAT_SECONDS <= 0.0
@@ -10863,11 +10863,11 @@ class WorldHandler(BaseHTTPRequestHandler):
                 has_pointer = x_raw is not None and y_raw is not None
                 x_ratio = max(0.0, min(1.0, _safe_float(x_raw, 0.5)))
                 y_ratio = max(0.0, min(1.0, _safe_float(y_raw, 0.5)))
-                embed_daimoi = bool(
+                embed_particle = bool(
                     row.get(
-                        "embed_daimoi",
+                        "embed_particle",
                         row.get(
-                            "embedDaimoi",
+                            "embedParticle",
                             kind
                             in {
                                 "hover",
@@ -10904,7 +10904,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                     )
                     query_text = meta_query or _normalize_query_text(message)
                     if query_text:
-                        search_meta = _build_search_daimoi_meta(
+                        search_meta = _build_search_particle_meta(
                             query_text,
                             target=target,
                             model=_effective_request_embed_model(
@@ -10913,7 +10913,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                         )
                         if search_meta:
                             meta_copy["query"] = query_text
-                            meta_copy["search_daimoi"] = search_meta
+                            meta_copy["search_particle"] = search_meta
                             message = query_text
 
                 event_unix = batch_now_unix + (index * 0.0001)
@@ -10922,7 +10922,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                 event_id = hashlib.sha1(
                     (
                         f"{event_iso}|{kind}|{target}|{message}|"
-                        f"{x_ratio:.5f}|{y_ratio:.5f}|{int(embed_daimoi)}|{index}"
+                        f"{x_ratio:.5f}|{y_ratio:.5f}|{int(embed_particle)}|{index}"
                     ).encode("utf-8")
                 ).hexdigest()[:14]
                 event_row: dict[str, Any] = {
@@ -10932,7 +10932,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                     "kind": kind,
                     "target": target[:240],
                     "message": message[:320],
-                    "embed_daimoi": bool(embed_daimoi),
+                    "embed_particle": bool(embed_particle),
                     "ts": event_iso,
                     "ts_monotonic": round(event_mono, 6),
                 }
@@ -10953,7 +10953,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                         "has_pointer": has_pointer,
                         "x_ratio": x_ratio,
                         "y_ratio": y_ratio,
-                        "embed_daimoi": embed_daimoi,
+                        "embed_particle": embed_particle,
                         "meta": meta_copy,
                         "event_unix": event_unix,
                         "event_mono": event_mono,
@@ -11025,7 +11025,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                         if has_pointer
                         else None
                     ),
-                    embed_daimoi=bool(tracker_row.get("embed_daimoi", False)),
+                    embed_particle=bool(tracker_row.get("embed_particle", False)),
                     meta=(
                         tracker_row.get("meta")
                         if isinstance(tracker_row.get("meta"), dict)

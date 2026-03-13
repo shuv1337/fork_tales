@@ -6,7 +6,7 @@ from typing import Any
 from .metrics import _safe_float
 
 
-DAIMOI_COMPONENT_RESOURCE_REQ: dict[str, dict[str, float]] = {
+PARTICLE_COMPONENT_RESOURCE_REQ: dict[str, dict[str, float]] = {
     "deliver_message": {
         "cpu": 0.22,
         "gpu": 0.05,
@@ -90,7 +90,7 @@ DAIMOI_COMPONENT_RESOURCE_REQ: dict[str, dict[str, float]] = {
 }
 
 
-DAIMOI_COMPONENT_COST: dict[str, float] = {
+PARTICLE_COMPONENT_COST: dict[str, float] = {
     "deliver_message": 0.18,
     "invoke_receipt_audit": 0.52,
     "invoke_truth_gate": 0.58,
@@ -130,7 +130,7 @@ def component_resource_req(
     source_map = (
         component_resource_req_map
         if isinstance(component_resource_req_map, dict)
-        else DAIMOI_COMPONENT_RESOURCE_REQ
+        else PARTICLE_COMPONENT_RESOURCE_REQ
     )
     base = source_map.get(token, {})
     req = {
@@ -154,7 +154,7 @@ def component_cost(
     source_map = (
         component_cost_map
         if isinstance(component_cost_map, dict)
-        else DAIMOI_COMPONENT_COST
+        else PARTICLE_COMPONENT_COST
     )
     default_value = max(0.0, _finite_float(default_cost, 0.3))
     return max(

@@ -5,7 +5,7 @@ from typing import Any
 from pathlib import Path
 
 try:
-    from code.lore import (
+    from code.catalog_data import (
         ENTITY_MANIFEST,
         CANONICAL_TERMS,
         VOICE_LINE_BANK,
@@ -15,7 +15,7 @@ try:
         PART_67_PROLOGUE,
     )
 except ImportError:
-    from lore import (
+    from catalog_data import (
         ENTITY_MANIFEST,
         CANONICAL_TERMS,
         VOICE_LINE_BANK,
@@ -50,67 +50,67 @@ def simulation_tick_seconds() -> float:
     return max(0.001, float(SIM_TICK_SECONDS))
 
 
-# Daimoi Dynamics
-DAIMO_FORCE_KAPPA = max(
+# Particle Dynamics
+PARTICLE_FORCE_KAPPA = max(
     0.02,
-    float(os.getenv("DAIMO_FORCE_KAPPA", "0.22") or "0.22"),
+    float(os.getenv("PARTICLE_FORCE_KAPPA", "0.22") or "0.22"),
 )
-DAIMO_DAMPING = max(
+PARTICLE_DAMPING = max(
     0.0,
-    min(0.99, float(os.getenv("DAIMO_DAMPING", "0.88") or "0.88")),
+    min(0.99, float(os.getenv("PARTICLE_DAMPING", "0.88") or "0.88")),
 )
-DAIMO_DT_SECONDS = max(
+PARTICLE_DT_SECONDS = max(
     0.02,
-    min(0.4, float(os.getenv("DAIMO_DT_SECONDS", "0.2") or "0.2")),
+    min(0.4, float(os.getenv("PARTICLE_DT_SECONDS", "0.2") or "0.2")),
 )
-DAIMO_MAX_TRACKED_ENTITIES = max(
+PARTICLE_MAX_TRACKED_ENTITIES = max(
     24,
-    int(os.getenv("DAIMO_MAX_TRACKED_ENTITIES", "280") or "280"),
+    int(os.getenv("PARTICLE_MAX_TRACKED_ENTITIES", "280") or "280"),
 )
-DAIMO_PROFILE_DEFS: tuple[dict[str, Any], ...] = (
+PARTICLE_PROFILE_DEFS: tuple[dict[str, Any], ...] = (
     {
-        "id": "daimo:core",
-        "name": "Core Daimoi",
+        "id": "particle:core",
+        "name": "Core Particle",
         "ctx": "主",
         "base_budget": 9.0,
         "w": 1.0,
         "temperature": 0.34,
     },
     {
-        "id": "daimo:resource",
-        "name": "Resource Daimoi",
+        "id": "particle:resource",
+        "name": "Resource Particle",
         "ctx": "資",
         "base_budget": 12.0,
         "w": 1.05,
         "temperature": 0.28,
     },
     {
-        "id": "daimo:self",
-        "name": "Self Daimoi",
+        "id": "particle:self",
+        "name": "Self Particle",
         "ctx": "己",
         "base_budget": 7.0,
         "w": 0.9,
         "temperature": 0.42,
     },
     {
-        "id": "daimo:you",
-        "name": "You Daimoi",
+        "id": "particle:you",
+        "name": "You Particle",
         "ctx": "汝",
         "base_budget": 7.0,
         "w": 0.88,
         "temperature": 0.48,
     },
     {
-        "id": "daimo:they",
-        "name": "They Daimoi",
+        "id": "particle:they",
+        "name": "They Particle",
         "ctx": "彼",
         "base_budget": 6.0,
         "w": 0.84,
         "temperature": 0.56,
     },
     {
-        "id": "daimo:world",
-        "name": "World Daimoi",
+        "id": "particle:world",
+        "name": "World Particle",
         "ctx": "世",
         "base_budget": 8.0,
         "w": 0.94,
@@ -120,19 +120,19 @@ DAIMO_PROFILE_DEFS: tuple[dict[str, Any], ...] = (
 
 # Named Fields
 CANONICAL_NAMED_FIELD_IDS = (
-    "receipt_river",
-    "witness_thread",
-    "fork_tax_canticle",
-    "mage_of_receipts",
-    "keeper_of_receipts",
+    "log_stream",
+    "observer_thread",
+    "fork_cost_metric",
+    "log_writer",
+    "log_guardian",
     "anchor_registry",
-    "gates_of_truth",
-    "file_sentinel",
-    "change_fog",
-    "path_ward",
-    "manifest_lith",
-    "resolution_weaver",
-    "core_pulse",
+    "compliance_gate",
+    "file_monitor",
+    "change_buffer",
+    "path_guard",
+    "manifest_anchor",
+    "resolution_engine",
+    "core_heartbeat",
 )
 
 # Eta Mu Storage
@@ -159,7 +159,7 @@ EMSC_STREAM_LOG_REL = ".opencode/runtime/emsc_stream.v1.jsonl"
 # The unified model has exactly four primitive types:
 # - Presence: AI physics-based agent with spec embedding, need, priority, mass
 # - Nexus: Graph node/particle representing a resource with embedding, capacity, demand, role
-# - Daimoi: Free particle with carrier embedding, seed embedding, type distribution, owner
+# - Particle: Free particle with carrier embedding, seed embedding, type distribution, owner
 # - Field: Shared global scalar field (demand, flow, entropy, graph)
 #
 # Nexus graph, field dynamics, and model audit concepts.
@@ -168,10 +168,10 @@ EMSC_STREAM_LOG_REL = ".opencode/runtime/emsc_stream.v1.jsonl"
 NEXUS_GRAPH_RECORD = "ημ.nexus-graph.v1"
 NEXUS_GRAPH_SCHEMA_VERSION = "nexus.graph.v1"
 
-# Canonical daimon (replaces multiple particle types)
-DAIMON_RECORD = "ημ.daimon.v1"
-DAIMON_SCHEMA_VERSION = "daimon.v1"
-DAIMOI_PACKET_RECORD = "ημ.daimoi-packet.v1"
+# Canonical particle (replaces multiple particle types)
+PARTICLE_RECORD = "ημ.particle.v1"
+PARTICLE_SCHEMA_VERSION = "particle.v1"
+PARTICLE_PACKET_RECORD = "ημ.particle-packet.v1"
 
 # Canonical presence (unified agent type)
 PRESENCE_RECORD = "ημ.presence.v1"
@@ -1129,13 +1129,13 @@ DOCKER_AUTORESTART_EXCLUDE_GLOBS = str(
 
 # Presence and Fields
 FIELD_TO_PRESENCE = {
-    "f1": "receipt_river",
-    "f2": "witness_thread",
+    "f1": "log_stream",
+    "f2": "observer_thread",
     "f3": "anchor_registry",
-    "f4": "keeper_of_receipts",
-    "f5": "fork_tax_canticle",
-    "f6": "mage_of_receipts",
-    "f7": "gates_of_truth",
+    "f4": "log_guardian",
+    "f5": "fork_cost_metric",
+    "f6": "log_writer",
+    "f7": "compliance_gate",
     "f8": "anchor_registry",
     # Philosophical concept fields
     "f9": "principle_good",
@@ -1145,7 +1145,7 @@ FIELD_TO_PRESENCE = {
     "f13": "state_dead",
     "f14": "state_living",
     # Chaos field - transcends and perturbs all other fields
-    "f15": "chaos_butterfly",
+    "f15": "entropy_source",
     # Core resource fields
     "f16": "presence.core.cpu",
     "f17": "presence.core.ram",
@@ -2255,7 +2255,7 @@ KEEPER_OF_CONTRACTS_PROFILE = {
     "type": "portal",
 }
 FILE_SENTINEL_PROFILE = {
-    "id": "file_sentinel",
+    "id": "file_monitor",
     "en": "File Sentinel",
     "ja": "ファイルの哨戒者",
     "type": "network",
@@ -2342,12 +2342,12 @@ _PRESENCE_ALIASES = {
     "keeper_of_contracts": "keeper_of_contracts",
     "keeper-of-contracts": "keeper_of_contracts",
     "KeeperOfContracts": "keeper_of_contracts",
-    "file_sentinel": "file_sentinel",
-    "file-sentinel": "file_sentinel",
-    "FileSentinel": "file_sentinel",
-    "auto_commit_ghost": "file_sentinel",
-    "auto-commit-ghost": "file_sentinel",
-    "autocommitghost": "file_sentinel",
+    "file_monitor": "file_monitor",
+    "file-monitor": "file_monitor",
+    "FileMonitor": "file_monitor",
+    "auto_agent": "file_monitor",
+    "auto-agent": "file_monitor",
+    "autoagent": "file_monitor",
     "the_council": "the_council",
     "the-council": "the_council",
     "thecouncil": "the_council",
@@ -2492,7 +2492,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "title": "Web Graph Weaver",
         "binds_to": ["/api/weaver/status", "/ws"],
         "field_bindings": {"f2": 0.18, "f4": 0.34, "f6": 0.2, "f8": 0.28},
-        "presence": "witness_thread",
+        "presence": "observer_thread",
         "tags": ["graph", "drift"],
         "lane": "senses",
     },
@@ -2502,7 +2502,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "title": "Inspiration Atlas",
         "binds_to": ["/api/catalog"],
         "field_bindings": {"f1": 0.18, "f3": 0.24, "f6": 0.4, "f8": 0.18},
-        "presence": "mage_of_receipts",
+        "presence": "log_writer",
         "tags": ["atlas", "memory"],
         "lane": "memory",
     },
@@ -2512,17 +2512,17 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "title": "Everything Dashboard",
         "binds_to": ["/api/simulation", "/ws", "/stream/mix.wav"],
         "field_bindings": {"f1": 0.22, "f2": 0.2, "f4": 0.24, "f7": 0.18, "f8": 0.16},
-        "presence": "receipt_river",
+        "presence": "log_stream",
         "tags": ["simulation", "overlay", "field"],
         "lane": "senses",
     },
     {
-        "id": "nexus.ui.chat.witness_thread",
+        "id": "nexus.ui.chat.observer_thread",
         "kind": "chat-lens",
         "title": "Chat Lens: Witness Thread",
         "binds_to": ["/api/chat", "/api/presence/say"],
         "field_bindings": {"f2": 0.38, "f3": 0.14, "f6": 0.22, "f7": 0.14, "f8": 0.12},
-        "presence": "witness_thread",
+        "presence": "observer_thread",
         "tags": ["chat", "lens", "witness"],
         "lane": "voice",
         "memory_scope": "shared",
@@ -2533,7 +2533,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "title": "Entity Vitals",
         "binds_to": ["/api/simulation"],
         "field_bindings": {"f1": 0.18, "f2": 0.22, "f3": 0.2, "f5": 0.2, "f8": 0.2},
-        "presence": "keeper_of_receipts",
+        "presence": "log_guardian",
         "tags": ["vitals", "telemetry"],
         "lane": "voice",
     },
@@ -2543,7 +2543,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "title": "Omni Panel",
         "binds_to": ["/api/catalog", "/api/memories"],
         "field_bindings": {"f1": 0.24, "f3": 0.25, "f6": 0.28, "f8": 0.23},
-        "presence": "keeper_of_receipts",
+        "presence": "log_guardian",
         "tags": ["archive", "covers", "memory"],
         "lane": "memory",
     },
@@ -2553,7 +2553,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "title": "Myth Commons",
         "binds_to": ["/api/world", "/api/world/interact"],
         "field_bindings": {"f2": 0.22, "f3": 0.22, "f6": 0.2, "f7": 0.2, "f8": 0.16},
-        "presence": "gates_of_truth",
+        "presence": "compliance_gate",
         "tags": ["world", "people", "interaction"],
         "lane": "voice",
     },
@@ -2577,7 +2577,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
             "/api/push-truth/dry-run",
         ],
         "field_bindings": {"f2": 0.14, "f4": 0.26, "f7": 0.3, "f8": 0.3},
-        "presence": "gates_of_truth",
+        "presence": "compliance_gate",
         "tags": ["autopilot", "governance", "ledger", "operations"],
         "lane": "council",
     },
@@ -2591,7 +2591,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
             "/api/file-graph/summary",
         ],
         "field_bindings": {"f2": 0.2, "f4": 0.3, "f7": 0.22, "f8": 0.28},
-        "presence": "gates_of_truth",
+        "presence": "compliance_gate",
         "tags": ["stability", "drift", "study", "governance"],
         "lane": "council",
     },
@@ -2706,8 +2706,8 @@ _IMAGE_COMMENTS_CACHE: dict[str, Any] = {
     "mtime_ns": 0,
     "entries": [],
 }
-_DAIMO_DYNAMICS_LOCK = threading.Lock()
-_DAIMO_DYNAMICS_CACHE: dict[str, Any] = {
+_PARTICLE_DYNAMICS_LOCK = threading.Lock()
+_PARTICLE_DYNAMICS_CACHE: dict[str, Any] = {
     "entities": {},
     "last_gc_monotonic": 0.0,
 }

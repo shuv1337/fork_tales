@@ -39,11 +39,11 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError
 
 from .constants import (
-    DAIMO_PROFILE_DEFS,
-    DAIMO_FORCE_KAPPA,
-    DAIMO_DAMPING,
-    DAIMO_DT_SECONDS,
-    DAIMO_MAX_TRACKED_ENTITIES,
+    PARTICLE_PROFILE_DEFS,
+    PARTICLE_FORCE_KAPPA,
+    PARTICLE_DAMPING,
+    PARTICLE_DT_SECONDS,
+    PARTICLE_MAX_TRACKED_ENTITIES,
     ENTITY_MANIFEST,
     USER_PRESENCE_ID,
     USER_PRESENCE_LABEL_EN,
@@ -53,8 +53,8 @@ from .constants import (
     USER_PRESENCE_DRIFT_ALPHA,
     USER_PRESENCE_EVENT_TTL_SECONDS,
     USER_PRESENCE_MAX_EVENTS,
-    _DAIMO_DYNAMICS_LOCK,
-    _DAIMO_DYNAMICS_CACHE,
+    _PARTICLE_DYNAMICS_LOCK,
+    _PARTICLE_DYNAMICS_CACHE,
     _USER_PRESENCE_INPUT_LOCK,
     _USER_PRESENCE_INPUT_CACHE,
     _MIX_CACHE_LOCK,
@@ -101,9 +101,9 @@ from .db import (
     _load_eta_mu_knowledge_entries,
 )
 from .nooi import NooiField
-from .daimoi_probabilistic import (
-    build_probabilistic_daimoi_particles,
-    DAIMOI_JOB_KEYS,
+from .particle_probabilistic import (
+    build_probabilistic_particles,
+    PARTICLE_JOB_KEYS,
     _simplex_noise_2d,
 )
 from .presence_runtime import (
@@ -128,40 +128,40 @@ from .simulation_nexus import (
 )
 from . import simulation_resources as simulation_resources_module
 
-_RESOURCE_DAIMOI_TYPES = simulation_resources_module._RESOURCE_DAIMOI_TYPES
-_RESOURCE_DAIMOI_TYPE_ALIASES = (
-    simulation_resources_module._RESOURCE_DAIMOI_TYPE_ALIASES
+_RESOURCE_PARTICLE_TYPES = simulation_resources_module._RESOURCE_PARTICLE_TYPES
+_RESOURCE_PARTICLE_TYPE_ALIASES = (
+    simulation_resources_module._RESOURCE_PARTICLE_TYPE_ALIASES
 )
-_RESOURCE_DAIMOI_WALLET_FLOOR = (
-    simulation_resources_module._RESOURCE_DAIMOI_WALLET_FLOOR
+_RESOURCE_PARTICLE_WALLET_FLOOR = (
+    simulation_resources_module._RESOURCE_PARTICLE_WALLET_FLOOR
 )
-_RESOURCE_DAIMOI_WALLET_CAP = simulation_resources_module._RESOURCE_DAIMOI_WALLET_CAP
-_RESOURCE_DAIMOI_CPU_SENTINEL_ID = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ID
+_RESOURCE_PARTICLE_WALLET_CAP = simulation_resources_module._RESOURCE_PARTICLE_WALLET_CAP
+_RESOURCE_PARTICLE_CPU_SENTINEL_ID = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ID
 )
-_RESOURCE_DAIMOI_SENTINEL_RESOURCE_BY_ID = (
-    simulation_resources_module._RESOURCE_DAIMOI_SENTINEL_RESOURCE_BY_ID
+_RESOURCE_PARTICLE_SENTINEL_RESOURCE_BY_ID = (
+    simulation_resources_module._RESOURCE_PARTICLE_SENTINEL_RESOURCE_BY_ID
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT
+_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_MAX_MULTIPLIER = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_BURN_MAX_MULTIPLIER
+_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_MAX_MULTIPLIER = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_BURN_MAX_MULTIPLIER
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_BURN_COST_MAX
+_RESOURCE_PARTICLE_CPU_SENTINEL_BURN_COST_MAX = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_BURN_COST_MAX
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_GAIN = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_GAIN
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_GAIN = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_GAIN
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST
 )
-_RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI = (
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI
+_RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES = (
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES
 )
 
 _canonical_resource_type = simulation_resources_module._canonical_resource_type
@@ -203,12 +203,12 @@ _resource_payment_plan = simulation_resources_module._resource_payment_plan
 
 
 def _sync_resource_module_overrides() -> None:
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT = (
-        _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT = (
+        _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT
     )
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT = _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT
-    simulation_resources_module._RESOURCE_DAIMOI_CPU_SENTINEL_ID = (
-        _RESOURCE_DAIMOI_CPU_SENTINEL_ID
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT = _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT
+    simulation_resources_module._RESOURCE_PARTICLE_CPU_SENTINEL_ID = (
+        _RESOURCE_PARTICLE_CPU_SENTINEL_ID
     )
 
 
@@ -261,7 +261,7 @@ def _resource_action_utility(
     )
 
 
-def _apply_resource_daimoi_emissions(
+def _apply_resource_particle_emissions(
     *,
     field_particles: list[dict[str, Any]],
     presence_impacts: list[dict[str, Any]],
@@ -269,7 +269,7 @@ def _apply_resource_daimoi_emissions(
     queue_ratio: float,
 ) -> dict[str, Any]:
     _sync_resource_module_overrides()
-    return simulation_resources_module._apply_resource_daimoi_emissions(
+    return simulation_resources_module._apply_resource_particle_emissions(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat=resource_heartbeat,
@@ -277,7 +277,7 @@ def _apply_resource_daimoi_emissions(
     )
 
 
-def _apply_resource_daimoi_action_consumption(
+def _apply_resource_particle_action_consumption(
     *,
     field_particles: list[dict[str, Any]],
     presence_impacts: list[dict[str, Any]],
@@ -285,7 +285,7 @@ def _apply_resource_daimoi_action_consumption(
     queue_ratio: float,
 ) -> dict[str, Any]:
     _sync_resource_module_overrides()
-    return simulation_resources_module._apply_resource_daimoi_action_consumption(
+    return simulation_resources_module._apply_resource_particle_action_consumption(
         field_particles=field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat=resource_heartbeat,
@@ -452,21 +452,21 @@ _SIMULATION_STREAM_FRICTION_LEGACY = _safe_float(
     os.getenv("SIMULATION_WS_STREAM_FRICTION", "0.997") or "0.997",
     0.997,
 )
-_SIMULATION_STREAM_DAIMOI_FRICTION_DEFAULT = _safe_float(
+_SIMULATION_STREAM_PARTICLE_FRICTION_DEFAULT = _safe_float(
     os.getenv("SIMULATION_WS_STREAM_FRICTION", "0.998") or "0.998",
     0.998,
 )
-SIMULATION_STREAM_DAIMOI_FRICTION = max(
+SIMULATION_STREAM_PARTICLE_FRICTION = max(
     0.0,
     min(
         2.0,
         _safe_float(
             os.getenv(
-                "SIMULATION_WS_STREAM_DAIMOI_FRICTION",
-                str(_SIMULATION_STREAM_DAIMOI_FRICTION_DEFAULT),
+                "SIMULATION_WS_STREAM_PARTICLE_FRICTION",
+                str(_SIMULATION_STREAM_PARTICLE_FRICTION_DEFAULT),
             )
-            or str(_SIMULATION_STREAM_DAIMOI_FRICTION_DEFAULT),
-            _SIMULATION_STREAM_DAIMOI_FRICTION_DEFAULT,
+            or str(_SIMULATION_STREAM_PARTICLE_FRICTION_DEFAULT),
+            _SIMULATION_STREAM_PARTICLE_FRICTION_DEFAULT,
         ),
     ),
 )
@@ -528,11 +528,11 @@ SIMULATION_STREAM_LOW_FRICTION = max(
         ),
     ),
 )
-SIMULATION_DISABLE_DAIMOI = max(
+SIMULATION_DISABLE_PARTICLES = max(
     0.0,
     min(
         1.0,
-        _safe_float(os.getenv("SIMULATION_DISABLE_DAIMOI", "0") or "0", 0.0),
+        _safe_float(os.getenv("SIMULATION_DISABLE_PARTICLES", "0") or "0", 0.0),
     ),
 )
 SIMULATION_RANDOM_FIELD_VECTORS_ON_BOOT = max(
@@ -626,12 +626,12 @@ SIMULATION_STREAM_NEXUS_SEMANTIC_WEIGHT = max(
         ),
     ),
 )
-SIMULATION_STREAM_DAIMOI_ORBIT_DAMPING = max(
+SIMULATION_STREAM_PARTICLE_ORBIT_DAMPING = max(
     0.0,
     min(
         2.0,
         _safe_float(
-            os.getenv("SIMULATION_WS_STREAM_DAIMOI_ORBIT_DAMPING", "1.2") or "1.2",
+            os.getenv("SIMULATION_WS_STREAM_PARTICLE_ORBIT_DAMPING", "1.2") or "1.2",
             1.2,
         ),
     ),
@@ -771,23 +771,23 @@ def _simulation_core_resource_emitters(
         seen.add(canonical)
         resources.append(canonical)
 
-    cpu_daimoi_stop_percent = max(
+    cpu_particle_stop_percent = max(
         0.0,
         min(
             100.0,
             _safe_float(
-                os.getenv("SIMULATION_CPU_DAIMOI_STOP_PERCENT", "50") or "50",
+                os.getenv("SIMULATION_CPU_PARTICLE_STOP_PERCENT", "50") or "50",
                 50.0,
             ),
         ),
     )
     cpu_core_emitter_enabled = (
-        _safe_float(cpu_utilization, 0.0) < cpu_daimoi_stop_percent
+        _safe_float(cpu_utilization, 0.0) < cpu_particle_stop_percent
     )
     if not cpu_core_emitter_enabled:
         resources = [resource for resource in resources if resource != "cpu"]
 
-    return resources, cpu_core_emitter_enabled, cpu_daimoi_stop_percent
+    return resources, cpu_core_emitter_enabled, cpu_particle_stop_percent
 
 
 SIMULATION_FILE_GRAPH_NODE_FIELDS: tuple[str, ...] = (
@@ -890,15 +890,15 @@ _SIMULATION_LAYOUT_CACHE: dict[str, Any] = {
 _NOOI_FIELD = NooiField()
 _NOOI_RANDOM_BOOT_LOCK = threading.Lock()
 _NOOI_RANDOM_BOOT_APPLIED = False
-_DAIMOI_TRAIL_STEPS = max(
+_PARTICLE_TRAIL_STEPS = max(
     2,
     min(
         128,
-        _safe_int(os.getenv("SIMULATION_DAIMOI_TRAIL_STEPS", "24") or "24", 24),
+        _safe_int(os.getenv("SIMULATION_PARTICLE_TRAIL_STEPS", "24") or "24", 24),
     ),
 )
-_DAIMOI_MOTION_HISTORY_LOCK = threading.Lock()
-_DAIMOI_MOTION_HISTORY: dict[str, list[dict[str, Any]]] = {}
+_PARTICLE_MOTION_HISTORY_LOCK = threading.Lock()
+_PARTICLE_MOTION_HISTORY: dict[str, list[dict[str, Any]]] = {}
 _SIMULATION_WEAVER_INTERACTION_DELTA = max(
     0.05,
     min(
@@ -953,7 +953,7 @@ _SIMULATION_CRAWLER_SEARCH_TTL_TICKS = max(
 _SIMULATION_WEAVER_INTERACTION_LOG_PATH = (
     Path(__file__).resolve().parents[2]
     / "world_state"
-    / "daimoi_crawler_interactions.jsonl"
+    / "particle_crawler_interactions.jsonl"
 )
 _WEAVER_INTERACTION_STATE_LOCK = threading.Lock()
 _WEAVER_INTERACTION_COOLDOWN_UNTIL: dict[str, float] = {}
@@ -961,31 +961,31 @@ _WEAVER_INTERACTION_HEALTH: dict[str, float | bool] = {
     "checked_monotonic": 0.0,
     "healthy": False,
 }
-_DAIMOI_CRAWL_SEARCH_STATE: dict[str, dict[str, Any]] = {}
+_PARTICLE_CRAWL_SEARCH_STATE: dict[str, dict[str, Any]] = {}
 
 
 def _reset_nooi_field_state() -> None:
-    global _NOOI_FIELD, _NOOI_RANDOM_BOOT_APPLIED, _DAIMOI_MOTION_HISTORY
+    global _NOOI_FIELD, _NOOI_RANDOM_BOOT_APPLIED, _PARTICLE_MOTION_HISTORY
     global _WEAVER_INTERACTION_COOLDOWN_UNTIL, _WEAVER_INTERACTION_HEALTH
-    global _DAIMOI_CRAWL_SEARCH_STATE
+    global _PARTICLE_CRAWL_SEARCH_STATE
     _NOOI_FIELD = NooiField()
     _NOOI_RANDOM_BOOT_APPLIED = False
-    with _DAIMOI_MOTION_HISTORY_LOCK:
-        _DAIMOI_MOTION_HISTORY = {}
+    with _PARTICLE_MOTION_HISTORY_LOCK:
+        _PARTICLE_MOTION_HISTORY = {}
     with _WEAVER_INTERACTION_STATE_LOCK:
         _WEAVER_INTERACTION_COOLDOWN_UNTIL = {}
         _WEAVER_INTERACTION_HEALTH = {
             "checked_monotonic": 0.0,
             "healthy": False,
         }
-        _DAIMOI_CRAWL_SEARCH_STATE = {}
+        _PARTICLE_CRAWL_SEARCH_STATE = {}
 
 
-def _record_daimoi_motion_trail(
+def _record_particle_motion_trail(
     row: dict[str, Any], *, tick: int
 ) -> tuple[str, list[dict[str, Any]]]:
-    daimoi_id = str(row.get("id", "") or "").strip()
-    if not daimoi_id:
+    particle_id = str(row.get("id", "") or "").strip()
+    if not particle_id:
         return "", []
     sample = {
         "x": _clamp01(_safe_float(row.get("x", 0.5), 0.5)),
@@ -994,24 +994,24 @@ def _record_daimoi_motion_trail(
         "vy": _safe_float(row.get("vy", 0.0), 0.0),
         "tick": max(0, _safe_int(tick, 0)),
     }
-    with _DAIMOI_MOTION_HISTORY_LOCK:
-        history = list(_DAIMOI_MOTION_HISTORY.get(daimoi_id, []))
+    with _PARTICLE_MOTION_HISTORY_LOCK:
+        history = list(_PARTICLE_MOTION_HISTORY.get(particle_id, []))
         history.append(sample)
-        if len(history) > _DAIMOI_TRAIL_STEPS:
-            history = history[-_DAIMOI_TRAIL_STEPS:]
-        _DAIMOI_MOTION_HISTORY[daimoi_id] = history
-        return daimoi_id, [dict(step) for step in history]
+        if len(history) > _PARTICLE_TRAIL_STEPS:
+            history = history[-_PARTICLE_TRAIL_STEPS:]
+        _PARTICLE_MOTION_HISTORY[particle_id] = history
+        return particle_id, [dict(step) for step in history]
 
 
-def _prune_daimoi_motion_history(active_ids: set[str]) -> None:
-    with _DAIMOI_MOTION_HISTORY_LOCK:
+def _prune_particle_motion_history(active_ids: set[str]) -> None:
+    with _PARTICLE_MOTION_HISTORY_LOCK:
         stale_ids = [
-            daimoi_id
-            for daimoi_id in list(_DAIMOI_MOTION_HISTORY.keys())
-            if daimoi_id not in active_ids
+            particle_id
+            for particle_id in list(_PARTICLE_MOTION_HISTORY.keys())
+            if particle_id not in active_ids
         ]
-        for daimoi_id in stale_ids:
-            _DAIMOI_MOTION_HISTORY.pop(daimoi_id, None)
+        for particle_id in stale_ids:
+            _PARTICLE_MOTION_HISTORY.pop(particle_id, None)
 
 
 def _maybe_seed_random_nooi_field_vectors(*, force: bool = False) -> None:
@@ -1125,9 +1125,9 @@ def _apply_nooi_from_particles(
         vx_value = _safe_float(row.get("vx", 0.0), 0.0)
         vy_value = _safe_float(row.get("vy", 0.0), 0.0)
         row_tick = max(0, _safe_int(row.get("age", tick), tick))
-        daimoi_id, motion_trail = _record_daimoi_motion_trail(row, tick=row_tick)
-        if daimoi_id:
-            active_ids.add(daimoi_id)
+        particle_id, motion_trail = _record_particle_motion_trail(row, tick=row_tick)
+        if particle_id:
+            active_ids.add(particle_id)
         _NOOI_FIELD.deposit(x_value, y_value, vx_value, vy_value)
 
         outcome = _nooi_outcome_from_particle(row)
@@ -1191,7 +1191,7 @@ def _apply_nooi_from_particles(
             vy=vy_value,
             intensity=intensity,
             presence_id=str(row.get("presence_id", row.get("owner", "")) or ""),
-            daimoi_id=daimoi_id,
+            particle_id=particle_id,
             reason=str(outcome.get("reason", "") or ""),
             graph_node_id=str(row.get("graph_node_id", "") or ""),
             tick=row_tick,
@@ -1200,7 +1200,7 @@ def _apply_nooi_from_particles(
         )
         summary[outcome_kind] = summary.get(outcome_kind, 0) + 1
         summary["total"] = summary.get("total", 0) + 1
-    _prune_daimoi_motion_history(active_ids)
+    _prune_particle_motion_history(active_ids)
     return _NOOI_FIELD.get_grid_snapshot(nooi_rows), summary
 
 
@@ -1654,12 +1654,12 @@ def _default_growth_guard(
             "collapsed_edges": 0,
             "clusters": 0,
         },
-        "daimoi": [],
+        "particles": [],
         "events": [],
     }
 
 
-def _apply_daimoi_growth_guard_to_file_graph(
+def _apply_particle_growth_guard_to_file_graph(
     *,
     file_graph: dict[str, Any] | None,
     crawler_graph: dict[str, Any] | None,
@@ -1830,7 +1830,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
             if mode != "normal":
                 guard["events"] = [
                     _event(
-                        "daimoi.consolidation.skipped",
+                        "particles.consolidation.skipped",
                         "ok",
                         "within_target_limits",
                         {
@@ -1912,7 +1912,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
         if not scored_entries:
             guard["events"] = [
                 _event(
-                    "daimoi.consolidation.skipped",
+                    "particles.consolidation.skipped",
                     "ok",
                     "no_file_nodes",
                     {
@@ -1960,7 +1960,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
         if not low_entries:
             guard["events"] = [
                 _event(
-                    "daimoi.consolidation.skipped",
+                    "particles.consolidation.skipped",
                     "ok",
                     "no_low_use_candidates",
                     {
@@ -2093,7 +2093,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
                     "dominant_presence": dominant_presence,
                     "field_scores": {field_id: 1.0},
                     "summary": (
-                        "Daimoi consolidated low-use files to keep simulation load stable."
+                        "Particles consolidated low-use files to keep simulation load stable."
                     ),
                     "consolidated": True,
                     "consolidated_count": len(member_ids),
@@ -2202,7 +2202,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
         if collapsed_file_nodes <= 0 and collapsed_edges <= 0:
             guard["events"] = [
                 _event(
-                    "daimoi.consolidation.skipped",
+                    "particles.consolidation.skipped",
                     "ok",
                     "no_reduction_needed",
                     {
@@ -2252,8 +2252,8 @@ def _apply_daimoi_growth_guard_to_file_graph(
         updated_graph["consolidation"] = consolidation_info
 
         deployment_row = {
-            "id": "daimo:consolidator",
-            "name": "Consolidator Daimoi",
+            "id": "particle:consolidator",
+            "name": "Consolidator Particle",
             "state": "deployed",
             "mode": mode,
             "collapsed_file_nodes": collapsed_file_nodes,
@@ -2263,13 +2263,13 @@ def _apply_daimoi_growth_guard_to_file_graph(
         }
         guard["active"] = True
         guard["action"] = {
-            "kind": "daimoi.consolidation.deployed",
+            "kind": "particles.consolidation.deployed",
             "reason": "growth_pressure_high",
             "collapsed_file_nodes": collapsed_file_nodes,
             "collapsed_edges": collapsed_edges,
             "clusters": len(cluster_nodes),
         }
-        guard["daimoi"] = [deployment_row]
+        guard["particles"] = [deployment_row]
         guard["events"] = [
             _event(
                 "simulation.growth.pressure",
@@ -2283,7 +2283,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
                 },
             ),
             _event(
-                "daimoi.consolidation.deployed",
+                "particles.consolidation.deployed",
                 "ok",
                 "growth_pressure_high",
                 {
@@ -2300,7 +2300,7 @@ def _apply_daimoi_growth_guard_to_file_graph(
         guard["mode"] = "watch"
         guard["events"] = [
             _event(
-                "daimoi.consolidation.failed",
+                "particles.consolidation.failed",
                 "blocked",
                 "fail_safe_noop",
                 {
@@ -2519,7 +2519,7 @@ def _project_file_graph_for_simulation(
 
         cpu_preheat_threshold = max(
             42.0,
-            _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT * 0.72,
+            _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT * 0.72,
         )
         cpu_pressure = _clamp01(
             (cpu_utilization - cpu_preheat_threshold)
@@ -2615,11 +2615,11 @@ def _project_file_graph_for_simulation(
             "record": "eta-mu.view-graph-compaction-policy.v1",
             "schema_version": "view-graph.compaction-policy.v1",
             "mode": "cpu-sentinel-sensitive",
-            "presence_id": _RESOURCE_DAIMOI_CPU_SENTINEL_ID,
+            "presence_id": _RESOURCE_PARTICLE_CPU_SENTINEL_ID,
             "cpu_utilization": round(cpu_utilization, 3),
             "cpu_preheat_threshold": round(cpu_preheat_threshold, 3),
             "cpu_sentinel_burn_threshold": round(
-                _RESOURCE_DAIMOI_CPU_SENTINEL_BURN_START_PERCENT,
+                _RESOURCE_PARTICLE_CPU_SENTINEL_BURN_START_PERCENT,
                 3,
             ),
             "memory_utilization": round(memory_utilization, 3),
@@ -3408,7 +3408,7 @@ def _project_file_graph_for_simulation(
                 "record": "eta-mu.view-graph-compaction-policy.v1",
                 "schema_version": "view-graph.compaction-policy.v1",
                 "mode": "cpu-sentinel-sensitive",
-                "presence_id": _RESOURCE_DAIMOI_CPU_SENTINEL_ID,
+                "presence_id": _RESOURCE_PARTICLE_CPU_SENTINEL_ID,
                 "compaction_drive": 0.0,
                 "compaction_drive_effective": 0.0,
                 "decompression_drive": 0.0,
@@ -3500,7 +3500,7 @@ def _field_scores_from_position(
     return _normalize_field_scores(raw)
 
 
-def _daimoi_softmax_weights(
+def _particle_softmax_weights(
     rows: list[tuple[str, float]], *, temperature: float
 ) -> dict[str, float]:
     if not rows:
@@ -3518,7 +3518,7 @@ def _daimoi_softmax_weights(
     )
 
 
-def _build_daimoi_state(
+def _build_particle_state(
     heat_values: dict[str, Any],
     pain_field: dict[str, Any],
     *,
@@ -3538,7 +3538,7 @@ def _build_daimoi_state(
 
     if not node_heat_rows:
         return {
-            "record": "ημ.daimoi.v1",
+            "record": "ημ.particle.v1",
             "generated_at": generated_at,
             "glyph": "霊",
             "active": False,
@@ -3546,13 +3546,13 @@ def _build_daimoi_state(
                 "queue_ratio": round(_clamp01(_safe_float(queue_ratio)), 4),
                 "resource_ratio": round(_clamp01(_safe_float(resource_ratio)), 4),
             },
-            "daimoi": [],
+            "particles": [],
             "relations": relations,
             "entities": [],
             "physics": {
-                "kappa": round(DAIMO_FORCE_KAPPA, 6),
-                "damping": round(DAIMO_DAMPING, 6),
-                "dt": round(DAIMO_DT_SECONDS, 6),
+                "kappa": round(PARTICLE_FORCE_KAPPA, 6),
+                "damping": round(PARTICLE_DAMPING, 6),
+                "dt": round(PARTICLE_DT_SECONDS, 6),
             },
         }
 
@@ -3602,7 +3602,7 @@ def _build_daimoi_state(
             )
 
     entities = []
-    for row in node_heat_rows[:DAIMO_MAX_TRACKED_ENTITIES]:
+    for row in node_heat_rows[:PARTICLE_MAX_TRACKED_ENTITIES]:
         eid = str(row.get("node_id"))
         if not eid:
             continue
@@ -3638,9 +3638,9 @@ def _build_daimoi_state(
     )
     budget_scale = max(0.4, 1.0 - (pressure * 0.5))
 
-    daimo_rows, force_by_entity = [], defaultdict(lambda: [0.0, 0.0])
-    for idx, profile in enumerate(DAIMO_PROFILE_DEFS):
-        did = str(profile.get("id", f"daimo:{idx}"))
+    particle_rows, force_by_entity = [], defaultdict(lambda: [0.0, 0.0])
+    for idx, profile in enumerate(PARTICLE_PROFILE_DEFS):
+        did = str(profile.get("id", f"particle:{idx}"))
         ctx, dw = (
             str(profile.get("ctx", "世")),
             _clamp01(_safe_float(profile.get("w", 0.88))),
@@ -3672,7 +3672,7 @@ def _build_daimoi_state(
 
         scored.sort(key=lambda r: (-r[1], r[0]))
         top = scored[:top_k]
-        attn = _daimoi_softmax_weights(top, temperature=temp)
+        attn = _particle_softmax_weights(top, temperature=temp)
         counts = {"attend": 0, "push": 0, "bind": 0, "link": 0}
 
         for eid, escore in top:
@@ -3684,7 +3684,7 @@ def _build_daimoi_state(
                 {
                     "id": _stable_entity_id("edge", f"{did}|{eid}|霊/attend"),
                     "rel": "霊/attend",
-                    "daimo_id": did,
+                    "particle_id": did,
                     "entity_id": eid,
                     "w": round(aw, 6),
                     "score": round(escore, 6),
@@ -3707,7 +3707,7 @@ def _build_daimoi_state(
                     best_s, best_r = sig, str(rid)
             v_mag = math.sqrt(vx**2 + vy**2)
             dx, dy = (vx / v_mag, vy / v_mag) if v_mag > 1e-8 else (0.0, 0.0)
-            fx, fy = DAIMO_FORCE_KAPPA * dw * aw * dx, DAIMO_FORCE_KAPPA * dw * aw * dy
+            fx, fy = PARTICLE_FORCE_KAPPA * dw * aw * dx, PARTICLE_FORCE_KAPPA * dw * aw * dy
             if abs(fx) + abs(fy) > 1e-10:
                 force_by_entity[eid][0] += fx
                 force_by_entity[eid][1] += fy
@@ -3716,7 +3716,7 @@ def _build_daimoi_state(
                 {
                     "id": _stable_entity_id("edge", f"{did}|{eid}|霊/push"),
                     "rel": "霊/push",
-                    "daimo_id": did,
+                    "particle_id": did,
                     "entity_id": eid,
                     "region_id": best_r,
                     "fx": round(fx, 8),
@@ -3733,14 +3733,14 @@ def _build_daimoi_state(
                         "edge", f"{did}|{top[0][0]}|{top[1][0]}|霊/link"
                     ),
                     "rel": "霊/link",
-                    "daimo_id": did,
+                    "particle_id": did,
                     "entity_a": top[0][0],
                     "entity_b": top[1][0],
                     "w": round(math.sqrt(attn[top[0][0]] * attn[top[1][0]]), 6),
                 }
             )
 
-        daimo_rows.append(
+        particle_rows.append(
             {
                 "id": did,
                 "name": str(profile.get("name", did)),
@@ -3777,7 +3777,7 @@ def _build_daimoi_state(
         for eid, e in entity_by_id.items()
     ]
     return {
-        "record": "ημ.daimoi.v1",
+        "record": "ημ.particle.v1",
         "generated_at": generated_at,
         "glyph": "霊",
         "active": bool(relations["霊/attend"]),
@@ -3786,25 +3786,25 @@ def _build_daimoi_state(
             "resource_ratio": round(_clamp01(_safe_float(resource_ratio)), 4),
             "blend": round(pressure, 4),
         },
-        "daimoi": daimo_rows,
+        "particles": particle_rows,
         "relations": relations,
         "entities": e_rows,
         "physics": {
-            "kappa": round(DAIMO_FORCE_KAPPA, 6),
-            "damping": round(DAIMO_DAMPING, 6),
-            "dt": round(DAIMO_DT_SECONDS, 6),
+            "kappa": round(PARTICLE_FORCE_KAPPA, 6),
+            "damping": round(PARTICLE_DAMPING, 6),
+            "dt": round(PARTICLE_DT_SECONDS, 6),
         },
     }
 
 
-def _apply_daimoi_dynamics_to_pain_field(
-    pain_field: dict[str, Any], daimoi_state: dict[str, Any]
+def _apply_particle_dynamics_to_pain_field(
+    pain_field: dict[str, Any], particle_state: dict[str, Any]
 ) -> dict[str, Any]:
     if not isinstance(pain_field, dict):
         return {}
     node_heat_rows = pain_field.get("node_heat", [])
     relations = (
-        daimoi_state.get("relations", {}) if isinstance(daimoi_state, dict) else {}
+        particle_state.get("relations", {}) if isinstance(particle_state, dict) else {}
     )
     push_rows = relations.get("霊/push", []) if isinstance(relations, dict) else []
     force_by_entity = defaultdict(lambda: [0.0, 0.0])
@@ -3814,18 +3814,18 @@ def _apply_daimoi_dynamics_to_pain_field(
             force_by_entity[eid][0] += _safe_float(row.get("fx"))
             force_by_entity[eid][1] += _safe_float(row.get("fy"))
 
-    physics = daimoi_state.get("physics", {}) if isinstance(daimoi_state, dict) else {}
+    physics = particle_state.get("physics", {}) if isinstance(particle_state, dict) else {}
     dt, damping = (
-        max(0.02, min(0.4, _safe_float(physics.get("dt", DAIMO_DT_SECONDS)))),
-        max(0.0, min(0.99, _safe_float(physics.get("damping", DAIMO_DAMPING)))),
+        max(0.02, min(0.4, _safe_float(physics.get("dt", PARTICLE_DT_SECONDS)))),
+        max(0.0, min(0.99, _safe_float(physics.get("damping", PARTICLE_DAMPING)))),
     )
     edge_band = 0.12
     edge_pressure = 0.08
     edge_bounce = 0.74
     updated_rows, active_ids, now_mono = [], set(), time.monotonic()
 
-    with _DAIMO_DYNAMICS_LOCK:
-        cache = _DAIMO_DYNAMICS_CACHE.get("entities", {})
+    with _PARTICLE_DYNAMICS_LOCK:
+        cache = _PARTICLE_DYNAMICS_CACHE.get("entities", {})
         for row in node_heat_rows:
             eid = str(row.get("node_id")).strip()
             if not eid:
@@ -3891,13 +3891,13 @@ def _apply_daimoi_dynamics_to_pain_field(
         for k in list(cache.keys()):
             if k not in active_ids and _safe_float(cache[k].get("ts")) < stale:
                 cache.pop(k, None)
-        _DAIMO_DYNAMICS_CACHE["entities"] = cache
+        _PARTICLE_DYNAMICS_CACHE["entities"] = cache
 
     return {
         **pain_field,
         "node_heat": updated_rows,
         "motion": {
-            "record": "ημ.daimoi-motion.v1",
+            "record": "ημ.particle-motion.v1",
             "glyph": "霊",
             "active": bool(force_by_entity),
             "dt": round(dt, 6),
@@ -5919,7 +5919,7 @@ def _crawler_url_lookup(crawler_graph: dict[str, Any] | None) -> dict[str, str]:
 
 def _trim_weaver_interaction_state(
     *,
-    active_daimoi_ids: set[str],
+    active_particle_ids: set[str],
     now_monotonic: float,
 ) -> None:
     with _WEAVER_INTERACTION_STATE_LOCK:
@@ -5931,17 +5931,17 @@ def _trim_weaver_interaction_state(
         for key in stale_urls:
             _WEAVER_INTERACTION_COOLDOWN_UNTIL.pop(key, None)
 
-        stale_daimoi = []
-        for daimoi_id, state in _DAIMOI_CRAWL_SEARCH_STATE.items():
-            if daimoi_id in active_daimoi_ids:
+        stale_particles = []
+        for particle_id, state in _PARTICLE_CRAWL_SEARCH_STATE.items():
+            if particle_id in active_particle_ids:
                 continue
             age = now_monotonic - _safe_float(
                 state.get("last_seen_monotonic", 0.0), 0.0
             )
             if age > 180.0:
-                stale_daimoi.append(daimoi_id)
-        for daimoi_id in stale_daimoi:
-            _DAIMOI_CRAWL_SEARCH_STATE.pop(daimoi_id, None)
+                stale_particles.append(particle_id)
+        for particle_id in stale_particles:
+            _PARTICLE_CRAWL_SEARCH_STATE.pop(particle_id, None)
 
 
 def _apply_crawler_weaver_interaction_triggers(
@@ -5973,7 +5973,7 @@ def _apply_crawler_weaver_interaction_triggers(
         return summary
 
     now_monotonic = time.monotonic()
-    active_daimoi_ids: set[str] = set()
+    active_particle_ids: set[str] = set()
     candidate_rows: list[dict[str, Any]] = []
     events: list[dict[str, Any]] = []
 
@@ -5994,7 +5994,7 @@ def _apply_crawler_weaver_interaction_triggers(
             "ts": datetime.now(timezone.utc).isoformat(),
             "outcome": str(outcome or "").strip().lower(),
             "reason": str(reason or "").strip().lower(),
-            "daimoi_id": str(row.get("id", "") or "").strip(),
+            "particle_id": str(row.get("id", "") or "").strip(),
             "presence_id": str(row.get("presence_id", "") or "").strip(),
             "url_id": str(url_id or "").strip(),
             "canonical_url": str(canonical_url or "").strip(),
@@ -6012,10 +6012,10 @@ def _apply_crawler_weaver_interaction_triggers(
         top_job = str(row.get("top_job", "") or "").strip().lower()
         if top_job != "invoke_graph_crawl":
             continue
-        daimoi_id = str(row.get("id", "") or "").strip()
-        if not daimoi_id:
+        particle_id = str(row.get("id", "") or "").strip()
+        if not particle_id:
             continue
-        active_daimoi_ids.add(daimoi_id)
+        active_particle_ids.add(particle_id)
 
         route_node_id = str(row.get("route_node_id", "") or "").strip()
         graph_node_id = str(row.get("graph_node_id", "") or "").strip()
@@ -6027,7 +6027,7 @@ def _apply_crawler_weaver_interaction_triggers(
         tick = max(0, _safe_int(row.get("age", 0), 0))
         state_key = f"{url_id}|{canonical_url}"
         with _WEAVER_INTERACTION_STATE_LOCK:
-            state = dict(_DAIMOI_CRAWL_SEARCH_STATE.get(daimoi_id, {}))
+            state = dict(_PARTICLE_CRAWL_SEARCH_STATE.get(particle_id, {}))
             previous_target = str(state.get("target", "")).strip()
             start_tick = max(0, _safe_int(state.get("start_tick", tick), tick))
             if previous_target != state_key:
@@ -6035,7 +6035,7 @@ def _apply_crawler_weaver_interaction_triggers(
             state["target"] = state_key
             state["start_tick"] = int(start_tick)
             state["last_seen_monotonic"] = float(now_monotonic)
-            _DAIMOI_CRAWL_SEARCH_STATE[daimoi_id] = state
+            _PARTICLE_CRAWL_SEARCH_STATE[particle_id] = state
 
         deadline_tick = start_tick + _SIMULATION_CRAWLER_SEARCH_TTL_TICKS
         row["crawler_search_start_tick"] = int(start_tick)
@@ -6051,10 +6051,10 @@ def _apply_crawler_weaver_interaction_triggers(
             row["resource_block_reason"] = "crawler_deadline_exceeded"
             row["crawler_recycled"] = True
             with _WEAVER_INTERACTION_STATE_LOCK:
-                state = dict(_DAIMOI_CRAWL_SEARCH_STATE.get(daimoi_id, {}))
+                state = dict(_PARTICLE_CRAWL_SEARCH_STATE.get(particle_id, {}))
                 state["start_tick"] = int(tick)
                 state["last_seen_monotonic"] = float(now_monotonic)
-                _DAIMOI_CRAWL_SEARCH_STATE[daimoi_id] = state
+                _PARTICLE_CRAWL_SEARCH_STATE[particle_id] = state
             summary["deadline_losses"] = int(summary.get("deadline_losses", 0)) + 1
             _event(
                 outcome="loss",
@@ -6088,7 +6088,7 @@ def _apply_crawler_weaver_interaction_triggers(
         candidate_rows.append(
             {
                 "row": row,
-                "daimoi_id": daimoi_id,
+                "particle_id": particle_id,
                 "url_id": url_id,
                 "canonical_url": canonical_url,
                 "tick": int(tick),
@@ -6191,7 +6191,7 @@ def _apply_crawler_weaver_interaction_triggers(
         interaction_result = _post_weaver_entity_interaction(
             canonical_url,
             delta=_SIMULATION_WEAVER_INTERACTION_DELTA,
-            source="simulation.daimoi",
+            source="simulation.particles",
         )
         if not bool(interaction_result.get("ok", False)):
             error_reason = str(interaction_result.get("error", "interaction_failed"))
@@ -6274,7 +6274,7 @@ def _apply_crawler_weaver_interaction_triggers(
             )
 
     _trim_weaver_interaction_state(
-        active_daimoi_ids=active_daimoi_ids,
+        active_particle_ids=active_particle_ids,
         now_monotonic=now_monotonic,
     )
     summary["events"] = events[-24:]
@@ -7629,8 +7629,8 @@ def _build_backend_field_particles(
             score = max(score, 1.0)
         return _clamp01(score)
 
-    with _DAIMO_DYNAMICS_LOCK:
-        runtime = _DAIMO_DYNAMICS_CACHE.get("field_particles", {})
+    with _PARTICLE_DYNAMICS_LOCK:
+        runtime = _PARTICLE_DYNAMICS_CACHE.get("field_particles", {})
         if not isinstance(runtime, dict):
             runtime = {}
         # Handle nested runtime structure: {'particles': {...}, 'surfaces': {...}}
@@ -8227,7 +8227,7 @@ def _build_backend_field_particles(
 
         # Preserve nested runtime structure when saving back
         runtime["particles"] = particle_cache
-        _DAIMO_DYNAMICS_CACHE["field_particles"] = runtime
+        _PARTICLE_DYNAMICS_CACHE["field_particles"] = runtime
 
     field_particles.sort(
         key=lambda row: (
@@ -9241,7 +9241,7 @@ def reset_simulation_bootstrap_state(
 def _maybe_reset_simulation_runtime_state() -> None:
     global _SIMULATION_BOOT_RESET_APPLIED
     reset_on_boot = str(
-        os.getenv("SIMULATION_RESET_DAIMOI_ON_BOOT", "1") or "1"
+        os.getenv("SIMULATION_RESET_PARTICLES_ON_BOOT", "1") or "1"
     ).strip().lower() in {"1", "true", "yes", "on"}
     if not reset_on_boot:
         return
@@ -9249,8 +9249,8 @@ def _maybe_reset_simulation_runtime_state() -> None:
         if _SIMULATION_BOOT_RESET_APPLIED:
             return
         get_presence_runtime_manager().reset()
-        with _DAIMO_DYNAMICS_LOCK:
-            _DAIMO_DYNAMICS_CACHE.clear()
+        with _PARTICLE_DYNAMICS_LOCK:
+            _PARTICLE_DYNAMICS_CACHE.clear()
         simulation_resources_module.reset_resource_runtime_state()
         _reset_nooi_field_state()
         _maybe_seed_random_nooi_field_vectors(force=True)
@@ -9284,7 +9284,7 @@ def _snapshot_user_presence_runtime_state(
                     "kind": str(row.get("kind", "input") or "input"),
                     "target": str(row.get("target", "simulation") or "simulation"),
                     "message": str(row.get("message", "") or ""),
-                    "embed_daimoi": bool(row.get("embed_daimoi", False)),
+                    "embed_particle": bool(row.get("embed_particle", False)),
                     "meta": (
                         {
                             str(key): value
@@ -9447,7 +9447,7 @@ def _user_query_component_rows(event: dict[str, Any]) -> list[dict[str, Any]]:
     kind = str(event.get("kind", "input") or "input").strip().lower()
     meta_raw = event.get("meta")
     meta: dict[str, Any] = meta_raw if isinstance(meta_raw, dict) else {}
-    search_meta_raw = meta.get("search_daimoi")
+    search_meta_raw = meta.get("search_particle")
     search_meta: dict[str, Any] = (
         search_meta_raw if isinstance(search_meta_raw, dict) else {}
     )
@@ -9592,7 +9592,7 @@ def _update_user_query_transient_edges(
                 for row in events[-24:]
                 if isinstance(row, dict)
                 and str(row.get("kind", "")).strip().lower() in USER_SEARCH_QUERY_KINDS
-                and bool(row.get("embed_daimoi", False))
+                and bool(row.get("embed_particle", False))
             ],
             key=lambda row: _safe_float(row.get("ts_monotonic", 0.0), 0.0),
         )
@@ -9611,7 +9611,7 @@ def _update_user_query_transient_edges(
 
             meta_raw = event.get("meta")
             meta: dict[str, Any] = meta_raw if isinstance(meta_raw, dict) else {}
-            search_meta_raw = meta.get("search_daimoi")
+            search_meta_raw = meta.get("search_particle")
             search_meta: dict[str, Any] = (
                 search_meta_raw if isinstance(search_meta_raw, dict) else {}
             )
@@ -9737,7 +9737,7 @@ def _update_user_query_transient_edges(
     }
 
 
-def _build_user_presence_embedded_daimoi_rows(
+def _build_user_presence_embedded_particle_rows(
     user_presence_state: dict[str, Any],
     *,
     now: float,
@@ -9756,7 +9756,7 @@ def _build_user_presence_embedded_daimoi_rows(
     for index, event in enumerate(reversed(events[-24:])):
         if not isinstance(event, dict):
             continue
-        if not bool(event.get("embed_daimoi", False)):
+        if not bool(event.get("embed_particle", False)):
             continue
         age_seconds = max(0.0, _safe_float(event.get("age_seconds", 0.0), 0.0))
         life = _clamp01(1.0 - (age_seconds / ttl_seconds))
@@ -9804,9 +9804,9 @@ def _build_user_presence_embedded_daimoi_rows(
 
         rows.append(
             {
-                "id": f"{event_id}:daimoi",
-                "record": "ημ.user-input-daimoi.v1",
-                "schema_version": "user.input.daimoi.v1",
+                "id": f"{event_id}:particle",
+                "record": "ημ.user-input-particle.v1",
+                "schema_version": "user.input.particle.v1",
                 "packet_record": "ημ.user-input-packet.v1",
                 "packet_schema_version": "user.input.packet.v1",
                 "presence_id": USER_PRESENCE_ID,
@@ -9827,11 +9827,11 @@ def _build_user_presence_embedded_daimoi_rows(
                 "route_probability": round(route_probability, 6),
                 "influence_power": round(influence_power, 6),
                 "top_job": (
-                    "emit_query_daimoi_packet"
+                    "emit_query_particle_packet"
                     if kind in USER_SEARCH_QUERY_KINDS
                     else "emit_user_input_message"
                 ),
-                "resource_daimoi": True,
+                "resource_particle": True,
                 "resource_emit_amount": round(0.08 + (life * 0.22), 6),
                 "resource_emit_type": "attention",
                 "resource_emit_reason": kind,
@@ -9839,7 +9839,7 @@ def _build_user_presence_embedded_daimoi_rows(
                 "packet_components": packet_components,
                 "action_probabilities": {
                     "emit_user_input_message": round(_clamp01(0.64 + (life * 0.24)), 6),
-                    "emit_query_daimoi_packet": (
+                    "emit_query_particle_packet": (
                         round(_clamp01(0.58 + (life * 0.3)), 6)
                         if kind in USER_SEARCH_QUERY_KINDS
                         else 0.0
@@ -9911,7 +9911,7 @@ def build_simulation_state(
         file_graph if isinstance(file_graph, dict) else None
     )
     crawler_graph = catalog.get("crawler_graph") if isinstance(catalog, dict) else None
-    file_graph, growth_guard = _apply_daimoi_growth_guard_to_file_graph(
+    file_graph, growth_guard = _apply_particle_growth_guard_to_file_graph(
         file_graph=file_graph if isinstance(file_graph, dict) else None,
         crawler_graph=crawler_graph if isinstance(crawler_graph, dict) else None,
         item_count=len(items) if isinstance(items, list) else 0,
@@ -10475,7 +10475,7 @@ def build_simulation_state(
     ][:4]
 
     # Create core resource presences
-    core_resources, cpu_core_emitter_enabled, cpu_daimoi_stop_percent = (
+    core_resources, cpu_core_emitter_enabled, cpu_particle_stop_percent = (
         _simulation_core_resource_emitters(cpu_utilization=resource_cpu_util)
     )
     manager = get_presence_runtime_manager()
@@ -10591,7 +10591,7 @@ def build_simulation_state(
             "world": round(_clamp01(0.24 + (click_ratio * 0.56)), 4),
             "ledger": round(_clamp01(0.18 + (queue_ratio * 0.42)), 4),
         },
-        "notes_en": "Operator input emits user daimoi packets and steers the user nexus anchor.",
+        "notes_en": "Operator input emits user particle packets and steers the user nexus anchor.",
         "notes_ja": "操作者入力はユーザーダイモイを放出し、ユーザーネクサス錨点をゆっくり誘導する。",
         "active_nexus_id": "nexus.user.cursor",
         "pinned_node_ids": [
@@ -10607,7 +10607,7 @@ def build_simulation_state(
                 "target": str(row.get("target", ""))[:180],
                 "message": str(row.get("message", ""))[:240],
                 "age_seconds": round(_safe_float(row.get("age_seconds", 0.0), 0.0), 4),
-                "embed_daimoi": bool(row.get("embed_daimoi", False)),
+                "embed_particle": bool(row.get("embed_particle", False)),
             }
             for row in user_recent_events
         ],
@@ -10663,7 +10663,7 @@ def build_simulation_state(
     ghost["status_en"] = str(ghost.get("status_en", "gate idle"))
     ghost["status_ja"] = str(ghost.get("status_ja", "門前で待機中"))
 
-    ds = _build_daimoi_state(
+    ds = _build_particle_state(
         heat_values,
         pain_field,
         queue_ratio=queue_ratio,
@@ -10671,14 +10671,14 @@ def build_simulation_state(
     )
     if isinstance(ds, dict):
         ds["growth_guard"] = growth_guard
-        deployment_rows = growth_guard.get("daimoi", [])
+        deployment_rows = growth_guard.get("particles", [])
         if isinstance(deployment_rows, list) and deployment_rows:
-            daimo_rows = ds.get("daimoi", [])
-            if isinstance(daimo_rows, list):
-                daimo_rows.extend(
+            particle_rows = ds.get("particles", [])
+            if isinstance(particle_rows, list):
+                particle_rows.extend(
                     [dict(row) for row in deployment_rows if isinstance(row, dict)]
                 )
-                ds["daimoi"] = daimo_rows
+                ds["particles"] = particle_rows
             ds["active"] = bool(
                 ds.get("active", False) or growth_guard.get("active", False)
             )
@@ -10717,7 +10717,7 @@ def build_simulation_state(
         sync_sub_sim_presences(presence_impacts, docker_snapshot)
         process_resource_cycle(presence_impacts, now=now)
 
-    # Calculate daimoi particles (using presence_impacts which now has updated wallets)
+    # Calculate particles (using presence_impacts which now has updated wallets)
     _prof_pre_particles = time.perf_counter()
     particle_backend_mode = (
         str(os.getenv("SIM_PARTICLE_BACKEND", "python") or "python").strip().lower()
@@ -10728,7 +10728,7 @@ def build_simulation_state(
         try:
             from .c_double_buffer_backend import build_double_buffer_field_particles
 
-            field_particle_points_raw, daimoi_probabilistic = (
+            field_particle_points_raw, particle_probabilistic = (
                 build_double_buffer_field_particles(
                     file_graph=runtime_file_graph,
                     presence_impacts=presence_impacts,
@@ -10740,8 +10740,8 @@ def build_simulation_state(
                 )
             )
         except Exception as exc:
-            field_particle_points_raw, daimoi_probabilistic = (
-                build_probabilistic_daimoi_particles(
+            field_particle_points_raw, particle_probabilistic = (
+                build_probabilistic_particles(
                     file_graph=runtime_file_graph,
                     presence_impacts=presence_impacts,
                     resource_heartbeat=resource_heartbeat,
@@ -10750,14 +10750,14 @@ def build_simulation_state(
                     now=now,
                 )
             )
-            if isinstance(daimoi_probabilistic, dict):
-                daimoi_probabilistic["backend"] = "python-fallback"
-                daimoi_probabilistic["backend_error"] = (
+            if isinstance(particle_probabilistic, dict):
+                particle_probabilistic["backend"] = "python-fallback"
+                particle_probabilistic["backend_error"] = (
                     f"{exc.__class__.__name__}:{exc}"
                 )
     else:
-        field_particle_points_raw, daimoi_probabilistic = (
-            build_probabilistic_daimoi_particles(
+        field_particle_points_raw, particle_probabilistic = (
+            build_probabilistic_particles(
                 file_graph=runtime_file_graph,
                 presence_impacts=presence_impacts,
                 resource_heartbeat=resource_heartbeat,
@@ -10860,18 +10860,18 @@ def build_simulation_state(
                 normalized_row[key] = value
         normalized_field_particles.append(normalized_row)
 
-    disable_daimoi = _safe_float(SIMULATION_DISABLE_DAIMOI, 0.0) >= 0.5
-    user_embedded_daimoi: list[dict[str, Any]] = []
-    if not disable_daimoi:
-        user_embedded_daimoi = _build_user_presence_embedded_daimoi_rows(
+    disable_particles = _safe_float(SIMULATION_DISABLE_PARTICLES, 0.0) >= 0.5
+    user_embedded_particles: list[dict[str, Any]] = []
+    if not disable_particles:
+        user_embedded_particles = _build_user_presence_embedded_particle_rows(
             user_presence_state,
             now=now,
         )
-        if user_embedded_daimoi:
-            normalized_field_particles.extend(user_embedded_daimoi)
+        if user_embedded_particles:
+            normalized_field_particles.extend(user_embedded_particles)
     else:
         normalized_field_particles = []
-        if isinstance(daimoi_probabilistic, dict):
+        if isinstance(particle_probabilistic, dict):
             for key in (
                 "active",
                 "spawned",
@@ -10881,26 +10881,26 @@ def build_simulation_state(
                 "handoffs",
                 "deliveries",
             ):
-                daimoi_probabilistic[key] = 0
-            daimoi_probabilistic["job_triggers"] = {}
-            daimoi_probabilistic["disabled"] = True
-            daimoi_probabilistic["disabled_reason"] = "SIMULATION_DISABLE_DAIMOI"
+                particle_probabilistic[key] = 0
+            particle_probabilistic["job_triggers"] = {}
+            particle_probabilistic["disabled"] = True
+            particle_probabilistic["disabled_reason"] = "SIMULATION_DISABLE_PARTICLES"
 
-    resource_daimoi = _apply_resource_daimoi_emissions(
+    resource_particle = _apply_resource_particle_emissions(
         field_particles=normalized_field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat=resource_heartbeat,
         queue_ratio=queue_ratio,
     )
-    resource_consumption = _apply_resource_daimoi_action_consumption(
+    resource_consumption = _apply_resource_particle_action_consumption(
         field_particles=normalized_field_particles,
         presence_impacts=presence_impacts,
         resource_heartbeat=resource_heartbeat,
         queue_ratio=queue_ratio,
     )
-    if isinstance(daimoi_probabilistic, dict):
-        daimoi_probabilistic["resource_daimoi"] = dict(resource_daimoi)
-        daimoi_probabilistic["resource_consumption"] = dict(resource_consumption)
+    if isinstance(particle_probabilistic, dict):
+        particle_probabilistic["resource_particle"] = dict(resource_particle)
+        particle_probabilistic["resource_consumption"] = dict(resource_consumption)
 
     remaining_capacity = max(0, sim_point_budget - len(points))
     for particle in normalized_field_particles[:remaining_capacity]:
@@ -10919,7 +10919,7 @@ def build_simulation_state(
 
     nooi_field, nooi_outcome_summary = _apply_nooi_from_particles(
         emitted_field_particles,
-        dt_seconds=DAIMO_DT_SECONDS,
+        dt_seconds=PARTICLE_DT_SECONDS,
     )
 
     distributed_runtime = sync_presence_runtime_state(
@@ -10941,7 +10941,7 @@ def build_simulation_state(
             "presence_profile": presence_profile,
             "core_resource_emitters": list(core_resources),
             "cpu_core_emitter_enabled": bool(cpu_core_emitter_enabled),
-            "cpu_daimoi_stop_percent": round(cpu_daimoi_stop_percent, 2),
+            "cpu_particle_stop_percent": round(cpu_particle_stop_percent, 2),
         },
         "click_events": clicks_recent,
         "file_events": file_changes_recent,
@@ -10953,10 +10953,10 @@ def build_simulation_state(
         "compute_jobs": compute_jobs[:32],
         "field_particles_record": "ημ.field-particles.v1",
         "field_particles": emitted_field_particles,
-        "resource_daimoi": resource_daimoi,
+        "resource_particle": resource_particle,
         "resource_consumption": resource_consumption,
         "user_presence": user_presence_state,
-        "user_embedded_daimoi_count": len(user_embedded_daimoi),
+        "user_embedded_particle_count": len(user_embedded_particles),
         "user_query_transient_edges": list(user_query_edges.get("active_edges", [])),
         "user_query_transient_edge_count": int(
             _safe_float(user_query_edges.get("active_count", 0), 0.0)
@@ -10987,8 +10987,8 @@ def build_simulation_state(
             )[-12:]
         ],
         "nooi_field": nooi_field,
-        "daimoi_outcome_summary": nooi_outcome_summary,
-        "daimoi_outcome_trails": nooi_field.get("outcome_trails", []),
+        "particle_outcome_summary": nooi_outcome_summary,
+        "particle_outcome_trails": nooi_field.get("outcome_trails", []),
         "river_flow": {
             "unit": "m3/s",
             "rate": river_flow_rate,
@@ -10999,17 +10999,17 @@ def build_simulation_state(
         "witness_thread": witness_thread_state,
         "presence_impacts": presence_impacts,
         "growth_guard": growth_guard,
-        "daimoi_probabilistic_record": str(
-            daimoi_probabilistic.get("record", "")
-            if isinstance(daimoi_probabilistic, dict)
+        "particle_probabilistic_record": str(
+            particle_probabilistic.get("record", "")
+            if isinstance(particle_probabilistic, dict)
             else ""
         ),
-        "daimoi_probabilistic": (
-            daimoi_probabilistic
-            if isinstance(daimoi_probabilistic, dict)
+        "particle_probabilistic": (
+            particle_probabilistic
+            if isinstance(particle_probabilistic, dict)
             else {
-                "record": "ημ.daimoi-probabilistic.v1",
-                "schema_version": "daimoi.probabilistic.v1",
+                "record": "ημ.particle-probabilistic.v1",
+                "schema_version": "particle.probabilistic.v1",
                 "active": 0,
                 "spawned": 0,
                 "collisions": 0,
@@ -11024,7 +11024,7 @@ def build_simulation_state(
                 "behavior_defaults": ["deflect", "diffuse"],
             }
         ),
-        "daimoi_behavior_defaults": ["deflect", "diffuse"],
+        "particle_behavior_defaults": ["deflect", "diffuse"],
         "distributed_runtime": distributed_runtime,
     }
     _update_stream_motion_overlays(
@@ -11056,8 +11056,8 @@ def build_simulation_state(
         field_registry_payload = _build_field_registry(
             catalog=catalog,
             graph_runtime=(
-                daimoi_probabilistic.get("graph_runtime")
-                if isinstance(daimoi_probabilistic, dict)
+                particle_probabilistic.get("graph_runtime")
+                if isinstance(particle_probabilistic, dict)
                 else None
             ),
             kernel_width=0.3,
@@ -11136,7 +11136,7 @@ def build_simulation_state(
         "logical_graph": logical_graph,
         "pain_field": pain_field,
         "heat_values": heat_values,
-        "daimoi": ds,
+        "particles": ds,
         "entities": entity_states,
         "echoes": echo_particles,
         "fork_tax": fork_tax,
@@ -11168,7 +11168,7 @@ def _stream_particle_effective_mass(row: dict[str, Any]) -> float:
         0.0, _safe_float(row.get("semantic_text_chars", 0.0), 0.0)
     )
     semantic_mass = max(0.0, _safe_float(row.get("semantic_mass", 0.0), 0.0))
-    daimoi_energy = max(0.0, _safe_float(row.get("daimoi_energy", 0.0), 0.0))
+    particle_energy = max(0.0, _safe_float(row.get("particle_energy", 0.0), 0.0))
     message_probability = max(
         0.0,
         _safe_float(row.get("message_probability", 0.0), 0.0),
@@ -11176,7 +11176,7 @@ def _stream_particle_effective_mass(row: dict[str, Any]) -> float:
     package_entropy = max(0.0, _safe_float(row.get("package_entropy", 0.0), 0.0))
 
     text_term = math.log1p(semantic_text_chars) * 0.32
-    energy_term = math.log1p((daimoi_energy * 2.8) + (message_probability * 3.5)) * 0.42
+    energy_term = math.log1p((particle_energy * 2.8) + (message_probability * 3.5)) * 0.42
     entropy_term = package_entropy * 0.08
     mass_term = semantic_mass * 0.15
     return max(0.35, min(8.5, 0.5 + text_term + energy_term + entropy_term + mass_term))
@@ -11749,8 +11749,8 @@ def _update_stream_motion_overlays(
     graph_positions: dict[str, dict[str, Any]] = {}
     presence_positions: dict[str, dict[str, Any]] = {}
 
-    with _DAIMO_DYNAMICS_LOCK:
-        graph_cache = _DAIMO_DYNAMICS_CACHE.get("graph_nodes", {})
+    with _PARTICLE_DYNAMICS_LOCK:
+        graph_cache = _PARTICLE_DYNAMICS_CACHE.get("graph_nodes", {})
         if not isinstance(graph_cache, dict):
             graph_cache = {}
 
@@ -11876,9 +11876,9 @@ def _update_stream_motion_overlays(
             if node_id not in node_acc and ts_value < graph_stale_before:
                 graph_cache.pop(node_id, None)
 
-        _DAIMO_DYNAMICS_CACHE["graph_nodes"] = graph_cache
+        _PARTICLE_DYNAMICS_CACHE["graph_nodes"] = graph_cache
 
-        anchor_cache = _DAIMO_DYNAMICS_CACHE.get("presence_anchors", {})
+        anchor_cache = _PARTICLE_DYNAMICS_CACHE.get("presence_anchors", {})
         if not isinstance(anchor_cache, dict):
             anchor_cache = {}
 
@@ -11985,7 +11985,7 @@ def _update_stream_motion_overlays(
             if presence_id not in presence_acc and ts_value < anchor_stale_before:
                 anchor_cache.pop(presence_id, None)
 
-        _DAIMO_DYNAMICS_CACHE["presence_anchors"] = anchor_cache
+        _PARTICLE_DYNAMICS_CACHE["presence_anchors"] = anchor_cache
 
     if graph_positions:
         presence_dynamics["graph_node_positions"] = graph_positions
@@ -12011,7 +12011,7 @@ def advance_simulation_field_particles(
     if not isinstance(presence_dynamics, dict):
         return
     policy_obj = policy if isinstance(policy, dict) else {}
-    disable_daimoi = _safe_float(SIMULATION_DISABLE_DAIMOI, 0.0) >= 0.5
+    disable_particles = _safe_float(SIMULATION_DISABLE_PARTICLES, 0.0) >= 0.5
     rows = presence_dynamics.get("field_particles", [])
     if not isinstance(rows, list):
         return
@@ -12024,7 +12024,7 @@ def advance_simulation_field_particles(
     if ws_particle_max > 0 and len(rows) > ws_particle_max:
         rows = list(rows[:ws_particle_max])
         presence_dynamics["field_particles"] = rows
-    if disable_daimoi:
+    if disable_particles:
         if rows:
             _reset_nooi_field_state()
         _maybe_seed_random_nooi_field_vectors()
@@ -12056,13 +12056,13 @@ def advance_simulation_field_particles(
         ),
     )
     now_value = _safe_float(now_seconds, time.time())
-    daimoi_friction_base = max(
+    particle_friction_base = max(
         0.0,
         min(
             2.0,
             _safe_float(
-                SIMULATION_STREAM_DAIMOI_FRICTION,
-                _SIMULATION_STREAM_DAIMOI_FRICTION_DEFAULT,
+                SIMULATION_STREAM_PARTICLE_FRICTION,
+                _SIMULATION_STREAM_PARTICLE_FRICTION_DEFAULT,
             ),
         ),
     )
@@ -12072,13 +12072,13 @@ def advance_simulation_field_particles(
             2.0,
             _safe_float(
                 SIMULATION_STREAM_NEXUS_FRICTION,
-                daimoi_friction_base,
+                particle_friction_base,
             ),
         ),
     )
-    daimoi_friction_tick = max(
+    particle_friction_tick = max(
         0.0,
-        min(1.2, daimoi_friction_base ** (dt / base_dt)),
+        min(1.2, particle_friction_base ** (dt / base_dt)),
     )
     nexus_friction_tick = max(
         0.0,
@@ -12136,17 +12136,17 @@ def advance_simulation_field_particles(
     cpu_sentinel_attractor_active_stream = bool(
         resource_consumption_state.get("cpu_sentinel_burn_active", False)
     ) or (
-        cpu_utilization_stream >= _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT
+        cpu_utilization_stream >= _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT
     )
     cpu_sentinel_pressure_stream = _clamp01(
-        (cpu_utilization_stream - _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT)
-        / max(1.0, (100.0 - _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_START_PERCENT))
+        (cpu_utilization_stream - _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT)
+        / max(1.0, (100.0 - _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_START_PERCENT))
     )
-    cpu_sentinel_center = presence_centers.get(_RESOURCE_DAIMOI_CPU_SENTINEL_ID)
+    cpu_sentinel_center = presence_centers.get(_RESOURCE_PARTICLE_CPU_SENTINEL_ID)
     if not (isinstance(cpu_sentinel_center, tuple) and len(cpu_sentinel_center) == 2):
         anchor_positions = presence_dynamics.get("presence_anchor_positions", {})
         if isinstance(anchor_positions, dict):
-            anchor_state = anchor_positions.get(_RESOURCE_DAIMOI_CPU_SENTINEL_ID)
+            anchor_state = anchor_positions.get(_RESOURCE_PARTICLE_CPU_SENTINEL_ID)
             if isinstance(anchor_state, dict):
                 cpu_sentinel_center = (
                     _clamp01(_safe_float(anchor_state.get("x", 0.5), 0.5)),
@@ -12188,7 +12188,7 @@ def advance_simulation_field_particles(
         y_value = _clamp01(_safe_float(row.get("y", 0.5), 0.5))
         is_nexus = bool(row.get("is_nexus", False))
         row["cpu_sentinel_attractor_active"] = False
-        friction_tick = nexus_friction_tick if is_nexus else daimoi_friction_tick
+        friction_tick = nexus_friction_tick if is_nexus else particle_friction_tick
         vx_value = (
             _safe_float(row.get("vx", 0.0), 0.0) * SIMULATION_STREAM_VELOCITY_SCALE
         )
@@ -12332,7 +12332,7 @@ def advance_simulation_field_particles(
             _safe_float(row.get("semantic_mass", 0.0), 0.0),
             _safe_float(row.get("mass", 0.0), 0.0) * (1.1 if is_nexus else 0.65),
         )
-        daimoi_energy = max(0.0, _safe_float(row.get("daimoi_energy", 0.0), 0.0))
+        particle_energy = max(0.0, _safe_float(row.get("particle_energy", 0.0), 0.0))
         message_probability = max(
             0.0,
             _safe_float(row.get("message_probability", 0.0), 0.0),
@@ -12356,7 +12356,7 @@ def advance_simulation_field_particles(
             + (semantic_mass_signal * 0.72)
             + (wallet_signal * 0.58)
         )
-        energy_signal = _clamp01((daimoi_energy * 0.35) + (message_probability * 0.45))
+        energy_signal = _clamp01((particle_energy * 0.35) + (message_probability * 0.45))
         entropy_signal = _clamp01(package_entropy / 3.0)
         semantic_signal = _clamp01(
             abs(drift_cost_semantic_term)
@@ -12547,24 +12547,24 @@ def advance_simulation_field_particles(
                 sentinel_nx = sentinel_dx / sentinel_dist
                 sentinel_ny = sentinel_dy / sentinel_dist
                 sentinel_gain = SIMULATION_STREAM_FIELD_FORCE * (
-                    _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_GAIN
+                    _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_GAIN
                     * (0.22 + (cpu_sentinel_pressure_stream * 1.78))
                 )
-                if bool(row.get("resource_daimoi", False)):
+                if bool(row.get("resource_particle", False)):
                     resource_type = _canonical_resource_type(
                         str(row.get("resource_type", "cpu") or "cpu")
                     )
                     if resource_type == "cpu":
                         sentinel_gain *= (
-                            _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST
+                            _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_RESOURCE_BOOST
                         )
                         row["resource_target_presence_id"] = (
-                            _RESOURCE_DAIMOI_CPU_SENTINEL_ID
+                            _RESOURCE_PARTICLE_CPU_SENTINEL_ID
                         )
                         row["resource_forced_target"] = "cpu_sentinel_attractor"
-                    elif not _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI:
+                    elif not _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES:
                         sentinel_gain = 0.0
-                elif not _RESOURCE_DAIMOI_CPU_SENTINEL_ATTRACTOR_ALL_DAIMOI:
+                elif not _RESOURCE_PARTICLE_CPU_SENTINEL_ATTRACTOR_ALL_PARTICLES:
                     sentinel_gain = 0.0
 
                 if sentinel_gain > 1e-8:
@@ -12572,7 +12572,7 @@ def advance_simulation_field_particles(
                     ay += sentinel_ny * sentinel_gain
                     row["cpu_sentinel_attractor_active"] = True
                     row["cpu_sentinel_attractor_target"] = (
-                        _RESOURCE_DAIMOI_CPU_SENTINEL_ID
+                        _RESOURCE_PARTICLE_CPU_SENTINEL_ID
                     )
                     row["cpu_sentinel_attractor_gain"] = round(sentinel_gain, 6)
 
@@ -12643,7 +12643,7 @@ def advance_simulation_field_particles(
         if not is_nexus and orbit_ratio > 1.05:
             orbit_damping = min(
                 0.94,
-                _safe_float(SIMULATION_STREAM_DAIMOI_ORBIT_DAMPING, 1.2)
+                _safe_float(SIMULATION_STREAM_PARTICLE_ORBIT_DAMPING, 1.2)
                 * dt
                 * min(3.2, orbit_ratio),
             )
@@ -12745,7 +12745,7 @@ def advance_simulation_field_particles(
         row["vy"] = round(vy_value, 6)
 
         # Absorption (Suck up)
-        if bool(row.get("resource_daimoi", False)):
+        if bool(row.get("resource_particle", False)):
             target_id = str(row.get("resource_target_presence_id", "")).strip()
             if target_id:
                 tx, ty = presence_centers.get(target_id, (0.5, 0.5))
@@ -12796,7 +12796,7 @@ def advance_simulation_field_particles(
                     wallet_floor = max(
                         0.1,
                         _safe_float(
-                            _RESOURCE_DAIMOI_WALLET_FLOOR.get(primary_resource, 4.0),
+                            _RESOURCE_PARTICLE_WALLET_FLOOR.get(primary_resource, 4.0),
                             4.0,
                         ),
                     )
@@ -12868,8 +12868,8 @@ def advance_simulation_field_particles(
         dt_seconds=dt,
     )
     presence_dynamics["nooi_field"] = nooi_field
-    presence_dynamics["daimoi_outcome_summary"] = nooi_outcome_summary
-    presence_dynamics["daimoi_outcome_trails"] = nooi_field.get("outcome_trails", [])
+    presence_dynamics["particle_outcome_summary"] = nooi_outcome_summary
+    presence_dynamics["particle_outcome_trails"] = nooi_field.get("outcome_trails", [])
 
     _update_stream_motion_overlays(
         presence_dynamics,
@@ -12898,7 +12898,7 @@ def build_simulation_delta(
         "points",
         "field_particles",
         "presence_dynamics",
-        "daimoi",
+        "particles",
         "pain_field",
         "truth_state",
         "projection",

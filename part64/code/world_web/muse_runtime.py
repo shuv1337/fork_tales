@@ -20,7 +20,7 @@ MUSE_EVENT_SCHEMA_VERSION = "muse.events.v1"
 MUSE_CONTEXT_MANIFEST_RECORD = "eta-mu.muse-context-manifest.v1"
 MUSE_CONTEXT_MANIFEST_SCHEMA_VERSION = "muse.context-manifest.v1"
 MUSE_RESOURCE_NODE_RECORD = "eta-mu.resource-node.v1"
-MUSE_DAIMON_RECORD = "eta-mu.muse-daimon.v1"
+MUSE_PARTICLE_RECORD = "eta-mu.agent-particle.v1"
 MUSE_GPU_CLAIM_RECORD = "eta-mu.muse-gpu-claim.v1"
 MUSE_STATE_FILE_RECORD = "eta-mu.muse-runtime-state.v1"
 
@@ -55,7 +55,7 @@ BOOTSTRAP_MUSE_SPECS: tuple[dict[str, Any], ...] = (
 )
 DEFAULT_AUDIO_INTENT_ENABLED = True
 DEFAULT_AUDIO_MIN_SCORE = 0.55
-DEFAULT_AUDIO_DAIMOI_FANOUT = 3
+DEFAULT_AUDIO_PARTICLE_FANOUT = 3
 DEFAULT_AUDIO_MAX_CANDIDATES = 32
 DEFAULT_AUDIO_TARGET_PRESENCE_ID = "receipt_river"
 DEFAULT_IMAGE_TARGET_PRESENCE_ID = "mage_of_receipts"
@@ -328,7 +328,7 @@ class MuseRuntimeManager:
         max_manifests_per_muse: int,
         audio_intent_enabled: bool,
         audio_min_score: float,
-        audio_daimoi_fanout: int,
+        audio_particle_fanout: int,
         audio_max_candidates: int,
         audio_target_presence_id: str,
         image_target_presence_id: str,
@@ -343,7 +343,7 @@ class MuseRuntimeManager:
         self._max_manifests_per_muse = max(8, int(max_manifests_per_muse))
         self._audio_intent_enabled = bool(audio_intent_enabled)
         self._audio_min_score = max(0.01, min(2.0, float(audio_min_score)))
-        self._audio_daimoi_fanout = max(1, min(12, int(audio_daimoi_fanout)))
+        self._audio_particle_fanout = max(1, min(12, int(audio_particle_fanout)))
         self._audio_max_candidates = max(4, min(96, int(audio_max_candidates)))
         self._audio_target_presence_id = (
             str(audio_target_presence_id or DEFAULT_AUDIO_TARGET_PRESENCE_ID).strip()
@@ -767,23 +767,23 @@ class MuseRuntimeManager:
                 manifest=manifest,
                 surrounding_nodes=surrounding_nodes,
             )
-            daimoi_rows = self._emit_daimoi_locked(
+            particle_rows = self._emit_particles_locked(
                 muse=muse,
                 manifest=manifest,
                 turn_id=turn_id,
                 rng=rng,
             )
             if isinstance(media_action, dict) and media_action:
-                media_action = self._route_media_action_with_daimoi_locked(
+                media_action = self._route_media_action_with_particles_locked(
                     muse_id=clean_muse_id,
                     turn_id=turn_id,
                     action=media_action,
-                    daimoi_rows=daimoi_rows,
+                    particle_rows=particle_rows,
                 )
-            field_deltas = self._field_deltas_from_daimoi_locked(
+            field_deltas = self._field_deltas_from_particles_locked(
                 muse=muse,
                 turn_id=turn_id,
-                daimoi_rows=daimoi_rows,
+                particle_rows=particle_rows,
             )
             gpu_claim = self._claim_gpu_locked(
                 muse=muse,
@@ -943,7 +943,7 @@ class MuseRuntimeManager:
                 turn_id=turn_id,
                 payload={
                     "manifest_id": str(manifest.get("id", "")),
-                    "daimoi": len(daimoi_rows),
+                    "particles": len(particle_rows),
                     "field_deltas": len(field_deltas),
                     "tool_results": len(tool_rows),
                     "media_actions": 1
@@ -977,7 +977,7 @@ class MuseRuntimeManager:
                 "model": model_name,
                 "fallback": fallback_used,
                 "manifest": manifest,
-                "daimoi": daimoi_rows,
+                "particles": particle_rows,
                 "field_deltas": field_deltas,
                 "gpu_claim": gpu_claim,
                 "tool_results": tool_rows,
@@ -1351,7 +1351,7 @@ class MuseRuntimeManager:
         self._state["manifests"][muse_id] = manifests
         return manifest
 
-    def _emit_daimoi_locked(
+    def _emit_particles_locked(
         self,
         *,
         muse: dict[str, Any],
@@ -1380,8 +1380,8 @@ class MuseRuntimeManager:
             jitter_x = (rng.random() - 0.5) * 0.06
             jitter_y = (rng.random() - 0.5) * 0.06
             row = {
-                "record": MUSE_DAIMON_RECORD,
-                "id": f"daimon:{sha1(embedding_seed.encode('utf-8')).hexdigest()[:16]}",
+                "record": MUSE_PARTICLE_RECORD,
+                "id": f"particle:{sha1(embedding_seed.encode('utf-8')).hexdigest()[:16]}",
                 "muse_id": muse_id,
                 "turn_id": turn_id,
                 "manifest_id": str(manifest.get("id", "")),
@@ -1397,7 +1397,7 @@ class MuseRuntimeManager:
             rows.append(row)
 
         self._emit_event_locked(
-            kind="muse.daimoi.emitted",
+            kind="agent.particles.emitted",
             status="ok",
             muse_id=muse_id,
             turn_id=turn_id,
@@ -1408,16 +1408,16 @@ class MuseRuntimeManager:
         )
         return rows
 
-    def _field_deltas_from_daimoi_locked(
+    def _field_deltas_from_particles_locked(
         self,
         *,
         muse: dict[str, Any],
         turn_id: str,
-        daimoi_rows: list[dict[str, Any]],
+        particle_rows: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
         muse_id = str(muse.get("id", "")).strip()
         deltas: list[dict[str, Any]] = []
-        for row in daimoi_rows[:16]:
+        for row in particle_rows[:16]:
             energy = _clamp01(_safe_float(row.get("energy", 0.0), 0.0))
             ttl = max(1, _safe_int(row.get("ttl", 1), 1))
             deltas.append(
@@ -1687,25 +1687,25 @@ class MuseRuntimeManager:
             graph_tail = str(normalized.split("/graph", 1)[1]).strip()
             _append_tool(f"graph_query:{graph_tail or 'overview'}")
         else:
-            daimoi_id = ""
-            daimoi_match = re.search(r"\bdaimoi[:\s]+([a-z0-9._:-]+)", normalized)
-            if daimoi_match:
-                daimoi_id = str(daimoi_match.group(1) or "").strip()
-            if not daimoi_id:
+            particle_id = ""
+            particle_match = re.search(r"\bparticle[:\s]+([a-z0-9._:-]+)", normalized)
+            if particle_match:
+                particle_id = str(particle_match.group(1) or "").strip()
+            if not particle_id:
                 for token in re.findall(r"[a-z0-9._:-]+", normalized):
-                    if token.startswith("field:") or token.startswith("daimoi:"):
-                        daimoi_id = token
+                    if token.startswith("field:") or token.startswith("particles:"):
+                        particle_id = token
                         break
 
-            asks_why_daimoi = (
-                ("why" in normalized and "daimoi" in normalized)
-                or "explain daimoi" in normalized
-                or "daimoi die" in normalized
-                or "daimoi died" in normalized
-                or "daimoi death" in normalized
+            asks_why_particle = (
+                ("why" in normalized and "particles" in normalized)
+                or "explain particle" in normalized
+                or "particle die" in normalized
+                or "particle died" in normalized
+                or "particle death" in normalized
             )
-            if asks_why_daimoi and daimoi_id:
-                _append_tool(f"graph_query:explain_daimoi {daimoi_id}")
+            if asks_why_particle and particle_id:
+                _append_tool(f"graph_query:explain_particle {particle_id}")
 
             asks_recent_outcomes = (
                 "recent outcomes" in normalized
@@ -2651,13 +2651,13 @@ class MuseRuntimeManager:
         action["score"] = round(selected_score, 6)
         return action
 
-    def _route_media_action_with_daimoi_locked(
+    def _route_media_action_with_particles_locked(
         self,
         *,
         muse_id: str,
         turn_id: str,
         action: dict[str, Any],
-        daimoi_rows: list[dict[str, Any]],
+        particle_rows: list[dict[str, Any]],
     ) -> dict[str, Any]:
         if str(action.get("status", "")) != "requested":
             return action
@@ -2690,15 +2690,15 @@ class MuseRuntimeManager:
             return action
 
         ranked_rows = sorted(
-            [row for row in daimoi_rows if isinstance(row, dict)],
+            [row for row in particle_rows if isinstance(row, dict)],
             key=lambda row: (
                 -_safe_float(row.get("energy", 0.0), 0.0),
                 str(row.get("id", "")),
             ),
         )
-        selected_rows = ranked_rows[: self._audio_daimoi_fanout]
+        selected_rows = ranked_rows[: self._audio_particle_fanout]
         collisions = 0
-        daimon_ids: list[str] = []
+        particle_ids: list[str] = []
         target_presence_id = str(
             action.get(
                 "target_presence_id",
@@ -2721,16 +2721,16 @@ class MuseRuntimeManager:
                 row["collision"] = "audio-resource"
             row["target_node_id"] = target_node_id
             row["target_presence_id"] = target_presence_id
-            daimon_id = str(row.get("id", "")).strip()
-            if daimon_id:
-                daimon_ids.append(daimon_id)
+            particle_id = str(row.get("id", "")).strip()
+            if particle_id:
+                particle_ids.append(particle_id)
             collisions += 1
 
         action["collision_count"] = collisions
-        action["daimon_ids"] = daimon_ids
+        action["particle_ids"] = particle_ids
         if collisions <= 0:
             action["status"] = "blocked"
-            action["reason"] = "no_daimoi_available"
+            action["reason"] = "no_particles_available"
             blocked_kind = (
                 "image.open.blocked" if media_kind == "image" else "audio.play.blocked"
             )
@@ -2740,14 +2740,14 @@ class MuseRuntimeManager:
                 muse_id=muse_id,
                 turn_id=turn_id,
                 payload={
-                    "reason": "no_daimoi_available",
+                    "reason": "no_particles_available",
                     "target_node_id": target_node_id,
                 },
             )
             return action
 
         self._emit_event_locked(
-            kind="muse.daimoi.media.collided",
+            kind="agent.particles.media.collided",
             status="ok",
             muse_id=muse_id,
             turn_id=turn_id,
@@ -2756,12 +2756,12 @@ class MuseRuntimeManager:
                 "target_node_id": target_node_id,
                 "target_presence_id": target_presence_id,
                 "media_kind": media_kind,
-                "daimon_ids": daimon_ids[:8],
+                "particle_ids": particle_ids[:8],
             },
         )
         if media_kind == "image":
             self._emit_event_locked(
-                kind="muse.daimoi.image.collided",
+                kind="agent.particles.image.collided",
                 status="ok",
                 muse_id=muse_id,
                 turn_id=turn_id,
@@ -2769,7 +2769,7 @@ class MuseRuntimeManager:
                     "count": collisions,
                     "target_node_id": target_node_id,
                     "target_presence_id": target_presence_id,
-                    "daimon_ids": daimon_ids[:8],
+                    "particle_ids": particle_ids[:8],
                 },
             )
             self._emit_event_locked(
@@ -2788,7 +2788,7 @@ class MuseRuntimeManager:
             )
         else:
             self._emit_event_locked(
-                kind="muse.daimoi.audio.collided",
+                kind="agent.particles.audio.collided",
                 status="ok",
                 muse_id=muse_id,
                 turn_id=turn_id,
@@ -2796,7 +2796,7 @@ class MuseRuntimeManager:
                     "count": collisions,
                     "target_node_id": target_node_id,
                     "target_presence_id": target_presence_id,
-                    "daimon_ids": daimon_ids[:8],
+                    "particle_ids": particle_ids[:8],
                 },
             )
             self._emit_event_locked(
@@ -3112,9 +3112,9 @@ def _muse_runtime_signature_from_env() -> str:
             ).strip(),
             str(
                 os.getenv(
-                    "MUSE_RUNTIME_AUDIO_DAIMOI_FANOUT", str(DEFAULT_AUDIO_DAIMOI_FANOUT)
+                    "MUSE_RUNTIME_AUDIO_PARTICLE_FANOUT", str(DEFAULT_AUDIO_PARTICLE_FANOUT)
                 )
-                or str(DEFAULT_AUDIO_DAIMOI_FANOUT)
+                or str(DEFAULT_AUDIO_PARTICLE_FANOUT)
             ).strip(),
             str(
                 os.getenv(
@@ -3209,12 +3209,12 @@ def _build_muse_runtime_manager_from_env() -> MuseRuntimeManager:
             ),
             DEFAULT_AUDIO_MIN_SCORE,
         ),
-        audio_daimoi_fanout=_safe_int(
+        audio_particle_fanout=_safe_int(
             os.getenv(
-                "MUSE_RUNTIME_AUDIO_DAIMOI_FANOUT",
-                str(DEFAULT_AUDIO_DAIMOI_FANOUT),
+                "MUSE_RUNTIME_AUDIO_PARTICLE_FANOUT",
+                str(DEFAULT_AUDIO_PARTICLE_FANOUT),
             ),
-            DEFAULT_AUDIO_DAIMOI_FANOUT,
+            DEFAULT_AUDIO_PARTICLE_FANOUT,
         ),
         audio_max_candidates=_safe_int(
             os.getenv(

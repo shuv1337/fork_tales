@@ -52,12 +52,12 @@ def _simulation_payload() -> dict:
         "nexus_graph": _nexus_graph(),
         "presence_dynamics": {
             "tick": 77,
-            "daimoi_outcome_summary": {"food": 2, "death": 1, "total": 3},
-            "daimoi_outcome_trails": [
+            "particle_outcome_summary": {"food": 2, "death": 1, "total": 3},
+            "particle_outcome_trails": [
                 {
                     "seq": 1,
                     "tick": 76,
-                    "daimoi_id": "field:witness_thread:001",
+                    "particle_id": "field:witness_thread:001",
                     "outcome": "food",
                     "graph_node_id": "url:aaaa",
                     "reason": "resource_consumed",
@@ -68,7 +68,7 @@ def _simulation_payload() -> dict:
                 {
                     "seq": 2,
                     "tick": 77,
-                    "daimoi_id": "field:witness_thread:001",
+                    "particle_id": "field:witness_thread:001",
                     "outcome": "death",
                     "graph_node_id": "url:bbbb",
                     "reason": "timeout",
@@ -193,8 +193,8 @@ def test_run_named_graph_query_named_menu_uses_simulation_context() -> None:
 
     explain = run_named_graph_query(
         graph,
-        "explain_daimoi",
-        args={"daimoi_id": "field:witness_thread:001"},
+        "explain_particle",
+        args={"particle_id": "field:witness_thread:001"},
         simulation=simulation,
     )
     assert explain.get("result", {}).get("status") in {"alive", "death", "food"}
@@ -320,7 +320,7 @@ def test_build_facts_snapshot_includes_web_sections_and_writes_file() -> None:
         assert facts.get("counts", {}).get("nodes_by_role", {}).get("web:url") == 2
         assert len(facts.get("web", {}).get("urls", [])) == 2
         assert len(facts.get("web", {}).get("resources", [])) == 1
-        assert facts.get("dynamics", {}).get("daimoi_outcomes", {}).get("food") == 2
+        assert facts.get("dynamics", {}).get("particle_outcomes", {}).get("food") == 2
         assert len(str(facts.get("snapshot_hash", ""))) == 64
         snapshot_path = str(facts.get("snapshot_path", ""))
         assert snapshot_path

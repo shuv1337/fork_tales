@@ -520,8 +520,8 @@ def test_github_queries_and_facts_snapshot() -> None:
         },
         "presence_dynamics": {
             "tick": 9,
-            "daimoi_outcome_summary": {"food": 0, "death": 0, "total": 0},
-            "daimoi_outcome_trails": [],
+            "particle_outcome_summary": {"food": 0, "death": 0, "total": 0},
+            "particle_outcome_trails": [],
             "field_particles": [],
             "resource_heartbeat": {"devices": {}},
         },
