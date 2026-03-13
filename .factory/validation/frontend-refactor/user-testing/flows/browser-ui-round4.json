@@ -1,0 +1,64 @@
+{
+  "groupId": "browser-ui-round4",
+  "testedAt": "2026-03-13T14:14:09.727146Z",
+  "isolation": {
+    "surface": "browser-ui",
+    "url": "http://127.0.0.1:5173",
+    "backendUrl": "http://127.0.0.1:8787",
+    "session": "24bfe3a79476__u1",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4"
+  },
+  "toolsUsed": [
+    "agent-browser"
+  ],
+  "assertionResults": [
+    {
+      "id": "VAL-UI-001",
+      "status": "pass",
+      "reason": "The live dashboard rendered active panels and sidebars as opaque dark surfaces with no user-visible glass or translucency. The screenshots show solid dark navy panels, and the DOM style capture recorded opaque dark background colors or fully opaque dark gradients with backdropFilter set to 'none'.",
+      "evidence": [
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/VAL-UI-001-006-full.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/VAL-UI-001-006-full-annotated.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/VAL-UI-001-006-full-after-reload.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/dom-observations.json",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/page-errors.txt",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/network-requests-after-reload.txt"
+      ]
+    },
+    {
+      "id": "VAL-UI-006",
+      "status": "fail",
+      "reason": "Narrative/stylized labels are still visibly rendered in the live UI. The screenshot and extracted body text show user-facing text including 'eta-mu world daemon', 'witness thread', 'view lens keeper', 'anchor registry', 'fork tax canticle', 'receipt river', and 'Observer Thread'.",
+      "evidence": [
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/VAL-UI-001-006-full.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/VAL-UI-001-006-full-annotated.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/body-text.txt",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/dom-observations.json",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-round4/page-errors.txt"
+      ]
+    }
+  ],
+  "frictions": [
+    {
+      "description": "The live page stayed mounted, but the Threat Radar card showed 'Failed to fetch' and the frontend requested backend endpoints on port 9787 instead of the assigned shared backend URL 8787.",
+      "resolved": true,
+      "resolution": "Per the mission instructions, this was treated as non-blocking because the UI remained mounted and the assigned assertions were limited to visible backgrounds and labels.",
+      "affectedAssertions": [
+        "VAL-UI-001",
+        "VAL-UI-006"
+      ]
+    },
+    {
+      "description": "Initial network capture returned 'No requests captured' for the already-loaded page state.",
+      "resolved": true,
+      "resolution": "Reloaded the page in the same session and captured the request list afterward.",
+      "affectedAssertions": [
+        "VAL-UI-001",
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Validated VAL-UI-001 and VAL-UI-006 against the live Vite app. VAL-UI-001 passes because the visible panels render as solid dark opaque surfaces without a glass effect, while VAL-UI-006 fails because narrative/stylized labels remain visible in multiple live UI regions."
+}

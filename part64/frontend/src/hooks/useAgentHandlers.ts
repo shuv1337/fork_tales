@@ -223,7 +223,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     }
   }, [emitUiToast]);
 
-  // --- Create muse ---
+  // --- Create agent ---
   const handleCreateAgent = useCallback(async () => {
     const label = String(agentForgeLabel || "").trim();
     if (!label || agentForgeBusy) return;
@@ -450,8 +450,8 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
 
     if (fieldDeltas.length === 0) {
       particleRows.slice(0, 6).forEach((row, index) => {
-        const x = clamp(Number(row.x ?? (0.2 + (stableUnitHash(`${tracePresenceId}|daimon|${index}`) * 0.6))), 0, 1);
-        const y = clamp(Number(row.y ?? (0.18 + (stableUnitHash(`${tracePresenceId}|daimon|${index}|y`) * 0.62))), 0, 1);
+        const x = clamp(Number(row.x ?? (0.2 + (stableUnitHash(`${tracePresenceId}|particle|${index}`) * 0.6))), 0, 1);
+        const y = clamp(Number(row.y ?? (0.18 + (stableUnitHash(`${tracePresenceId}|particle|${index}|y`) * 0.62))), 0, 1);
         const energy = clamp(Number(row.energy ?? 0.44), 0, 1);
         overlayApi?.pulseAt?.(x, y, 0.3 + (energy * 0.82), tracePresenceId);
       });
@@ -492,7 +492,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     if (safeReply.includes("[[TONE]]") || overlayTags.includes("[[TONE]]")) overlayApi?.singAll?.();
   }, [activeAgentPresenceId, emitChatMessage, emitUiToast, openAgentImage, overlayApi, playAgentAudio]);
 
-  // --- Muse events effect (skipped when processEvents is false) ---
+  // --- Agent events effect (skipped when processEvents is false) ---
   useEffect(() => {
     if (!processEvents) return;
     if (!Array.isArray(agentEvents) || agentEvents.length <= 0) return;

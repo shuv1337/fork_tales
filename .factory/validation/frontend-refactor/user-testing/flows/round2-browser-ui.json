@@ -1,0 +1,63 @@
+{
+  "groupId": "round2-browser-ui",
+  "testedAt": "2026-03-13T13:38:12.994520Z",
+  "isolation": {
+    "surface": "browser-ui",
+    "appUrl": "http://127.0.0.1:5173",
+    "session": "round2-browser-ui",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "reportPath": "/home/shuv/repos/fork_tales/.factory/validation/frontend-refactor/user-testing/flows/round2-browser-ui.json",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/round2-browser-ui"
+  },
+  "toolsUsed": [
+    "agent-browser",
+    "Read",
+    "Grep",
+    "Execute"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-UI-006",
+      "title": "Narrative labels stripped",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Open the shared dashboard at http://127.0.0.1:5173 and capture full-page evidence.",
+          "expected": "The visible dashboard uses only neutral and technical labels.",
+          "observed": "The page loaded with browser title 'eta-mu' and rendered a dark dashboard. Neutral labels such as 'SYSTEM OPERATING RAIL', 'SIMULATION VIEWPORT', and 'AGENT CREATOR' were visible."
+        },
+        {
+          "action": "Inspect visible panel titles, list items, and status copy for prior round-1 residue terms.",
+          "expected": "Previously reported narrative residue is removed from user-visible text.",
+          "observed": "Visible residue still appeared in the captured dashboard: 'witness thread', 'view lens keeper', 'anchor registry', 'fork tax canticle', 'receipt river', and the status copy 'Glass lane preferred during low-priority cycle.' The previously reported strings 'presence operating rail', 'fork tax paid', 'ghost pulse', and 'galaxy sweep' were not seen in the captured dashboard text."
+        },
+        {
+          "action": "Check browser console and page errors after load.",
+          "expected": "No browser-side errors relevant to the label-cleanup assertion.",
+          "observed": "No page errors were reported. The visible Threat Radar card still showed 'Failed to fetch', which was not treated as a VAL-UI-006 failure because the rerun guidance explicitly allows backend-connected fetch failures for this assertion."
+        }
+      ],
+      "evidence": {
+        "screenshots": [
+          "frontend-refactor/round2-browser-ui/dashboard-full.png",
+          "frontend-refactor/round2-browser-ui/dashboard-annotated-full.png"
+        ],
+        "consoleErrors": "none observed; errors.txt was empty and console.txt only contained the agent-browser completion marker",
+        "network": "agent-browser network export reported 'No requests captured' for this read-only session; the visible UI still included a 'Failed to fetch' card state"
+      },
+      "issues": "VAL-UI-006 remains failing because live user-visible labels and status copy still contain narrative residue."
+    }
+  ],
+  "frictions": [
+    {
+      "description": "The shared frontend still displayed a backend-related 'Failed to fetch' message on the Threat Radar card during inspection.",
+      "resolved": true,
+      "resolution": "Per the rerun guidance, the assessment stayed focused on visible text residue and did not count backend-connected fetch failure by itself as a VAL-UI-006 failure.",
+      "affectedAssertions": [
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Tested 1 assertion (VAL-UI-006): failed. Neutral replacements such as 'SYSTEM OPERATING RAIL', 'SIMULATION VIEWPORT', and 'AGENT CREATOR' are visible, but the live dashboard still shows 'witness thread', 'view lens keeper', 'anchor registry', 'fork tax canticle', 'receipt river', and 'Glass lane preferred during low-priority cycle.'"
+}

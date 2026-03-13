@@ -1,0 +1,79 @@
+{
+  "milestone": "frontend-refactor",
+  "round": 3,
+  "status": "fail",
+  "generatedAt": "2026-03-13T13:53:56.768995+00:00",
+  "assertionsSummary": {
+    "total": 15,
+    "passed": 12,
+    "failed": 3,
+    "blocked": 0
+  },
+  "scopeAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-003",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-001",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-006",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "testedThisRound": [
+    "VAL-FS-003",
+    "VAL-UI-001",
+    "VAL-UI-003",
+    "VAL-UI-006"
+  ],
+  "carriedForwardPassedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "passedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-FS-003",
+      "reason": "Frontend-owned old naming still exists in source (`museRuntimeSnapshot`, `musePresenceId`, `requestedMusePresenceId`, `ghostPulse`, and `Mouse daimon` comments), even after excluding allowed backend interop fields."
+    },
+    {
+      "id": "VAL-UI-001",
+      "reason": "The live dashboard looked dark, but active frontend content still includes a non-exempt translucent container (`bg-sky-50/70` in WorldSimulation.tsx) plus a transparent gradient overlay in Canvas.tsx."
+    },
+    {
+      "id": "VAL-UI-006",
+      "reason": "Narrative/stylized user-visible labels remain in the live UI, including `witness thread`, `view lens keeper`, `anchor registry`, `fork tax canticle`, `receipt river`, `Glass lane preferred during low-priority cycle.`, `Glass lane awaiting presence`, `transparent standby viewport`, `ghost trails`, `hologram worldscreen`, and `Observer Thread Ledger`."
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": ".factory/validation/frontend-refactor/user-testing/synthesis.round2.json"
+}

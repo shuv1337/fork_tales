@@ -1,0 +1,108 @@
+{
+  "groupId": "round2-repo-shell",
+  "testedAt": "2026-03-13T13:38:05Z",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "reportPath": "/home/shuv/repos/fork_tales/.factory/validation/frontend-refactor/user-testing/flows/round2-repo-shell.json",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/round2-repo-shell",
+    "scope": "read-only repository inspection plus report/evidence writes under assigned paths"
+  },
+  "toolsUsed": [
+    "Read",
+    "Grep",
+    "Execute"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-FS-003",
+      "title": "TypeScript types renamed",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Search frontend TS/TSX for clearly frontend-owned old naming residue from the rename set",
+          "expected": "No frontend-local daimon/muse naming remains after the round-2 fixes",
+          "observed": "The exact `mouseDaimonTuning` identifier no longer appears, but frontend-local `museRuntimeSnapshot`, `musePresenceId`, `requestedMusePresenceId`, and `Mouse daimon` / `Mouse Daimon` comments still remain in live source."
+        },
+        {
+          "action": "Review remaining old backend wire-format fields separately",
+          "expected": "Interop fields may remain only where needed for backend compatibility and should not be the primary failure reason for this rerun",
+          "observed": "`witness_thread`, `fork_tax`, `ghost`, and `daimoi_probabilistic` are still present in response typing/access paths; they were treated as backend interop context rather than the main failure basis here."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/round2-repo-shell/source-inspection.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": "Round 2 removed the exact `mouseDaimonTuning` identifier, but the rename cleanup still fails because clearly frontend-owned old naming remains in local variables, function parameters, and comments (`museRuntimeSnapshot`, `musePresenceId`, `requestedMusePresenceId`, and `Mouse daimon`/`Mouse Daimon`)."
+    },
+    {
+      "id": "VAL-UI-001",
+      "title": "No transparency backgrounds",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Check the previously reported transparency utility classes in frontend TSX/CSS",
+          "expected": "The prior `bg-white/70`, `bg-white/55`, and `bg-black/40` residues are gone",
+          "observed": "Those exact classes no longer matched in current frontend source."
+        },
+        {
+          "action": "Inspect current live panel/container background classes for any remaining translucency",
+          "expected": "Panel and container surfaces use only solid dark backgrounds",
+          "observed": "Current TSX still includes translucent panel/control backgrounds such as `bg-sky-50/70` in WorldSimulation and multiple `bg-white/5` / `bg-transparent` surfaces in PresenceCallDeck."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/round2-repo-shell/source-inspection.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": "The exact round-1 class names were partly cleaned up, but the assertion still fails because live TSX panel/container surfaces continue to use translucent background utilities instead of solid dark backgrounds."
+    },
+    {
+      "id": "VAL-UI-003",
+      "title": "No galaxy/parallax backgrounds",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Search current frontend source for the previously reported cosmic-effect residues",
+          "expected": "No `radial-gradient`, `vignette`, `parallax`, or `star-field` matches remain",
+          "observed": "No current matches were found for those effect terms in part64/frontend/src."
+        },
+        {
+          "action": "Inspect remaining galaxy-related matches and ignore functional component naming alone",
+          "expected": "No visible galaxy wording remains in active UI copy",
+          "observed": "GalaxyModelDock.tsx still renders the visible strings `galaxy model dock` and `in-galaxy management`, so user-facing galaxy wording remains even though the earlier effect residues appear removed."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/round2-repo-shell/source-inspection.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": "The earlier radial-gradient/vignette residue appears fixed, but the assertion still fails because active UI copy still exposes galaxy wording in GalaxyModelDock.tsx."
+    }
+  ],
+  "frictions": [
+    {
+      "description": "This rerun was assigned to the repo-shell surface, so screenshot/browser evidence was out of scope even though the contract examples mention screenshots for UI assertions.",
+      "resolved": true,
+      "resolution": "Captured shell-based source evidence under the assigned mission evidence directory instead.",
+      "affectedAssertions": [
+        "VAL-FS-003",
+        "VAL-UI-001",
+        "VAL-UI-003"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Retested 3 assigned round-2 repo-shell assertions. All 3 still fail: VAL-FS-003 retains frontend-local muse/daimon naming residue, VAL-UI-001 still has translucent live panel/control backgrounds, and VAL-UI-003 still shows visible galaxy wording even though the earlier gradient/vignette residues appear removed."
+}

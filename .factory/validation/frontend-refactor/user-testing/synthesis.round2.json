@@ -1,0 +1,73 @@
+{
+  "milestone": "frontend-refactor",
+  "round": 2,
+  "status": "fail",
+  "generatedAt": "2026-03-13T06:39:46-07:00",
+  "assertionsSummary": {
+    "total": 15,
+    "passed": 11,
+    "failed": 4,
+    "blocked": 0
+  },
+  "scopeAssertions": [
+    "VAL-FS-001",
+    "VAL-FS-003",
+    "VAL-UI-001",
+    "VAL-UI-003",
+    "VAL-UI-006",
+    "VAL-UI-008"
+  ],
+  "testedThisRound": [
+    "VAL-FS-003",
+    "VAL-UI-001",
+    "VAL-UI-003",
+    "VAL-UI-006"
+  ],
+  "carriedForwardPassedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "passedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-FS-003",
+      "reason": "`mouseDaimonTuning` is gone, but frontend-owned old naming still remains in current source (`museRuntimeSnapshot`, `musePresenceId`, `requestedMusePresenceId`, and `Mouse daimon` comments)."
+    },
+    {
+      "id": "VAL-UI-001",
+      "reason": "The exact round-1 transparency classes were removed, but active panels still use translucent backgrounds such as `bg-sky-50/70`, `bg-white/5`, and `bg-transparent`."
+    },
+    {
+      "id": "VAL-UI-003",
+      "reason": "Earlier gradient/vignette residues are gone, but active user-visible copy still includes `galaxy model dock` and `in-galaxy management`."
+    },
+    {
+      "id": "VAL-UI-006",
+      "reason": "The live dashboard still shows visible narrative residue including `witness thread`, `view lens keeper`, `anchor registry`, `fork tax canticle`, `receipt river`, and `Glass lane preferred during low-priority cycle.`"
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": ".factory/validation/frontend-refactor/user-testing/synthesis.round1.json"
+}

@@ -853,7 +853,7 @@ export function ChatPanel({
   const checkpoint = lineageSnapshot?.checkpoint;
   const treeState = lineageSnapshot?.working_tree;
   const ledgerTitle = isObserverAgent
-    ? "Observer Thread Ledger / 観測スレッド台帳"
+    ? "Observer Continuity Ledger / 観測スレッド台帳"
     : "Agent Workspace Ledger / エージェント作業台帳";
 
   return (

@@ -183,7 +183,7 @@ export interface PresenceLearning {
 
 export interface Presence {
   id: string;
-  kind: string;  // e.g., "muse", "logos", "organizer", "concept", "resource"
+  kind: string;  // e.g., "agent", "logos", "organizer", "concept", "resource"
 
   // Core fields
   spec_embedding: number[];      // Purpose/lens embedding

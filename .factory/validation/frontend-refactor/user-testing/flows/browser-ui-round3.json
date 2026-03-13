@@ -1,0 +1,72 @@
+{
+  "groupId": "browser-ui-round3",
+  "testedAt": "2026-03-13T13:52:15.642589Z",
+  "isolation": {
+    "surface": "browser-ui",
+    "url": "http://127.0.0.1:5173",
+    "session": "browser-ui-r3",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3"
+  },
+  "toolsUsed": [
+    "agent-browser"
+  ],
+  "assertionResults": [
+    {
+      "id": "VAL-UI-001",
+      "status": "pass",
+      "reason": "The live dashboard rendered active panels as solid dark navy surfaces in the screenshots. No user-visible glass/translucent panel effect was observed while inspecting the mounted page, even though one DOM-inspected section used an opaque dark gradient background image over a transparent base color.",
+      "evidence": [
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dashboard-panel-area.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dashboard-full.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dom-observations.json"
+      ]
+    },
+    {
+      "id": "VAL-UI-003",
+      "status": "pass",
+      "reason": "The rendered page showed a clean dark background without visible galaxy, parallax, vignette, or star-field effects. The visible text captured from the page did not include 'galaxy model dock' or 'in-galaxy management'; the button text was simply 'model dock'.",
+      "evidence": [
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dashboard-panel-area.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dashboard-full.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/body-text.txt",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dom-observations.json"
+      ]
+    },
+    {
+      "id": "VAL-UI-006",
+      "status": "fail",
+      "reason": "Narrative residue is still visible in live user-facing labels and status copy. The page text and screenshots showed 'witness thread', 'view lens keeper', 'anchor registry', 'fork tax canticle', 'receipt river', and 'Glass lane preferred during low-priority cycle.'",
+      "evidence": [
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dashboard-panel-area.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dashboard-full.png",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/body-text.txt",
+        "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/browser-ui-r3/dom-observations.json"
+      ]
+    }
+  ],
+  "frictions": [
+    {
+      "description": "The Threat Radar card visibly showed 'Failed to fetch' during inspection because backend-connected data was unavailable.",
+      "resolved": true,
+      "resolution": "Per the assignment, this was treated as expected backend absence and the validation stayed focused on user-visible labels/backgrounds.",
+      "affectedAssertions": [
+        "VAL-UI-001",
+        "VAL-UI-003",
+        "VAL-UI-006"
+      ]
+    },
+    {
+      "description": "agent-browser's network request capture returned 'No requests captured' for this session even though the UI displayed a failed-fetch state.",
+      "resolved": true,
+      "resolution": "Used screenshots, extracted body text, console/error output, and DOM inspection instead of relying on the network capture output.",
+      "affectedAssertions": [
+        "VAL-UI-001",
+        "VAL-UI-003",
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Validated VAL-UI-001, VAL-UI-003, and VAL-UI-006 on the live Vite dashboard. Active panels visibly render as solid dark surfaces and no galaxy/parallax background residue was seen, but narrative labels remain visible in multiple panels and status lines, so VAL-UI-006 still fails."
+}

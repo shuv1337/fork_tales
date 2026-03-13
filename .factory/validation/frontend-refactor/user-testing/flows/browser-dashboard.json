@@ -1,0 +1,109 @@
+{
+  "groupId": "browser-dashboard",
+  "testedAt": "2026-03-13T13:23:31Z",
+  "isolation": {
+    "surface": "browser-ui",
+    "appUrl": "http://127.0.0.1:5173",
+    "session": "d01f85e9d779__u1",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "reportPath": "/home/shuv/repos/fork_tales/.factory/validation/frontend-refactor/user-testing/flows/browser-dashboard.json",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/ui-browser"
+  },
+  "toolsUsed": [
+    "agent-browser",
+    "Read",
+    "Execute"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-UI-006",
+      "title": "Narrative labels stripped",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Open the shared dashboard and inspect visible panel titles, status copy, and control labels.",
+          "expected": "User-facing labels are neutral and technical throughout the dashboard.",
+          "observed": "The dashboard rendered, but visible labels still included 'witness thread', 'Presence Operating Rail', 'Fork Tax Canticle', 'Receipt River', and 'galaxy sweep'."
+        },
+        {
+          "action": "Compare renamed headings with the rest of the visible UI.",
+          "expected": "All panels/tooltips/buttons/status text should match the neutral naming cleanup.",
+          "observed": "Some headings were neutralized (for example 'Simulation Viewport' and 'Agent Creator'), but multiple visible cards and status lines still carried narrative terminology."
+        }
+      ],
+      "evidence": {
+        "screenshots": [
+          "frontend-refactor/ui-browser/dashboard-full.png",
+          "frontend-refactor/ui-browser/dashboard-annotated-full.png"
+        ],
+        "consoleErrors": "none observed via agent-browser errors during load and inspection",
+        "network": "Tracked repeated GET requests to http://127.0.0.1:9787/api/simulation?perspective=hybrid&payload=trimmed and http://127.0.0.1:9787/api/agent/threat-radar/report?window_ticks=1440&limit=16."
+      },
+      "issues": "Visible narrative residue remains in panel labels and status copy, so the UI text cleanup is incomplete."
+    },
+    {
+      "id": "VAL-UI-007",
+      "title": "Clean dark dashboard appearance",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Capture a full-page screenshot of the rendered dashboard.",
+          "expected": "The app should present as a clean dark dashboard with solid dark surfaces and no mystical/cosmic effects.",
+          "observed": "The dashboard rendered on solid dark navy/black panels and background surfaces, with no obvious glass, parallax, or cosmic backdrop effects visible in the page render."
+        },
+        {
+          "action": "Visually inspect contrast and overall theme consistency across the visible layout.",
+          "expected": "The overall appearance should be professionally dark and readable.",
+          "observed": "The overall theme reads as a dark technical dashboard with generally adequate contrast, even though the content density is high."
+        }
+      ],
+      "evidence": {
+        "screenshots": [
+          "frontend-refactor/ui-browser/dashboard-full.png",
+          "frontend-refactor/ui-browser/dashboard-annotated-full.png"
+        ],
+        "consoleErrors": "none observed via agent-browser errors during load and inspection",
+        "network": "Same tracked 9787 API requests were observed during the render, without uncaught JavaScript errors."
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-UI-008",
+      "title": "All panels visible and functional",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Inspect all visible dashboard panes, sidebars, and card stacks after initial load.",
+          "expected": "All visible panels render with readable content and appear usable from the user perspective.",
+          "observed": "All major panels mounted, but several lanes were extremely narrow with cramped/clipped text, and the Threat Radar card displayed 'Failed to fetch'."
+        },
+        {
+          "action": "Check for browser-side rendering failures while reviewing the layout.",
+          "expected": "Panels should stay stable without rendering errors or broken UI sections.",
+          "observed": "No uncaught JavaScript errors were reported, but the degraded panel readability means the dashboard does not fully meet the visible/functional expectation."
+        }
+      ],
+      "evidence": {
+        "screenshots": [
+          "frontend-refactor/ui-browser/dashboard-full.png",
+          "frontend-refactor/ui-browser/dashboard-annotated-full.png"
+        ],
+        "consoleErrors": "none observed via agent-browser errors during load and inspection",
+        "network": "Visible frontend traffic targeted the 9787 API endpoints noted above; the page remained mounted while the Threat Radar panel showed a failed-fetch state."
+      },
+      "issues": "The UI stays mounted, but multiple panels are visually degraded by the compressed layout and at least one visible card is already in a failed-fetch state."
+    }
+  ],
+  "frictions": [
+    {
+      "description": "The shared frontend rendered while polling API endpoints on port 9787, and one visible card entered a failed-fetch state even though the milestone notes already warned that backend-connected data might not be reliable.",
+      "resolved": true,
+      "resolution": "Kept the assessment scoped to frontend render quality, visible text, panel availability, and absence of uncaught JavaScript errors.",
+      "affectedAssertions": [
+        "VAL-UI-008"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Tested 3 browser UI assertions on the shared Vite dashboard: 1 passed (VAL-UI-007) and 2 failed (VAL-UI-006, VAL-UI-008). The app rendered successfully in the browser and no uncaught JavaScript errors were observed during inspection."
+}

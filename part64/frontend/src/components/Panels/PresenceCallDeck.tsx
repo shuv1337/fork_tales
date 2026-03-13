@@ -471,7 +471,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
       <header className="border-b border-white/5 pb-4">
         <div className="flex justify-between items-start">
           <h2 className="text-2xl font-bold mb-1 text-ink tracking-tight">Particle Deck</h2>
-          <div className="px-2 py-0.5 rounded bg-white/5 text-[12px] font-mono text-muted border border-white/5">
+          <div className="px-2 py-0.5 rounded bg-[#1e293b] text-[12px] font-mono text-muted border border-[#334155]">
             WEBRTC LANE
           </div>
         </div>
@@ -530,8 +530,8 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
             </p>
             <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
               callStatus === 'connected' 
-                ? 'bg-[#a6e22e]/10 border-[#a6e22e]/30 text-[#a6e22e]' 
-                : 'bg-white/5 border-white/10 text-muted'
+                ? 'bg-[#1a2e1a] border-[#a6e22e]/30 text-[#a6e22e]' 
+                : 'bg-[#1e293b] border-[#334155] text-muted'
             }`}>
               {formatCallStatus(callStatus)}
               {activePresenceId ? ` : ${activePresenceId}` : ''}
@@ -550,7 +550,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
           </div>
           
           {callError ? (
-            <div className="text-xs text-[#f92672] bg-[#f92672]/10 p-2 rounded border border-[#f92672]/20 flex items-center gap-2">
+            <div className="text-xs text-[#f92672] bg-[#2e1a1e] p-2 rounded border border-[#f92672]/20 flex items-center gap-2">
                <span>⚠️</span> {callError}
             </div>
           ) : null}
@@ -562,7 +562,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               placeholder={`Message ${selectedPresence?.name.en ?? "Presence"}...`}
-              className="w-full min-h-[80px] rounded-lg bg-transparent px-4 py-3 text-sm text-ink outline-none resize-none placeholder:text-muted/50"
+              className="w-full min-h-[80px] rounded-lg bg-[#1a1a2e] px-4 py-3 text-sm text-ink outline-none resize-none placeholder:text-muted/50"
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
@@ -575,7 +575,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
                 type="button"
                 onClick={() => void askPresence()}
                 disabled={isAsking || !question.trim()}
-                className="btn-base flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-xs font-medium border border-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="btn-base flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#1e293b] hover:bg-[#2a3042] text-xs font-medium border border-[#334155] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 <SendHorizontal size={12} />
                 {isAsking ? "Sending..." : "Send"}

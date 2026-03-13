@@ -1,0 +1,93 @@
+{
+  "milestone": "frontend-refactor",
+  "round": 1,
+  "status": "fail",
+  "generatedAt": "2026-03-13T13:25:20+00:00",
+  "assertionsSummary": {
+    "total": 15,
+    "passed": 9,
+    "failed": 6,
+    "blocked": 0
+  },
+  "scopeAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-003",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-001",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-006",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "testedThisRound": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-003",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-001",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-006",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "carriedForwardPassedAssertions": [],
+  "passedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-FS-001",
+      "reason": "App.tsx is decomposed, but the decomposition target is not met because several child component files remain far above the ~800-line threshold."
+    },
+    {
+      "id": "VAL-FS-003",
+      "reason": "The frontend type surface is only partially renamed; old property and state naming still appears in source and tests."
+    },
+    {
+      "id": "VAL-UI-001",
+      "reason": "Semi-transparent backgrounds remain in live panel TSX code, so the UI is not fully on solid dark surfaces."
+    },
+    {
+      "id": "VAL-UI-003",
+      "reason": "Cosmic visual residue persists in inline TSX gradients and in active vignette/galaxy-related runtime naming."
+    },
+    {
+      "id": "VAL-UI-006",
+      "reason": "Visible narrative residue remains in panel labels and status copy, so the UI text cleanup is incomplete."
+    },
+    {
+      "id": "VAL-UI-008",
+      "reason": "The UI stays mounted, but multiple panels are visually degraded by the compressed layout and at least one visible card is already in a failed-fetch state."
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [
+    {
+      "target": "user-testing.md",
+      "description": "Recorded that the frontend-refactor dashboard polls port 9787 for simulation/threat-radar data and can surface a visible Failed to fetch state without uncaught JavaScript errors.",
+      "source": "flow-report"
+    }
+  ],
+  "previousRound": null
+}

@@ -32,6 +32,7 @@ Testing surface, resource classification, and validation approach.
 - Some panels may show "loading" states without backend data
 - The simulation canvas renders colored dots representing particles
 - During the 2026-03-13 file-cleanup validation run, `http://127.0.0.1:8787/` and `/api/catalog` both returned HTTP 404 from the live service on port 8787, so browser validation for this milestone should focus on successful frontend render and absence of uncaught JavaScript errors rather than backend-connected data.
+- During the 2026-03-13 frontend-refactor validation run, the frontend issued repeated GET requests to `http://127.0.0.1:9787/api/simulation?perspective=hybrid&payload=trimmed` and `http://127.0.0.1:9787/api/agent/threat-radar/report?window_ticks=1440&limit=16`; the page stayed mounted without uncaught JavaScript errors, but the Threat Radar card showed `Failed to fetch`.
 
 ## Flow Validator Guidance: repo-shell
 - Scope: filesystem presence checks, ripgrep residue checks, and baseline test commands.

@@ -1,0 +1,72 @@
+{
+  "groupId": "repo-shell-round3",
+  "testedAt": "2026-03-13T13:51:23Z",
+  "assertionResults": [
+    {
+      "id": "VAL-FS-003",
+      "status": "fail",
+      "reason": "Frontend-owned old naming still exists in live TS/TSX source even after separating backend interop fields. `museRuntimeSnapshot`, `musePresenceId`, `requestedMusePresenceId`, `ghostPulse`, and `Mouse daimon` comments remain in local variables, hook APIs, and comments; backend wire fields such as `muse_runtime`, `muse_id`, `witness_thread`, and `daimoi_probabilistic` were distinguished as interop and were not the failure basis by themselves.",
+      "evidence": [
+        "part64/frontend/src/App.tsx:233 stores backend `catalog?.muse_runtime` in frontend-local identifier `museRuntimeSnapshot`.",
+        "part64/frontend/src/hooks/useAgentHandlers.ts:60-73 still exposes frontend hook parameters `musePresenceId` and `requestedMusePresenceId`.",
+        "part64/frontend/src/components/Simulation/Canvas.tsx:43 and 2337 still contain `Mouse daimon` / `Mouse Daimon` comments in active source.",
+        "part64/frontend/src/components/Panels/InspirationAtlasPanel.tsx:81-87 still uses frontend-local `ghostPulse` while reading backend `presence_dynamics?.ghost`.",
+        "Backend interop fields were reviewed separately (for example `muse_runtime`, `muse_id`, `witness_thread`, `fork_tax`, `daimoi_probabilistic`) and were not counted as standalone failures without frontend-owned residue."
+      ]
+    },
+    {
+      "id": "VAL-UI-001",
+      "status": "fail",
+      "reason": "The obvious `rgba(...)` residues are gone, but active frontend source still contains translucent UI backgrounds. A live content container in WorldSimulation still uses `bg-sky-50/70`, so panel/content surfaces are not uniformly solid dark backgrounds yet.",
+      "evidence": [
+        "`rg -n 'rgba\\(' /home/shuv/repos/fork_tales/part64/frontend/src --glob '**/*.{ts,tsx,css}'` returned no matches.",
+        "part64/frontend/src/components/Panels/WorldSimulation.tsx:81-90 renders `<section className=\"border border-line rounded-xl bg-sky-50/70 p-3\">`, which is a translucent content container rather than a small accent pill.",
+        "part64/frontend/src/components/Simulation/Canvas.tsx:6899-6904 also renders a transparent/opacity-based overlay background (`bg-[linear-gradient(transparent_0%,#22283e_48%,transparent_100%)] ... opacity-40`) in the active simulation view."
+      ]
+    },
+    {
+      "id": "VAL-UI-003",
+      "status": "fail",
+      "reason": "Earlier parallax/vignette/star-field residues appear removed, and the functional component name `GalaxyModelDock` was not treated as a failure by itself. The assertion still fails because active rendered copy continues to use galaxy wording.",
+      "evidence": [
+        "`rg -ni 'parallax|vignette|star-field|cosmic' /home/shuv/repos/fork_tales/part64/frontend/src --glob '**/*.{ts,tsx,css}'` returned no matches.",
+        "part64/frontend/src/components/Simulation/GalaxyModelDock.tsx:701-703 renders the visible strings `galaxy model dock` and `Merged from proxy gateway interface for in-galaxy management.`",
+        "part64/frontend/src/components/Simulation/Canvas.tsx:9 and 6830 only reference the `GalaxyModelDock` component name/functionally; the fail basis here is the user-visible text in the dock itself."
+      ]
+    },
+    {
+      "id": "VAL-UI-006",
+      "status": "fail",
+      "reason": "Exact older labels like `Glass Viewport`, `Daimoi Presence`, and `Muse Forge` are no longer the primary issue, but active user-visible copy still includes narrative/stylized labels. Raw backend IDs such as `witness_thread` were treated as backend interop; the failure comes from rendered labels and messages such as `Glass lane awaiting presence`, `transparent standby viewport`, `ghost trails`, `hologram worldscreen`, and `Observer Thread Ledger`.",
+      "evidence": [
+        "part64/frontend/src/components/App/WorldPanelsViewport.tsx:1442-1449 renders `Glass lane awaiting presence`, `transparent standby viewport`, and glass-lane guidance copy.",
+        "part64/frontend/src/components/App/WorldPanelsViewport.tsx:245 says `Use the transparent viewport to track motion and steer where attention lands.`",
+        "part64/frontend/src/components/Simulation/Canvas.tsx:6807 renders `ghost trails: smart particles keep short path memory for easier tracing.`",
+        "part64/frontend/src/components/Simulation/Canvas.tsx:6901-6907 renders `hologram worldscreen / 投影スクリーン` in the active simulation UI.",
+        "part64/frontend/src/components/Panels/Chat.tsx:855-861 titles a mode `Observer Thread Ledger / 観測スレッド台帳`, which is a mapped display label rather than a raw backend field name."
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "LS",
+    "Read",
+    "Grep",
+    "ApplyPatch",
+    "Execute"
+  ],
+  "frictions": [
+    {
+      "description": "This assignment was repo-shell only, so evidence had to be collected from source inspection rather than screenshots/browser captures.",
+      "resolved": true,
+      "resolution": "Recorded concrete grep and file-line evidence directly in the JSON report.",
+      "affectedAssertions": [
+        "VAL-FS-003",
+        "VAL-UI-001",
+        "VAL-UI-003",
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Repo-shell round 3 checked VAL-FS-003, VAL-UI-001, VAL-UI-003, and VAL-UI-006 against current frontend source. All four still fail: frontend-owned old naming remains, a translucent content background is still present, galaxy wording is still rendered in GalaxyModelDock, and multiple user-visible narrative/stylized labels remain in the viewport/chat/simulation UI."
+}

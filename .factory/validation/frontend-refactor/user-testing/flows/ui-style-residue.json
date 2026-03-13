@@ -1,0 +1,165 @@
+{
+  "groupId": "ui-style-residue",
+  "testedAt": "2026-03-13T13:19:34Z",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "reportPath": "/home/shuv/repos/fork_tales/.factory/validation/frontend-refactor/user-testing/flows/ui-style-residue.json",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/frontend-refactor/ui-style-residue"
+  },
+  "toolsUsed": [
+    "Read",
+    "Grep",
+    "Execute"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-UI-001",
+      "title": "No transparency backgrounds",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Search frontend CSS/TSX/TS for rgba(alpha) and slash-alpha background utilities",
+          "expected": "No transparent panel/container backgrounds remain",
+          "observed": "No rgba(alpha) backgrounds were found, but slash-alpha utility backgrounds were still present."
+        },
+        {
+          "action": "Review matched panel/control source lines",
+          "expected": "Panels use solid dark backgrounds only",
+          "observed": "WorldSimulation.tsx still uses bg-white/70, bg-sky-50/70, and bg-white/55; PresenceCallDeck.tsx still uses bg-white/5, bg-black/40, bg-[#a6e22e]/10, bg-[#f92672]/10, and bg-transparent."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/ui-style-residue/rg-transparency.txt",
+          "frontend-refactor/ui-style-residue/assessment-notes.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": "Semi-transparent backgrounds remain in live panel TSX code, so the UI is not fully on solid dark surfaces."
+    },
+    {
+      "id": "VAL-UI-002",
+      "title": "No glass-morphism effects",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Search frontend CSS/TSX/TS for backdrop-filter, blur(), backdrop-blur, and blur-*",
+          "expected": "No glass-morphism implementation remains",
+          "observed": "No matches were found."
+        },
+        {
+          "action": "Review remaining backdrop/glass naming hits separately",
+          "expected": "Only implementation evidence should fail this assertion",
+          "observed": "Remaining backdrop/glass strings are naming/text residue, not blur-based styling."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/ui-style-residue/rg-effects.txt",
+          "frontend-refactor/ui-style-residue/assessment-notes.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-UI-003",
+      "title": "No galaxy/parallax backgrounds",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Search frontend CSS/TSX/TS for parallax, vignette, galaxy, star-field, and radial-gradient residue",
+          "expected": "No cosmic background treatment or related control residue remains",
+          "observed": "No parallax/star-field hits were found, but vignette controls, galaxy labels, and a radial-gradient overlay were still present."
+        },
+        {
+          "action": "Review matched runtime UI sources",
+          "expected": "No inline cosmic gradients or galaxy/vignette UI residue remains",
+          "observed": "Canvas.tsx still renders a radial-gradient overlay; coreSimulationConfig.ts and useSimulationTuning.ts still expose vignette tuning; GalaxyModelDock.tsx and CoreBackdrop.tsx still carry galaxy wording."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/ui-style-residue/rg-effects.txt",
+          "frontend-refactor/ui-style-residue/rg-transparency.txt",
+          "frontend-refactor/ui-style-residue/assessment-notes.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": "Cosmic visual residue persists in inline TSX gradients and in active vignette/galaxy-related runtime naming."
+    },
+    {
+      "id": "VAL-UI-004",
+      "title": "Readable typography",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Inspect base typography declarations in index.css",
+          "expected": "Base font size falls in the 14-16px range",
+          "observed": "body is set to 14px in index.css."
+        },
+        {
+          "action": "Search for 10px/11px text declarations in CSS/TSX/TS",
+          "expected": "No dashboard text below 12px remains",
+          "observed": "No 10px/11px text declarations were found; smallest observed text utilities were 12px/text-xs."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/ui-style-residue/rg-typography-and-classes.txt",
+          "frontend-refactor/ui-style-residue/assessment-notes.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-UI-005",
+      "title": "Semantic CSS classes",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Search frontend CSS/TSX/TS for mindfuck residue",
+          "expected": "No mindfuck-* classes or references remain",
+          "observed": "No matches were found."
+        },
+        {
+          "action": "Review stylesheet selector naming samples",
+          "expected": "Selectors use descriptive naming",
+          "observed": "Selectors are descriptive, e.g. simulation-core-*, world-panel-*, world-focus-*, dashboard-*."
+        }
+      ],
+      "evidence": {
+        "shellEvidence": [
+          "frontend-refactor/ui-style-residue/rg-typography-and-classes.txt",
+          "frontend-refactor/ui-style-residue/assessment-notes.txt"
+        ],
+        "consoleErrors": "not checked (repo-shell validation scope)",
+        "network": "not applicable"
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [
+    {
+      "description": "This group was assigned to the repo-shell surface, so screenshot/browser evidence from the UI was out of scope even though the contract describes screenshot examples.",
+      "resolved": true,
+      "resolution": "Captured shell-based evidence files and source excerpts under the assigned mission evidence directory instead.",
+      "affectedAssertions": [
+        "VAL-UI-001",
+        "VAL-UI-002",
+        "VAL-UI-003",
+        "VAL-UI-004",
+        "VAL-UI-005"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Tested 5 UI style residue assertions via repo-shell inspection: 3 passed (VAL-UI-002/004/005) and 2 failed (VAL-UI-001/003). Failures were caused by remaining semi-transparent backgrounds plus surviving cosmic gradient/vignette/galaxy residue in frontend TSX/config code."
+}

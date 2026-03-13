@@ -1,0 +1,184 @@
+{
+  "groupId": "frontend-structure",
+  "testedAt": "2026-03-13T13:14:30Z",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "scope": "read-only inspection plus report/evidence writes under assigned paths"
+  },
+  "toolsUsed": [
+    "Read",
+    "LS",
+    "Glob",
+    "Grep",
+    "python3",
+    "npx vitest",
+    "npx tsc"
+  ],
+  "commandsRun": [
+    "python3 (line counts for App.tsx and component files)",
+    "python3 (component directory listing)",
+    "rg -n \\b(Daimoi|DaimoiPacket|DaimoiProbabilisticSummary|MythSummary|WorldPerson|WorldSong|WorldBook|GhostRoleState|ForkTaxState|WitnessThreadState|BraidThread|BraidDiagnostics|Echo)\\b part64/frontend/src -g **/*.{ts,tsx}",
+    "rg -n \u03b7\u03bc\\.(daimon|daimoi-packet|muse|resource-daimoi)[^\"'\\s]* /home/shuv/repos/fork_tales -g **/*.{py,ts,tsx}",
+    "rg -n (DaimoiPresencePanel|MythWorld|museWorkspace|daimoi-presence\\.spec\\.ts) /home/shuv/repos/fork_tales/part64/frontend -g **/*.{ts,tsx}",
+    "rg -n export interface (ParticlePacket|ParticleProbabilisticSummary|AttributionSummary|WorldActor|WorldTrack|WorldReport|ForkCostState|AutoAgentState|ContinuityState|DiagnosticThread|DiagnosticBundle|TextOverlay) part64/frontend/src/types/index.ts",
+    "rg -n \\b(mouseDaimonTuning|daimoi_probabilistic|witness_thread|fork_tax|ghost|myth|echoes|people|songs|books)\\b part64/frontend/src -g **/*.{ts,tsx}",
+    "cd /home/shuv/repos/fork_tales/part64/frontend && npx vitest run --exclude e2e/**",
+    "cd /home/shuv/repos/fork_tales/part64/frontend && npx tsc -b --pretty false"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-BR-006",
+      "title": "Record type strings updated",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Search Python and TypeScript files for old record strings",
+          "expected": "No \u03b7\u03bc.daimon / \u03b7\u03bc.daimoi-packet / \u03b7\u03bc.muse / resource-daimoi matches remain",
+          "observed": "No matches found"
+        },
+        {
+          "action": "Search for replacement particle/resource-particle record strings",
+          "expected": "New neutral record strings appear in backend/frontend definitions",
+          "observed": "Found \u03b7\u03bc.particle.v1, \u03b7\u03bc.particle-packet.v1, and eta-mu.resource-particle-* records"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/grep-checks.txt"
+        ],
+        "details": "Old record strings grep returned no matches; replacement record strings are present in part64/code/world_web/* and part64/frontend/src/types/index.ts."
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-001",
+      "title": "App.tsx decomposed",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Measure App.tsx and component file line counts",
+          "expected": "App.tsx thin shell and no component file over ~800 lines",
+          "observed": "App.tsx is 353 lines, but multiple component files exceed 800 lines"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/structure-metrics.txt"
+        ],
+        "details": "WorldPanelsViewport.tsx (2449), Chat.tsx (1348), RuntimeConfigPanel.tsx (1858), WebGraphWeaverPanel.tsx (1954), Canvas.tsx (7383), and GalaxyModelDock.tsx (1110) exceed the target size."
+      },
+      "issues": "App.tsx is decomposed, but the decomposition target is not met because several child component files remain far above the ~800-line threshold."
+    },
+    {
+      "id": "VAL-FS-002",
+      "title": "Component organization",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "List src/components directory structure",
+          "expected": "Components grouped into logical subdirectories",
+          "observed": "Found App, Panels, Simulation, and layout subdirectories with focused files under each"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/structure-metrics.txt"
+        ],
+        "details": "The component tree is organized by concern under src/components/App, src/components/Panels, src/components/Simulation, and src/components/layout."
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-003",
+      "title": "TypeScript types renamed",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Search for old interface/type names",
+          "expected": "Old exported type names are gone",
+          "observed": "No old exported type names matched"
+        },
+        {
+          "action": "Search for renamed interface exports and residual property/state names",
+          "expected": "New names are present and old naming residues are gone from properties/state hooks",
+          "observed": "New interfaces exist, but many residual property/state names remain"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/grep-checks.txt"
+        ],
+        "details": "Renamed interfaces such as ParticlePacket and AttributionSummary exist, but residual terms remain in code and types, including mouseDaimonTuning, witness_thread, fork_tax, ghost, daimoi_probabilistic, world.people/songs/books, myth, and echoes."
+      },
+      "issues": "The frontend type surface is only partially renamed; old property and state naming still appears in source and tests."
+    },
+    {
+      "id": "VAL-FS-004",
+      "title": "Frontend tests pass",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run vitest baseline command",
+          "expected": "Pass rate stays at or above the accepted baseline of 111 passing / 12 failing",
+          "observed": "Vitest reported 111 passing and 12 failing tests"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/vitest-output.txt"
+        ],
+        "details": "npx vitest run --exclude e2e/** exited 1 with the documented accepted baseline of 111 passing / 12 failing."
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-005",
+      "title": "TypeScript compiles clean",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run TypeScript build check",
+          "expected": "tsc -b completes with zero errors",
+          "observed": "npx tsc -b --pretty false exited 0 with no errors printed"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/tsc-output.txt"
+        ],
+        "details": "TypeScript build check completed successfully with exit code 0."
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-FS-006",
+      "title": "Frontend component and module files renamed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Inspect frontend file tree",
+          "expected": "Renamed component/module files are present",
+          "observed": "ParticleDeckPanel.tsx, WorldSimulation.tsx, and app/agentWorkspace.ts are present in the frontend tree"
+        },
+        {
+          "action": "Search for old file/module names in frontend source",
+          "expected": "No DaimoiPresencePanel / MythWorld / museWorkspace / daimoi-presence.spec.ts references remain",
+          "observed": "No matches found"
+        }
+      ],
+      "evidence": {
+        "files": [
+          "frontend-refactor/structure-shell/structure-metrics.txt",
+          "frontend-refactor/structure-shell/grep-checks.txt"
+        ],
+        "details": "The current tree contains renamed files and grep found no residue for the old module/file names checked by the contract."
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 7 assigned assertions for frontend-refactor structure shell validation: 5 passed and 2 failed (VAL-FS-001 and VAL-FS-003)."
+}

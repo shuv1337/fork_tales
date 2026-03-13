@@ -192,7 +192,7 @@ async function requestSayCommand(
     }),
   });
   if (!response.ok) {
-    throw new Error(`muse say request failed (${response.status})`);
+    throw new Error(`agent say request failed (${response.status})`);
   }
 
   return (await response.json()) as SayCommandResponse;

@@ -190,7 +190,7 @@ function presenceRoleDescription(role: string): string {
     return "Schedules compute lanes and runtime pressure response.";
   }
   if (normalized === "camera-guidance") {
-    return "Keeps a glass-first camera lane and nudges map view gently.";
+    return "Keeps a simulation-first camera lane and nudges map view gently.";
   }
   return "Neutral emitter: particles follow field influence and collisions.";
 }
@@ -242,7 +242,7 @@ function glassObservationPrompt(panel: SortedPanel): string {
     return "Watch pressure gradients and identify the hottest compute corridor.";
   }
   if (role === "camera-guidance") {
-    return "Use the transparent viewport to track motion and steer where attention lands.";
+    return "Use the simulation viewport to track motion and steer where attention lands.";
   }
   return "Observe neutral field movement and where trajectories begin converging.";
 }
@@ -757,7 +757,7 @@ function WorldPanelsViewportInner({
     }
     const cue = anchor
       ? `camera moved to ${anchor.label}; ${glassInteractionPrompt(panel)}`
-      : `glass interface active; ${glassInteractionPrompt(panel)}`;
+      : `simulation interface active; ${glassInteractionPrompt(panel)}`;
     setJobNoteByPanelId((prev) => ({
       ...prev,
       [panelId]: cue,
@@ -1445,8 +1445,8 @@ function WorldPanelsViewportInner({
           <div className="world-glass-pane world-glass-pane-empty-lane">
             <p className="world-glass-title">standby viewport</p>
             <div className="world-glass-grid">
-              <p className="world-glass-row">This lane remains glass until a presence is focused here.</p>
-              <p className="world-glass-row">Council votes can move glass panes forward when simulation view is preferred.</p>
+              <p className="world-glass-row">This lane remains empty until a presence is focused here.</p>
+              <p className="world-glass-row">Panel votes can move simulation panes forward when simulation view is preferred.</p>
               <p className="world-glass-row">Use side task tray cards to move a presence into this lane.</p>
             </div>
           </div>
@@ -1629,7 +1629,7 @@ function WorldPanelsViewportInner({
           <>
             <p className="world-focus-reason world-focus-reason-muted">{presenceRoleDescription(panel.presenceRole)}</p>
             {preferredGlassPrimary ? (
-              <p className="world-focus-reason">preferred simulation frame: glass overlay stays primary when demand is low.</p>
+              <p className="world-focus-reason">preferred simulation frame: simulation overlay stays primary when demand is low.</p>
             ) : null}
             {paneLocked ? <p className="world-focus-reason">mouse lock: pane holds this card</p> : null}
             {pendingShift ? (
@@ -1743,14 +1743,14 @@ function WorldPanelsViewportInner({
                 <button
                   type="button"
                   className="world-focus-action"
-                  title={paneMode === "glass" ? "switch back to panel view" : "switch to glass simulation view"}
+                  title={paneMode === "glass" ? "switch back to panel view" : "switch to simulation overlay view"}
                   onClick={() => togglePanelGlassMode(panel, anchor)}
                 >
                   {panel.id === GLASS_VIEWPORT_PANEL_ID
-                    ? "glass fixed"
+                    ? "sim fixed"
                     : paneMode === "glass"
                       ? "panel"
-                      : "glass"}
+                      : "sim"}
                 </button>
               ) : null}
               {detailsOpen ? (
@@ -1978,8 +1978,8 @@ function WorldPanelsViewportInner({
             onClick={() => togglePanelGlassMode(panel, anchor)}
           >
             {panel.id === GLASS_VIEWPORT_PANEL_ID
-              ? "glass fixed"
-              : paneMode === "glass" ? "panel" : "glass"}
+              ? "sim fixed"
+              : paneMode === "glass" ? "panel" : "sim"}
           </button>
           <button
             type="button"
@@ -2433,7 +2433,7 @@ function WorldPanelsViewportInner({
                   guidePanelThroughGlass(panel, anchor);
                   onAdjustPanelCouncilRank(panel.id, 1);
                 }}
-                title={`${panel.presenceLabel} · click focus · double click glass + promote`}
+                title={`${panel.presenceLabel} · click focus · double click sim + promote`}
               >
                 <span className="world-unity-mobile-dock-core">{panelGlyph(panel.presenceId, panel.id)}</span>
                 <span className="world-unity-mobile-dock-label">{panel.presenceLabel}</span>

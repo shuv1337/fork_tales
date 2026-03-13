@@ -5937,7 +5937,7 @@ export function SimulationCanvas({
         });
         if (metaRef.current) {
           metaRef.current.textContent = openWorldscreen
-            ? `hologram opened: ${hit.label}`
+            ? `detail view opened: ${hit.label}`
             : `focused node: ${hit.label}`;
         }
         pulseAt(nodeXRatio, nodeYRatio, 1.0, hit.id);
@@ -6574,10 +6574,10 @@ export function SimulationCanvas({
             )}
             <p className="mt-1 text-[12px] text-[#bcd8ef]">{activeOverlayView.description}</p>
             <p className="mt-1 text-[12px] text-[#9fc7e3]">
-              swarm mode braids nearby packets by owner + direction.
+              swarm mode groups nearby packets by owner + direction.
             </p>
             {interactive ? (
-              <p className="mt-1 text-[12px] text-[#c4d7f0]">single tap centers nexus in viewport · double tap opens hologram / 単タップで中心化・ダブルで起動</p>
+              <p className="mt-1 text-[12px] text-[#c4d7f0]">single tap centers nexus in viewport · double tap opens detail view / 単タップで中心化・ダブルで起動</p>
             ) : null}
             <div className="mt-2 rounded border border-[#385168] bg-[#111a2b] px-2 py-1.5">
               <p className="text-[12px] uppercase tracking-[0.11em] text-[#9fd5f2]">mp3 nexus tools</p>

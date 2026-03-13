@@ -1,0 +1,63 @@
+{
+  "groupId": "repo-shell-round4",
+  "testedAt": "2026-03-13T14:13:32Z",
+  "assertionResults": [
+    {
+      "id": "VAL-FS-003",
+      "status": "fail",
+      "reason": "The exact legacy type-name grep came back clean, but non-test frontend source still contains frontend-owned old naming in comments, local identifiers, and local strings after excluding allowed backend wire-format reads.",
+      "evidence": [
+        "`part64/frontend/src/hooks/useAgentHandlers.ts:226` still contains the frontend comment `// --- Create muse ---`.",
+        "`part64/frontend/src/hooks/useAgentHandlers.ts:382-388` still creates the local identifier `const muse = payload.muse ...`, then reads `muse?.id` / `muse?.label`.",
+        "`part64/frontend/src/hooks/useAgentHandlers.ts:453-454` still uses the local hash seed string `|daimon|` in active overlay logic.",
+        "`part64/frontend/src/types/index.ts:186` still documents presence kinds with the comment `e.g., \"muse\", \"logos\", ...`.",
+        "`part64/frontend/src/app/useChatCommandHandlers.ts:195` still throws `muse say request failed (...)` in non-test source.",
+        "Allowed backend interop reads such as `catalog.muse_runtime`, `payload.muse`, `payload.daimoi`, `eventRow.muse_id`, and `presence_dynamics.witness_thread` were reviewed separately and were not counted as failures by themselves."
+      ]
+    },
+    {
+      "id": "VAL-UI-001",
+      "status": "fail",
+      "reason": "`rgba(...)` panel backgrounds appear removed, but active TSX still uses translucent background classes in live panel UI instead of uniformly solid dark backgrounds.",
+      "evidence": [
+        "`rg -n 'rgba\\(' /home/shuv/repos/fork_tales/part64/frontend/src --glob '**/*.{css,ts,tsx}'` returned no matches.",
+        "`part64/frontend/src/components/Panels/PresenceCallDeck.tsx:474` renders a live panel badge with `bg-white/5`.",
+        "`part64/frontend/src/components/Panels/PresenceCallDeck.tsx:533-534` renders the signal-status pill with `bg-[#a6e22e]/10` or `bg-white/5`.",
+        "`part64/frontend/src/components/Panels/PresenceCallDeck.tsx:553` renders the error container with `bg-[#f92672]/10`.",
+        "`part64/frontend/src/components/Panels/PresenceCallDeck.tsx:565` keeps the message input background as `bg-transparent`, and `:578` keeps the send button at `bg-white/5` / `hover:bg-white/10`."
+      ]
+    },
+    {
+      "id": "VAL-UI-006",
+      "status": "fail",
+      "reason": "Several user-visible labels/messages in active source still use stylized or narrative wording even though the main panel titles have largely been neutralized.",
+      "evidence": [
+        "`part64/frontend/src/components/App/WorldPanelsViewport.tsx:245` still tells the user to `Use the transparent viewport to track motion and steer where attention lands.`",
+        "`part64/frontend/src/components/App/WorldPanelsViewport.tsx:1446-1450` still renders `standby viewport`, `This lane remains glass until a presence is focused here.`, and `Council votes can move glass panes forward...`.",
+        "`part64/frontend/src/components/Panels/Chat.tsx:856` still titles the observer view `Observer Thread Ledger / 観測スレッド台帳`.",
+        "`part64/frontend/src/components/Simulation/Canvas.tsx:6577-6580` still renders `swarm mode braids nearby packets by owner + direction.` and `double tap opens hologram`.",
+        "`part64/frontend/src/components/Simulation/Canvas.tsx:5940` still writes the user-facing status text `hologram opened: ...` when the worldscreen opens."
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "LS",
+    "Read",
+    "Grep",
+    "Execute",
+    "ApplyPatch"
+  ],
+  "frictions": [
+    {
+      "description": "Repo-shell validation required separating allowed backend wire-format residue from frontend-owned naming residue.",
+      "resolved": true,
+      "resolution": "Only local identifiers/comments/strings and active user-visible copy were counted as failures; raw backend access patterns on the right-hand side were treated as allowed per mission notes.",
+      "affectedAssertions": [
+        "VAL-FS-003",
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Repo-shell round 4 rechecked VAL-FS-003, VAL-UI-001, and VAL-UI-006 after the round-3 fixes. All three still fail: frontend-owned naming residue remains in non-test source, translucent backgrounds remain in PresenceCallDeck, and active visible copy still includes glass/transparent/observer-thread/braids/hologram wording. Read-only validators showed vitest still at the accepted 111 passing / 12 failing baseline, while eslint reported 0 errors and 94 warnings."
+}
