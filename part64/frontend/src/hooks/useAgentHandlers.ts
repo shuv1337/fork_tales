@@ -96,6 +96,8 @@ interface UseAgentHandlersParams {
   agentEvents: AgentEvent[] | undefined;
   handleAutopilotUserInput: (text: string) => boolean;
   handleChatCommand: (text: string, musePresenceId: string) => Promise<boolean>;
+  /** When false, skip the agentEvents processing side-effect (toasts, overlays, system messages). */
+  processEvents?: boolean;
 }
 
 export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersState & AgentHandlersActions {
@@ -108,6 +110,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     agentEvents,
     handleAutopilotUserInput,
     handleChatCommand,
+    processEvents = true,
   } = params;
 
   const [activeAgentPresenceId, setActiveAgentPresenceId] = useState("witness_thread");
@@ -489,8 +492,9 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     if (safeReply.includes("[[TONE]]") || overlayTags.includes("[[TONE]]")) overlayApi?.singAll?.();
   }, [activeAgentPresenceId, emitChatMessage, emitUiToast, openAgentImage, overlayApi, playAgentAudio]);
 
-  // --- Muse events effect ---
+  // --- Muse events effect (skipped when processEvents is false) ---
   useEffect(() => {
+    if (!processEvents) return;
     if (!Array.isArray(agentEvents) || agentEvents.length <= 0) return;
     const freshEvents = agentEvents.filter(
       (row: AgentEvent) => Number(row.seq ?? 0) > processedAgentEventSeqRef.current,
@@ -538,7 +542,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       }
     });
     processedAgentEventSeqRef.current = maxSeq;
-  }, [activeAgentPresenceId, emitUiToast, agentEvents, overlayApi]);
+  }, [activeAgentPresenceId, emitUiToast, agentEvents, overlayApi, processEvents]);
 
   // --- Recording ---
   const handleRecord = useCallback(async () => {

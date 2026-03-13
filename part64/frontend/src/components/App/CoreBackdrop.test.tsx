@@ -51,11 +51,6 @@ function makeProps(overrides: Partial<CoreBackdropProps> = {}): CoreBackdropProp
       "pain-field": false,
     },
     agentWorkspaceBindings: { witness_thread: ["file:1"] },
-    galaxyLayerStyles: {
-      far: { opacity: 0.3 },
-      mid: { opacity: 0.5 },
-      near: { opacity: 0.8 },
-    },
     mouseDaimonTuning: {
       enabled: true,
       message: "witness",

@@ -1,5 +1,4 @@
 import type {
-  CSSProperties,
   PointerEvent as ReactPointerEvent,
   WheelEvent as ReactWheelEvent,
 } from "react";
@@ -16,12 +15,6 @@ import type {
 } from "../../app/coreSimulationConfig";
 import type { MouseDaimonTuning } from "./CoreControlPanel";
 
-interface GalaxyLayerStyles {
-  far: CSSProperties;
-  mid: CSSProperties;
-  near: CSSProperties;
-}
-
 interface Props {
   simulation: SimulationState | null;
   catalog: Catalog | null;
@@ -33,7 +26,6 @@ interface Props {
   coreVisualTuning: CoreVisualTuning;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
   agentWorkspaceBindings: Record<string, string[]>;
-  galaxyLayerStyles: GalaxyLayerStyles;
   mouseDaimonTuning: MouseDaimonTuning;
   onUserPresenceInput: (payload: {
     kind: string;
@@ -64,7 +56,6 @@ export function CoreBackdrop({
   coreVisualTuning,
   coreLayerVisibility,
   agentWorkspaceBindings,
-  galaxyLayerStyles,
   mouseDaimonTuning,
   onUserPresenceInput,
   onOverlayInit,
@@ -84,9 +75,6 @@ export function CoreBackdrop({
       onPointerCancelCapture={onPointerUp}
       onWheel={onWheel}
     >
-      <div className="simulation-galaxy-layer simulation-galaxy-layer-far" style={galaxyLayerStyles.far} />
-      <div className="simulation-galaxy-layer simulation-galaxy-layer-mid" style={galaxyLayerStyles.mid} />
-      <div className="simulation-galaxy-layer simulation-galaxy-layer-near" style={galaxyLayerStyles.near} />
       <div className="simulation-core-stage" style={{ transform: coreCameraTransform, filter: coreSimulationFilter }}>
         <SimulationCanvas
           simulation={simulation}
@@ -120,7 +108,6 @@ export function CoreBackdrop({
         />
       </div>
       <p className="simulation-core-hint">drag pan • wheel zoom • wasd strafe/drive • r/f rise/fall • enable orbit for galaxy sweep</p>
-      <div className="simulation-core-vignette" style={{ opacity: coreVisualTuning.vignette }} />
     </div>
   );
 }

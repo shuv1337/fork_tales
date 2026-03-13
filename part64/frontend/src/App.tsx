@@ -83,7 +83,8 @@ export default function App() {
     window.localStorage.setItem(INTERFACE_OPACITY_STORAGE_KEY, simTuning.interfaceOpacity.toFixed(3));
   }, [simTuning.interfaceOpacity]);
 
-  // Initial agent handlers (without autopilot wiring, for bootstrapping)
+  // Initial agent handlers (without autopilot wiring, for bootstrapping).
+  // processEvents is false so only the final instance runs event side-effects.
   const agentBootstrap = useAgentHandlers({
     overlayApi,
     setOverlayApi,
@@ -93,6 +94,7 @@ export default function App() {
     agentEvents,
     handleAutopilotUserInput: () => false,
     handleChatCommand: async () => false,
+    processEvents: false,
   });
 
   const {
@@ -184,18 +186,6 @@ export default function App() {
     resolveOverlayAnchorRatio: camera.resolveOverlayAnchorRatio,
   });
 
-  // --- Galaxy layer styles ---
-  const galaxyLayerStyles = useMemo(() => {
-    const driftX = camera.deferredCoreRenderedCameraPosition.x;
-    const driftY = camera.deferredCoreRenderedCameraPosition.y;
-    const driftZ = camera.deferredCoreRenderedCameraPosition.z;
-    return {
-      far: { transform: `translate3d(${((-driftX * 0.07) + (camera.deferredCoreCameraYaw * 1.4)).toFixed(1)}px, ${((-driftY * 0.05) + (camera.deferredCoreCameraPitch * 1.3)).toFixed(1)}px, ${(driftZ * 0.04).toFixed(1)}px) scale(${(1 + (driftZ * 0.00018)).toFixed(3)})` },
-      mid: { transform: `translate3d(${((-driftX * 0.14) + (camera.deferredCoreCameraYaw * 2.2)).toFixed(1)}px, ${((-driftY * 0.11) + (camera.deferredCoreCameraPitch * 1.8)).toFixed(1)}px, ${(driftZ * 0.08).toFixed(1)}px) scale(${(1.04 + (driftZ * 0.00022)).toFixed(3)})` },
-      near: { transform: `translate3d(${((-driftX * 0.22) + (camera.deferredCoreCameraYaw * 3.1)).toFixed(1)}px, ${((-driftY * 0.18) + (camera.deferredCoreCameraPitch * 2.4)).toFixed(1)}px, ${(driftZ * 0.14).toFixed(1)}px) scale(${(1.1 + (driftZ * 0.00032)).toFixed(3)})` },
-    };
-  }, [camera.deferredCoreCameraPitch, camera.deferredCoreCameraYaw, camera.deferredCoreRenderedCameraPosition]);
-
   // --- Glass and nexus interaction ---
   const lastGlassClickRef = useRef<{ ts: number; x: number; y: number } | null>(null);
 
@@ -255,7 +245,6 @@ export default function App() {
         coreVisualTuning={simTuning.coreVisualTuning}
         coreLayerVisibility={simTuning.coreLayerVisibility}
         agentWorkspaceBindings={agentWithDeps.agentWorkspaceBindings}
-        galaxyLayerStyles={galaxyLayerStyles}
         mouseDaimonTuning={simTuning.mouseDaimonTuning}
         onUserPresenceInput={handleUserPresenceInput}
         onOverlayInit={agentWithDeps.handleOverlayInit}

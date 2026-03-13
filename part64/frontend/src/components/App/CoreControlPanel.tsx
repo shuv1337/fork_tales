@@ -26,8 +26,6 @@ import {
   CORE_VISUAL_HUE_MIN,
   CORE_VISUAL_SATURATION_MAX,
   CORE_VISUAL_SATURATION_MIN,
-  CORE_VISUAL_VIGNETTE_MAX,
-  CORE_VISUAL_VIGNETTE_MIN,
   CORE_VISUAL_WASH_MAX,
   CORE_VISUAL_WASH_MIN,
   type CoreSimulationTuning,
@@ -408,18 +406,7 @@ export function CoreControlPanel({
                   />
                 </label>
 
-                <label className="grid gap-1">
-                  <span className="text-[12px] text-[#cde4f8]">edge vignette <code>{coreVisualTuning.vignette.toFixed(2)}x</code></span>
-                  <input
-                    type="range"
-                    min={CORE_VISUAL_VIGNETTE_MIN}
-                    max={CORE_VISUAL_VIGNETTE_MAX}
-                    step={0.01}
-                    value={coreVisualTuning.vignette}
-                    onChange={(event) => onSetCoreVisualDial("vignette", Number(event.target.value))}
-                    className="h-1 w-full accent-[#8ed8ff]"
-                  />
-                </label>
+
               </div>
             </>
           ) : null}
