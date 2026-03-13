@@ -1,0 +1,57 @@
+{
+  "milestone": "backend-refactor",
+  "round": 2,
+  "status": "pass",
+  "generatedAt": "2026-03-13T11:21:00+00:00",
+  "assertionsSummary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "blocked": 0
+  },
+  "scopeAssertions": [
+    "VAL-BR-001",
+    "VAL-BR-002",
+    "VAL-BR-002a",
+    "VAL-BR-003",
+    "VAL-BR-004",
+    "VAL-BR-005",
+    "VAL-BR-007",
+    "VAL-BR-008",
+    "VAL-BR-009"
+  ],
+  "testedThisRound": [
+    "VAL-BR-004",
+    "VAL-BR-007"
+  ],
+  "carriedForwardPassedAssertions": [
+    "VAL-BR-001",
+    "VAL-BR-002",
+    "VAL-BR-002a",
+    "VAL-BR-003",
+    "VAL-BR-005",
+    "VAL-BR-008",
+    "VAL-BR-009"
+  ],
+  "passedAssertions": [
+    "VAL-BR-001",
+    "VAL-BR-002",
+    "VAL-BR-002a",
+    "VAL-BR-003",
+    "VAL-BR-004",
+    "VAL-BR-005",
+    "VAL-BR-007",
+    "VAL-BR-008",
+    "VAL-BR-009"
+  ],
+  "failedAssertions": [],
+  "blockedAssertions": [],
+  "deferredAssertions": [
+    {
+      "id": "VAL-BR-006",
+      "reason": "Moved to frontend-refactor milestone per current completed-feature fulfills mapping and validation-state note."
+    }
+  ],
+  "appliedUpdates": [],
+  "previousRound": "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/user-testing/synthesis.round1.json"
+}

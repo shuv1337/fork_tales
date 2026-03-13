@@ -1,0 +1,81 @@
+{
+  "groupId": "catalog-text-round2",
+  "testedAt": "2026-03-13T11:16:53.757780+00:00",
+  "surface": "repo-shell",
+  "isolation": {
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "allowedWorkingDirectories": [
+      "/home/shuv/repos/fork_tales",
+      "/home/shuv/repos/fork_tales/part64"
+    ],
+    "mode": "read-only validation except assigned report and evidence files",
+    "targetFile": "/home/shuv/repos/fork_tales/part64/code/catalog_data.py"
+  },
+  "toolsUsed": [
+    "rg",
+    "python3"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-BR-007",
+      "title": "Narrative text content cleaned",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Search `part64/code/catalog_data.py` for removed narrative constants and previously failing residue phrases/tags (`PANTHEON_DIALOG`, `MYTHIC_GLITCH_EPIC`, `COLLECTIVE_RESONANCE`, `RECEIPT_OF_SURVIVAL`, `Pantheon Nexus`, `[[GLITCH]]`, `[[SING]]`).",
+          "expected": "No matches remain in the target file.",
+          "observed": "No matches found; `rg` exited 1 with empty stdout, confirming the targeted constants and phrases/tags are absent."
+        },
+        {
+          "action": "Inspect the surviving `ROLE_HINTS` snippet around the previously failing Pantheon-related text.",
+          "expected": "Any surviving prompt/text constant content is neutralized to technical language.",
+          "observed": "`ROLE_HINTS` still contains the internal key `pantheon`, but its user-facing label is now neutralized to `Entity Network` / `\u30a8\u30f3\u30c6\u30a3\u30c6\u30a3\u9023\u9396`; `Pantheon Nexus` is not present."
+        },
+        {
+          "action": "Inspect the full `SYSTEM_PROMPT_TEMPLATE` block for narrative framing or old trigger tags.",
+          "expected": "Prompt text should use operational/technical language and avoid the prior `[[GLITCH]]` / `[[SING]]` tags.",
+          "observed": "`SYSTEM_PROMPT_TEMPLATE` now describes an operational simulation assistant, uses technical instructions, and replaces the old tags with functional `[[PULSE]]`, `[[ALERT]]`, and `[[TONE]]` triggers. No targeted narrative framing was found in the inspected snippet."
+        }
+      ],
+      "evidence": {
+        "searchedTerms": [
+          "PANTHEON_DIALOG",
+          "MYTHIC_GLITCH_EPIC",
+          "COLLECTIVE_RESONANCE",
+          "RECEIPT_OF_SURVIVAL",
+          "Pantheon Nexus",
+          "[[GLITCH]]",
+          "[[SING]]"
+        ],
+        "files": [
+          "backend-refactor/catalog-text-round2/exact-residue-search.json",
+          "backend-refactor/catalog-text-round2/role-hints-snippet.txt",
+          "backend-refactor/catalog-text-round2/system-prompt-template-snippet.txt",
+          "backend-refactor/catalog-text-round2/broad-term-followup.json"
+        ],
+        "commandSummary": [
+          {
+            "command": "rg -n PANTHEON_DIALOG|MYTHIC_GLITCH_EPIC|COLLECTIVE_RESONANCE|RECEIPT_OF_SURVIVAL|Pantheon Nexus|\\[\\[GLITCH\\]\\]|\\[\\[SING\\]\\]|Collective Resonance|Receipt of Survival|Mythic Glitch Epic /home/shuv/repos/fork_tales/part64/code/catalog_data.py",
+            "exitCode": 1,
+            "result": "No matches"
+          },
+          {
+            "command": "python3 snippet extraction for ROLE_HINTS and SYSTEM_PROMPT_TEMPLATE",
+            "result": "Snippets captured to evidence files for manual review"
+          },
+          {
+            "command": "rg -ni -C 1 pantheon|\\[\\[(GLITCH|SING)\\]\\]|Pantheon Nexus /home/shuv/repos/fork_tales/part64/code/catalog_data.py",
+            "exitCode": 0,
+            "result": "Follow-up search shows only the neutralized internal `pantheon` key; no old Pantheon/GLITCH/SING phrases/tags remain."
+          }
+        ],
+        "nonTechnicalFramingAssessment": "No previously failing mythic/narrative framing remained in the inspected `ROLE_HINTS` and `SYSTEM_PROMPT_TEMPLATE` snippets. Remaining labels are operational/product-specific and explained in technical terms."
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "VAL-BR-007 passed: targeted narrative constants and the prior `Pantheon Nexus` / `[[GLITCH]]` / `[[SING]]` residue are absent from `part64/code/catalog_data.py`, and the inspected surviving prompt/text constants now read as neutral operational language."
+}

@@ -1,0 +1,135 @@
+{
+  "groupId": "backend-tests-imports",
+  "testedAt": "2026-03-13T04:04:34-07:00",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "workingDirectories": [
+      "/home/shuv/repos/fork_tales",
+      "/home/shuv/repos/fork_tales/part64"
+    ],
+    "constraints": [
+      "Read-only validation except for assigned JSON report and evidence files",
+      "Did not start, stop, or modify services",
+      "VAL-BR-005 evaluated via server-code ripgrep because live 127.0.0.1:8787 is off-limits"
+    ]
+  },
+  "toolsUsed": [
+    "rg",
+    "python3"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-BR-005",
+      "title": "API endpoint paths renamed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run `rg -n '/api/myth|/api/muse|/api/witness' /home/shuv/repos/fork_tales/part64/code/world_web -g '*.py'`",
+          "expected": "Old narrative endpoint paths are absent from Python server code.",
+          "observed": "No matches found in `part64/code/world_web` Python files; rg exited 1 as expected for zero matches."
+        },
+        {
+          "action": "Run `rg -n '/api/attribution|/api/agent|/api/continuity' /home/shuv/repos/fork_tales/part64/code/world_web -g '*.py'`",
+          "expected": "Neutral endpoint paths are present in server code if the refactor is complete.",
+          "observed": "Matches found in `part64/code/world_web/server.py`, including `/api/agent/runtime` (line 9067), `/api/continuity/lineage` (line 9409), `/api/attribution` (line 9587), and `/api/continuity` (line 11773); rg exited 0."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "rg -n '/api/myth|/api/muse|/api/witness' /home/shuv/repos/fork_tales/part64/code/world_web -g '*.py'",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 1,
+            "summary": "No old endpoint matches found in server code.",
+            "file": "backend-refactor/backend-tests-imports/val-br-005-old-endpoints-rg.txt"
+          },
+          {
+            "command": "rg -n '/api/attribution|/api/agent|/api/continuity' /home/shuv/repos/fork_tales/part64/code/world_web -g '*.py'",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Neutral endpoint matches found in `world_web/server.py`.",
+            "file": "backend-refactor/backend-tests-imports/val-br-005-new-endpoints-rg.txt"
+          }
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-BR-008",
+      "title": "Python tests pass after backend refactor",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run `python3 -m code.tests.test_world_life` from `part64/`.",
+          "expected": "World life test suite exits 0.",
+          "observed": "Command produced no stdout/stderr and exited 0."
+        },
+        {
+          "action": "Run `python3 -m code.tests.test_attribution` from `part64/`.",
+          "expected": "Attribution test suite exits 0.",
+          "observed": "Command produced no stdout/stderr and exited 0."
+        },
+        {
+          "action": "Run `python3 -m code.tests.test_sonify_determinism` from `part64/`.",
+          "expected": "Sonify determinism suite exits 0.",
+          "observed": "Command printed `ok` and exited 0."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "python3 -m code.tests.test_world_life",
+            "cwd": "/home/shuv/repos/fork_tales/part64",
+            "exitCode": 0,
+            "summary": "World life suite passed.",
+            "file": "backend-refactor/backend-tests-imports/val-br-008-test_world_life.txt"
+          },
+          {
+            "command": "python3 -m code.tests.test_attribution",
+            "cwd": "/home/shuv/repos/fork_tales/part64",
+            "exitCode": 0,
+            "summary": "Attribution suite passed.",
+            "file": "backend-refactor/backend-tests-imports/val-br-008-test_attribution.txt"
+          },
+          {
+            "command": "python3 -m code.tests.test_sonify_determinism",
+            "cwd": "/home/shuv/repos/fork_tales/part64",
+            "exitCode": 0,
+            "summary": "Sonify determinism suite passed.",
+            "file": "backend-refactor/backend-tests-imports/val-br-008-test_sonify_determinism.txt"
+          }
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-BR-009",
+      "title": "No import errors after rename",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run `python3 -c 'from code.catalog_data import ENTITY_MANIFEST; from code.attribution import AttributionTracker; print(\"all imports ok\", len(ENTITY_MANIFEST))'` from `part64/`.",
+          "expected": "Imports resolve successfully without tracebacks.",
+          "observed": "Command printed `all imports ok 30` and exited 0."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "python3 -c 'from code.catalog_data import ENTITY_MANIFEST; from code.attribution import AttributionTracker; print(\"all imports ok\", len(ENTITY_MANIFEST))'",
+            "cwd": "/home/shuv/repos/fork_tales/part64",
+            "exitCode": 0,
+            "summary": "Import verification succeeded and reported 30 catalog entities.",
+            "file": "backend-refactor/backend-tests-imports/val-br-009-import-check.txt"
+          }
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 3 assertions (VAL-BR-005, VAL-BR-008, VAL-BR-009): all 3 passed using repo-shell ripgrep and Python validation commands."
+}

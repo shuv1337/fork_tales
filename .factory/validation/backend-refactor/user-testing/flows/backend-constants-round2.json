@@ -1,0 +1,84 @@
+{
+  "groupId": "backend-constants-round2",
+  "testedAt": "2026-03-13T11:16:59.323700+00:00",
+  "surface": "repo-shell",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "workingDirectories": [
+      "/home/shuv/repos/fork_tales",
+      "/home/shuv/repos/fork_tales/part64"
+    ],
+    "constraints": [
+      "Read-only validation except for assigned JSON report and evidence files",
+      "Did not edit repository source files, mission files, or runtime state",
+      "Did not start, stop, or modify services"
+    ]
+  },
+  "toolsUsed": [
+    "rg",
+    "ls",
+    "python3"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-BR-004",
+      "title": "World life narrative terms replaced",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run a targeted residue search for prayer, devotion, faithful, faith, hymn_bpm, prays_to, people, songs, books, DAIMO_, daimoi, and daimon against part64/code/world_life.py and part64/code/world_web/constants.py.",
+          "expected": "No legacy narrative field names or DAIMO_* constants remain in either file.",
+          "observed": "The search returned no matches in either file (rg exit 1)."
+        },
+        {
+          "action": "Inspect neutral replacements in part64/code/world_life.py with context around current field names.",
+          "expected": "Neutral replacements such as linked_presence, base_weight, activity_level, engagement, bpm, actors, tracks, and reports are present.",
+          "observed": "Context shows linked_presence, base_weight, activity_level, engagement, bpm, actors, tracks, and reports in active world_life structures."
+        },
+        {
+          "action": "Inspect neutral replacements in part64/code/world_web/constants.py, including canonical field mappings and projection metadata.",
+          "expected": "Neutral PARTICLE_* constants and updated field labels and mappings appear without old narrative residue.",
+          "observed": "Context shows PARTICLE_RECORD and PARTICLE_PACKET_RECORD, an engagement synonym block, and projection metadata tagged with actors; extracted lines 1888-1898 and 2550-2560 show the prior devotion/faithful positions now read engagement and reliable."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "rg -n \"prayer|devotion|faithful|\\bfaith\\b|hymn_bpm|prays_to|\\bpeople\\b|\\bsongs\\b|\\bbooks\\b|DAIMO_|\\bdaimoi\\b|\\bdaimon\\b\" /home/shuv/repos/fork_tales/part64/code/world_life.py /home/shuv/repos/fork_tales/part64/code/world_web/constants.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 1,
+            "summary": "No matches found in either target file; the old narrative terms covered by VAL-BR-004 are absent.",
+            "file": "backend-refactor/backend-constants-round2/val-br-004-residue-rg.txt"
+          },
+          {
+            "command": "rg -n -C 2 \"activity|engagement|base_weight|\\bbpm\\b|linked_presence|\\bactors\\b|\\btracks\\b|\\breports\\b\" /home/shuv/repos/fork_tales/part64/code/world_life.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "world_life.py contains neutral replacement fields and collections.",
+            "file": "backend-refactor/backend-constants-round2/val-br-004-world-life-neutral-rg.txt"
+          },
+          {
+            "command": "rg -n -C 3 \"CANONICAL_NAMED_FIELD_IDS|FIELD_TO_PRESENCE|PROJECTION_ELEMENTS|engagement|reliable|linked_presence|actors|tracks|reports|PARTICLE_\" /home/shuv/repos/fork_tales/part64/code/world_web/constants.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "constants.py contains neutral PARTICLE_* constants plus updated field and projection mappings.",
+            "file": "backend-refactor/backend-constants-round2/val-br-004-constants-neutral-rg.txt"
+          },
+          {
+            "command": "python3 extracted lines 1888-1898 and 2550-2560 from /home/shuv/repos/fork_tales/part64/code/world_web/constants.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "The previously failing slots now show engagement and reliable, and the world simulation projection tags use actors.",
+            "file": "backend-refactor/backend-constants-round2/val-br-004-constants-snippet.txt"
+          }
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 1 assertion (VAL-BR-004): pass. The targeted old-term search came back clean for both world_life.py and world_web/constants.py, and spot checks confirmed neutral replacements including engagement, reliable, linked_presence, actors, tracks, reports, and PARTICLE_* constants."
+}

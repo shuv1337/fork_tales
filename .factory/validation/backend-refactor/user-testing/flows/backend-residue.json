@@ -1,0 +1,278 @@
+{
+  "groupId": "backend-residue",
+  "testedAt": "2026-03-13T04:08:19-07:00",
+  "surface": "repo-shell",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "workingDirectories": [
+      "/home/shuv/repos/fork_tales",
+      "/home/shuv/repos/fork_tales/part64"
+    ],
+    "constraints": [
+      "Read-only validation except for assigned JSON report and evidence files",
+      "Did not edit repository source files, mission files, or runtime state",
+      "Did not start, stop, or modify services"
+    ]
+  },
+  "toolsUsed": [
+    "rg",
+    "ls",
+    "python3"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-BR-001",
+      "title": "Core data model file renamed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Check for `/home/shuv/repos/fork_tales/part64/code/catalog_data.py` and `/home/shuv/repos/fork_tales/part64/code/lore.py`.",
+          "expected": "Neutral replacement exists and the old module path is gone.",
+          "observed": "`catalog_data.py` exists and `lore.py` does not."
+        },
+        {
+          "action": "Run `rg -n \"from\\s+code\\.lore\\s+import|from\\s+lore\\s+import|import\\s+code\\.lore|import\\s+lore|import lore|from lore\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"`.",
+          "expected": "No Python imports reference `lore`.",
+          "observed": "No matches found; rg exited 1. A follow-up `catalog_data` search found imports in `world_web/constants.py`."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "python3 path existence check for catalog_data.py and lore.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "`catalog_data.py` exists and `lore.py` is absent.",
+            "file": "backend-refactor/backend-residue/val-br-001-path-check.txt"
+          },
+          {
+            "command": "rg -n \"from\\s+code\\.lore\\s+import|from\\s+lore\\s+import|import\\s+code\\.lore|import\\s+lore|import lore|from lore\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 1,
+            "summary": "No legacy `lore` import matches found.",
+            "file": "backend-refactor/backend-residue/val-br-001-import-rg.txt"
+          },
+          {
+            "command": "rg -n \"catalog_data\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Replacement module imports are present in `world_web/constants.py`.",
+            "file": "backend-refactor/backend-residue/val-br-001-new-module-rg.txt"
+          }
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-BR-002",
+      "title": "Daimoi references replaced with particles",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run `rg -n \"\\bdaimoi\\b|\\bdaimon\\b\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"`.",
+          "expected": "No functional Python residue of `daimoi` or `daimon` remains.",
+          "observed": "No matches found in Python files; rg exited 1."
+        },
+        {
+          "action": "List `/home/shuv/repos/fork_tales/part64/code/world_web`.",
+          "expected": "No `daimoi`-prefixed Python module files remain.",
+          "observed": "Directory listing contains `particle_*` modules and no `daimoi*` filenames."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "rg -n \"\\bdaimoi\\b|\\bdaimon\\b\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 1,
+            "summary": "No `daimoi`/`daimon` matches found in Python files.",
+            "file": "backend-refactor/backend-residue/val-br-002-python-residue-rg.txt"
+          },
+          {
+            "command": "ls -1 /home/shuv/repos/fork_tales/part64/code/world_web",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "`world_web/` contains neutral `particle_*` modules and no `daimoi*` files.",
+            "file": "backend-refactor/backend-residue/val-br-002a-world-web-files.txt"
+          }
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-BR-002a",
+      "title": "world_web sub-module files renamed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "List `/home/shuv/repos/fork_tales/part64/code/world_web`.",
+          "expected": "Narrative filenames such as `daimoi_probabilistic.py`, `daimoi_flow.py`, and `muse_runtime.py` are gone.",
+          "observed": "Listing shows neutral filenames such as `particle_probabilistic.py` and `agent_runtime.py`, with no old narrative module filenames."
+        },
+        {
+          "action": "Run import-path-only rg for `daimoi_probabilistic`, `daimoi_flow`, and `muse_runtime` imports.",
+          "expected": "No Python import paths reference the old narrative module names.",
+          "observed": "No legacy import-path matches found; rg exited 1."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "ls -1 /home/shuv/repos/fork_tales/part64/code/world_web",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "`world_web/` file list contains no old narrative module filenames.",
+            "file": "backend-refactor/backend-residue/val-br-002a-world-web-files.txt"
+          },
+          {
+            "command": "rg -n \"from\\s+code\\.(daimoi_probabilistic|daimoi_flow|muse_runtime)\\s+import|from\\s+(daimoi_probabilistic|daimoi_flow|muse_runtime)\\s+import|import\\s+code\\.(daimoi_probabilistic|daimoi_flow|muse_runtime)|import\\s+(daimoi_probabilistic|daimoi_flow|muse_runtime)\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 1,
+            "summary": "No old narrative module import paths found.",
+            "file": "backend-refactor/backend-residue/val-br-002a-import-paths-only-rg.txt"
+          }
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-BR-003",
+      "title": "Myth bridge module renamed",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Check for `/home/shuv/repos/fork_tales/part64/code/attribution.py` and `/home/shuv/repos/fork_tales/part64/code/myth_bridge.py`.",
+          "expected": "Neutral replacement exists and `myth_bridge.py` is absent.",
+          "observed": "`attribution.py` exists and `myth_bridge.py` does not."
+        },
+        {
+          "action": "Run `rg -n \"myth_bridge|MythStateTracker\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"` and a follow-up `AttributionTracker|code\\.attribution|attribution` search.",
+          "expected": "Legacy myth bridge references are gone and replacement naming is present.",
+          "observed": "No `myth_bridge` or `MythStateTracker` matches were found; `AttributionTracker` and `code.attribution` references are present in the backend."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "python3 path existence check for attribution.py and myth_bridge.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "`attribution.py` exists and `myth_bridge.py` is absent.",
+            "file": "backend-refactor/backend-residue/val-br-003-path-check.txt"
+          },
+          {
+            "command": "rg -n \"myth_bridge|MythStateTracker\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 1,
+            "summary": "No legacy myth bridge references found.",
+            "file": "backend-refactor/backend-residue/val-br-003-old-module-rg.txt"
+          },
+          {
+            "command": "rg -n \"AttributionTracker|code\\.attribution|attribution\" /home/shuv/repos/fork_tales/part64/code -g \"*.py\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Replacement attribution module and class references are present.",
+            "file": "backend-refactor/backend-residue/val-br-003-new-module-rg.txt"
+          }
+        ]
+      },
+      "issues": null
+    },
+    {
+      "id": "VAL-BR-004",
+      "title": "World life narrative terms replaced",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Run `rg -n \"prayer|devotion|faith|hymn_bpm|prays_to|\\bpeople\\b|\\bsongs\\b|\\bbooks\\b|DAIMO_|\\bdaimoi\\b|\\bdaimon\\b\" /home/shuv/repos/fork_tales/part64/code/world_life.py /home/shuv/repos/fork_tales/part64/code/world_web/constants.py`.",
+          "expected": "No old narrative field names or constants remain in `world_life.py` or `constants.py`.",
+          "observed": "`world_life.py` stayed clean, but `world_web/constants.py` still matches `\"devotion\"` (line 1894) and `\"faithful\"` (line 1896)."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "rg -n \"prayer|devotion|faith|hymn_bpm|prays_to|\\bpeople\\b|\\bsongs\\b|\\bbooks\\b|DAIMO_|\\bdaimoi\\b|\\bdaimon\\b\" /home/shuv/repos/fork_tales/part64/code/world_life.py /home/shuv/repos/fork_tales/part64/code/world_web/constants.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Two legacy narrative-term matches remain in `world_web/constants.py`.",
+            "file": "backend-refactor/backend-residue/val-br-004-world-life-constants-rg.txt"
+          }
+        ]
+      },
+      "issues": "VAL-BR-004 fails because `world_web/constants.py` still contains functional text entries for `devotion` and `faithful`."
+    },
+    {
+      "id": "VAL-BR-006",
+      "title": "Record type strings updated",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Run `rg -n \"ημ\\.daimon\\.v1|ημ\\.daimoi-packet\\.v1|resource-daimoi|ημ\\.[^\\n\\r\"']*muse[^\\n\\r\"']*\" /home/shuv/repos/fork_tales -g \"*.py\" -g \"*.ts\" -g \"*.tsx\"`.",
+          "expected": "Old backend/frontend record type strings are absent.",
+          "observed": "Legacy record strings still appear in `part64/frontend/src/types/index.ts`: `ημ.daimon.v1` at line 222 and `ημ.daimoi-packet.v1` at line 257."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "rg -n \"ημ\\.daimon\\.v1|ημ\\.daimoi-packet\\.v1|resource-daimoi|ημ\\.[^\\n\\r\"']*muse[^\\n\\r\"']*\" /home/shuv/repos/fork_tales -g \"*.py\" -g \"*.ts\" -g \"*.tsx\"",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Two old record type strings remain in frontend type definitions.",
+            "file": "backend-refactor/backend-residue/val-br-006-record-strings-rg.txt"
+          }
+        ]
+      },
+      "issues": "VAL-BR-006 fails because `part64/frontend/src/types/index.ts` still defines `ημ.daimon.v1` and `ημ.daimoi-packet.v1`."
+    },
+    {
+      "id": "VAL-BR-007",
+      "title": "Narrative text content cleaned",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Run `rg -n \"PANTHEON_DIALOG|MYTHIC_GLITCH_EPIC|COLLECTIVE_RESONANCE|RECEIPT_OF_SURVIVAL|SYSTEM_PROMPT_TEMPLATE\" /home/shuv/repos/fork_tales/part64/code/catalog_data.py`.",
+          "expected": "Legacy narrative constants are removed, or only neutralized replacements remain.",
+          "observed": "The named narrative constants are gone, but `SYSTEM_PROMPT_TEMPLATE` still exists at line 596."
+        },
+        {
+          "action": "Inspect the surviving prompt/text snippet in `catalog_data.py`.",
+          "expected": "`SYSTEM_PROMPT_TEMPLATE` and nearby text are neutralized.",
+          "observed": "The snippet still contains `Pantheon Nexus` in `ROLE_HINTS`, a `Log Stream` / `Observer Thread` / `Compliance Gate` glossary, and `[[GLITCH]]` / `[[SING]]` trigger-tag instructions."
+        }
+      ],
+      "evidence": {
+        "commandOutputs": [
+          {
+            "command": "rg -n \"PANTHEON_DIALOG|MYTHIC_GLITCH_EPIC|COLLECTIVE_RESONANCE|RECEIPT_OF_SURVIVAL|SYSTEM_PROMPT_TEMPLATE\" /home/shuv/repos/fork_tales/part64/code/catalog_data.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Only `SYSTEM_PROMPT_TEMPLATE` remains from the targeted constant-name search.",
+            "file": "backend-refactor/backend-residue/val-br-007-constant-name-rg.txt"
+          },
+          {
+            "command": "rg -n \"pantheon|\\[\\[GLITCH\\]\\]|\\[\\[SING\\]\\]|Observer Thread|Log Stream|Compliance Gate\" /home/shuv/repos/fork_tales/part64/code/catalog_data.py",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Narrative/glossary residue is still present in `catalog_data.py` text constants.",
+            "file": "backend-refactor/backend-residue/val-br-007-narrative-text-rg.txt"
+          },
+          {
+            "command": "python3 snippet extraction for `catalog_data.py` lines 583-623",
+            "cwd": "/home/shuv/repos/fork_tales",
+            "exitCode": 0,
+            "summary": "Saved the relevant `ROLE_HINTS` and `SYSTEM_PROMPT_TEMPLATE` snippet for review.",
+            "file": "backend-refactor/backend-residue/val-br-007-catalog-snippet.txt"
+          }
+        ]
+      },
+      "issues": "VAL-BR-007 fails because `catalog_data.py` still carries non-neutral narrative/glossary text in `ROLE_HINTS` and `SYSTEM_PROMPT_TEMPLATE`."
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 7 assertions (VAL-BR-001, VAL-BR-002, VAL-BR-002a, VAL-BR-003, VAL-BR-004, VAL-BR-006, VAL-BR-007): 4 passed and 3 failed. Failing residue remains in `world_web/constants.py`, frontend record type definitions, and `catalog_data.py` text constants."
+}

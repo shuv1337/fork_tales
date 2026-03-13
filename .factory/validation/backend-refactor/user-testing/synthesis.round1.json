@@ -1,0 +1,38 @@
+{
+  "milestone": "backend-refactor",
+  "round": 1,
+  "status": "fail",
+  "generatedAt": "2026-03-13T11:09:21.074002+00:00",
+  "assertionsSummary": {
+    "total": 10,
+    "passed": 7,
+    "failed": 3,
+    "blocked": 0
+  },
+  "passedAssertions": [
+    "VAL-BR-001",
+    "VAL-BR-002",
+    "VAL-BR-002a",
+    "VAL-BR-003",
+    "VAL-BR-005",
+    "VAL-BR-008",
+    "VAL-BR-009"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-BR-004",
+      "reason": "world_web/constants.py still contains legacy narrative term entries `devotion` and `faithful`."
+    },
+    {
+      "id": "VAL-BR-006",
+      "reason": "part64/frontend/src/types/index.ts still defines old record type strings `ημ.daimon.v1` and `ημ.daimoi-packet.v1`."
+    },
+    {
+      "id": "VAL-BR-007",
+      "reason": "part64/code/catalog_data.py still includes non-neutral text in ROLE_HINTS / SYSTEM_PROMPT_TEMPLATE such as `Pantheon Nexus` and `[[GLITCH]]` / `[[SING]]` tags."
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": null
+}
