@@ -1,0 +1,111 @@
+{
+  "featureId": "fix-backend-scrutiny-issues",
+  "reviewedAt": "2026-03-13T10:56:17Z",
+  "commitId": "2db31776374d1958e10db667f7307773efa24629",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "Commit `2db3177` fixes the round-1 blockers in the touched backend files (`part64/scripts/*`, `world_life.py`, `constants.py`, `attribution.py`, and `test_agent_runtime.py`), but it does not clear the remaining blocking regressions from `update-api-and-records`. The checked-in frontend still targets removed `/api/muse/*` and `/api/witness*` routes and still ignores the renamed `agent_events` WebSocket payload, so the full backend-refactor scrutiny failure set is not resolved.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/app/useChatCommandHandlers.ts",
+        "line": 182,
+        "severity": "blocking",
+        "description": "The checked-in frontend still targets removed backend routes (`/api/muse/message`, plus `/api/muse/create`, `/api/muse/sync-pins`, `/api/muse/threat-radar/*`, and `/api/witness*` in `App.tsx`, `ThreatRadarPanel.tsx`, `Chat.tsx`, and `Canvas.tsx`). The current server only serves `/api/agent/*`, `/api/continuity*`, and `/api/attribution`, so the client/server contract break flagged in the original `update-api-and-records` review remains unresolved."
+      },
+      {
+        "file": "part64/frontend/src/hooks/useWorldState.ts",
+        "line": 424,
+        "severity": "blocking",
+        "description": "`useWorldState` still branches only on `muse_events`, but the backend now emits `agent_events` from `part64/code/world_web/server.py`. Live agent-event updates are still dropped by the checked-in frontend, so the WebSocket regression from the original `update-api-and-records` review remains."
+      }
+    ]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "update-api-and-records",
+      "file": "part64/frontend/src/app/useChatCommandHandlers.ts",
+      "line": 182,
+      "severity": "blocking",
+      "description": "Frontend callers still use removed HTTP routes after the backend rename.",
+      "evidence": "`part64/frontend/src/app/useChatCommandHandlers.ts:182` posts to `/api/muse/message`; `part64/frontend/src/App.tsx:632,1121,1216,2263`, `part64/frontend/src/components/Panels/ThreatRadarPanel.tsx:133,203`, `part64/frontend/src/components/Panels/Chat.tsx:519`, and `part64/frontend/src/components/Simulation/Canvas.tsx:5890` still call `/api/muse/*` or `/api/witness*`. The backend only defines `/api/agent/*`, `/api/continuity*`, and `/api/attribution` at `part64/code/world_web/server.py:9067-11773`."
+    },
+    {
+      "featureId": "update-api-and-records",
+      "file": "part64/frontend/src/hooks/useWorldState.ts",
+      "line": 424,
+      "severity": "blocking",
+      "description": "Frontend WebSocket handling still listens for the removed `muse_events` message type.",
+      "evidence": "`part64/frontend/src/hooks/useWorldState.ts:424` checks only `msgType === 'muse_events'`, while `part64/code/world_web/server.py:7162` and `7205` now send `\"type\": \"agent_events\"`."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "area": "knowledge",
+      "observation": "Shared architecture docs still describe the pre-refactor backend modules and API contract, which makes cross-surface review of rename work harder than it should be.",
+      "evidence": "`.factory/library/architecture.md:23-24,45` still lists `lore.py`, `myth_bridge.py`, and REST endpoints `/api/myth` / `/api/muse/*`, while `.factory/library/naming-map.md:66-68` and `part64/code/world_web/server.py:9067-11773` use `/api/attribution`, `/api/agent/*`, and `/api/continuity`."
+    },
+    {
+      "area": "skills",
+      "observation": "`refactor-worker` still does not explicitly require checking checked-in client consumers when backend API/event names change, so a backend-only rename can still be handed off as complete while the repository's own frontend remains incompatible.",
+      "evidence": "`.factory/skills/refactor-worker/SKILL.md:28-31` requires running backend `test_python_*` commands and `SKILL.md:71` says to curl API endpoints, but it never asks workers to inspect checked-in consumers. The unresolved callers remain in `part64/frontend/src/app/useChatCommandHandlers.ts:182`, `part64/frontend/src/components/Panels/ThreatRadarPanel.tsx:133,203`, `part64/frontend/src/components/Panels/Chat.tsx:519`, `part64/frontend/src/App.tsx:632,1121,1216,2263`, `part64/frontend/src/components/Simulation/Canvas.tsx:5890`, and `part64/frontend/src/hooks/useWorldState.ts:424`."
+    },
+    {
+      "area": "conventions",
+      "observation": "Mission/shared-service guidance still treats `python3 -m code.tests.test_*` as definitive test execution even though several important backend test modules do not self-execute under that command.",
+      "evidence": "Mission `AGENTS.md:20,64` and `.factory/services.yaml:7-10` prescribe `python3 -m code.tests.test_*`. The fix worker transcript for session `723e59da-e022-4afe-bc3b-b684476973b9` records discovering this gap while debugging `test_agent_runtime.py`, and current grep shows `part64/code/tests/test_world_life.py`, `part64/code/tests/test_attribution.py`, and `part64/code/tests/test_world_web_pm2.py` still have no `if __name__ == \"__main__\":`, while `part64/code/tests/test_agent_runtime.py:816` now does."
+    }
+  ],
+  "evidence": {
+    "reviewedArtifacts": [
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/validation-contract.md",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/features.json",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/AGENTS.md",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T10-51-29-940Z__fix-backend-scrutiny-issues__723e59da-e022-4afe-bc3b-b684476973b9.json",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/worker-transcripts.jsonl",
+      "/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md",
+      "/home/shuv/repos/fork_tales/.factory/services.yaml",
+      "/home/shuv/repos/fork_tales/.factory/library/architecture.md",
+      "/home/shuv/repos/fork_tales/.factory/library/naming-map.md",
+      "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/synthesis.json",
+      "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/rename-core-data-model.json",
+      "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/update-world-life-and-constants.json",
+      "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/update-api-and-records.json",
+      "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/update-backend-tests.json"
+    ],
+    "keyFindings": [
+      "`git show --stat --oneline 2db3177` shows the fix commit only touched backend/scripts/test files; it did not update any frontend callers.",
+      "Current backend code confirms the targeted round-1 backend fixes landed: `part64/scripts/*` has no residual `daimoi` references, `part64/code/world_life.py` now uses `logger_aya`/`boost`, `part64/code/world_web/constants.py:2500` now uses `nexus.ui.system_overview`, and `part64/code/attribution.py:113` now reads `ATTRIBUTION_URL`.",
+      "Current frontend code still demonstrates the unresolved contract break identified in the original `update-api-and-records` review: old `/api/muse/*` and `/api/witness*` callers remain, and `useWorldState` still ignores `agent_events`."
+    ]
+  },
+  "addressesFailureFrom": [
+    {
+      "featureId": "rename-core-data-model",
+      "priorReview": "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/rename-core-data-model.json",
+      "status": "resolved",
+      "notes": "`part64/scripts/bench_cdb_vs_python.py`, `ensure_npu_embeddings.py`, `eval_sim_learning_suite.py`, and `homeostasis_soak_probe.py` were updated to particle-era imports/keys, and `rg 'daimoi' part64/scripts/` is now clean."
+    },
+    {
+      "featureId": "update-world-life-and-constants",
+      "priorReview": "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/update-world-life-and-constants.json",
+      "status": "resolved",
+      "notes": "`part64/code/world_life.py:34-111` now uses neutral actor ids and the `boost` action, and `part64/code/world_web/constants.py:2500` now uses `nexus.ui.system_overview`."
+    },
+    {
+      "featureId": "update-api-and-records",
+      "priorReview": "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/update-api-and-records.json",
+      "status": "unresolved",
+      "notes": "The original frontend/backend contract break is still present: frontend callers continue to use `/api/muse/*` and `/api/witness*`, and the frontend still listens for `muse_events` while the server emits `agent_events`."
+    },
+    {
+      "featureId": "update-backend-tests",
+      "priorReview": "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/reviews/update-backend-tests.json",
+      "status": "resolved",
+      "notes": "`part64/code/tests/test_agent_runtime.py` now uses `agent_id`, `list_agents()`, `agent.*` event names, `presence_type == \"agent\"`, and includes a `__main__` runner for direct execution."
+    }
+  ],
+  "summary": "Fix review failed. `2db3177` resolves the five backend-side issues it targeted, but the two original blocking `update-api-and-records` contract regressions are still present in the checked-in frontend, so `fix-backend-scrutiny-issues` does not fully clear the prior backend-refactor scrutiny failures."
+}

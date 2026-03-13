@@ -1,6 +1,6 @@
 {
   "milestone": "backend-refactor",
-  "round": 1,
+  "round": 2,
   "status": "fail",
   "validatorsRun": {
     "test": {
@@ -13,7 +13,7 @@
         "pythonAttribution": "passed",
         "pythonSonify": "passed",
         "pythonWorldWebPm2": "passed",
-        "note": "Frontend vitest remains at the documented baseline, so the test validator is accepted for scrutiny purposes."
+        "note": "Frontend vitest remains at the documented baseline, so the test validator is accepted for scrutiny purposes on this rerun."
       }
     },
     "typecheck": {
@@ -32,46 +32,23 @@
     }
   },
   "reviewsSummary": {
-    "total": 5,
-    "passed": 1,
-    "failed": 4,
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
     "failedFeatures": [
-      "rename-core-data-model",
-      "update-world-life-and-constants",
-      "update-api-and-records",
-      "update-backend-tests"
+      "fix-backend-scrutiny-issues"
     ]
   },
   "blockingIssues": [
     {
-      "featureId": "rename-core-data-model",
+      "featureId": "update-api-and-records",
       "severity": "blocking",
-      "description": "Backend Python scripts under `part64/scripts/` still contain stale daimoi imports and payload keys, including `code.world_web.daimoi_probabilistic` in `bench_cdb_vs_python.py` and multiple `daimoi_*` fields in `ensure_npu_embeddings.py` / `eval_sim_learning_suite.py`, so VAL-BR-002 is not fully satisfied."
-    },
-    {
-      "featureId": "update-world-life-and-constants",
-      "severity": "blocking",
-      "description": "`part64/code/world_life.py` still emits narrative actor ids (`scribe_aya`, `cantor_ren`, `keeper_mio`, `witness_kai`, `weaver_noa`) and still accepts the `pray` action, so the world-life payload remains partially narrative."
-    },
-    {
-      "featureId": "update-world-life-and-constants",
-      "severity": "blocking",
-      "description": "`part64/code/world_web/constants.py` still ships the narrative projection id `nexus.ui.inspiration_atlas`, leaving PROJECTION_ELEMENTS only partially renamed."
+      "description": "Checked-in frontend callers still use removed `/api/muse/*` and `/api/witness*` routes in `App.tsx`, `useChatCommandHandlers.ts`, `Chat.tsx`, `ThreatRadarPanel.tsx`, and `Canvas.tsx`, so the backend-refactor milestone still has a broken frontend/backend HTTP contract."
     },
     {
       "featureId": "update-api-and-records",
       "severity": "blocking",
-      "description": "The backend removed `/api/muse/*` and `/api/witness*` without updating checked-in frontend callers (`App.tsx`, `useChatCommandHandlers.ts`, `Chat.tsx`, `ThreatRadarPanel.tsx`, `Canvas.tsx`), so the repository no longer has a working frontend/backend contract for these flows."
-    },
-    {
-      "featureId": "update-api-and-records",
-      "severity": "blocking",
-      "description": "The backend now emits `agent_events`, but `part64/frontend/src/hooks/useWorldState.ts` still only handles `muse_events`, so live runtime updates regress across the checked-in stack."
-    },
-    {
-      "featureId": "update-backend-tests",
-      "severity": "blocking",
-      "description": "`part64/code/tests/test_agent_runtime.py` was renamed but still asserts the removed muse-era API (`muse_id`, `list_muses`, `muse.*`, `presence_type == \"muse\"`) instead of the current agent runtime surface."
+      "description": "`part64/frontend/src/hooks/useWorldState.ts` still only handles `muse_events` while the backend emits `agent_events`, so live runtime event updates still regress across the checked-in stack."
     }
   ],
   "appliedUpdates": [
@@ -79,43 +56,50 @@
       "target": "services.yaml",
       "description": "Added the missing `test_python_world_web_pm2` command so future validators can run the backend runtime/API suite directly from `.factory/services.yaml`.",
       "sourceFeature": "update-api-and-records"
+    },
+    {
+      "target": "library",
+      "description": "Updated `.factory/library/architecture.md` to reflect the current backend module names (`catalog_data.py`, `attribution.py`) and the renamed backend API surface while noting the current mixed frontend/backend contract state.",
+      "sourceFeature": "fix-backend-scrutiny-issues"
     }
   ],
   "suggestedGuidanceUpdates": [
     {
       "target": "AGENTS.md",
       "suggestion": "For backend rename work, explicitly treat `part64/scripts/` as part of the functional Python backend search/verification surface, not just `part64/code/`.",
-      "evidence": "`rename-core-data-model` verified only `part64/code`, but scrutiny still found broken daimoi references in `part64/scripts/bench_cdb_vs_python.py`, `ensure_npu_embeddings.py`, `eval_sim_learning_suite.py`, and `homeostasis_soak_probe.py`.",
+      "evidence": "`rename-core-data-model` verified only `part64/code`, but scrutiny still found broken daimoi references in `part64/scripts/bench_cdb_vs_python.py`, `ensure_npu_embeddings.py`, `eval_sim_learning_suite.py`, and `homeostasis_soak_probe.py` before the rerun fix landed.",
       "isSystemic": true
     },
     {
       "target": "skill:refactor-worker",
       "suggestion": "Rename-focused work should explicitly search and verify env vars, ids/slugs, and machine-readable keys alongside display text and module/class names.",
-      "evidence": "`rename-narrative-modules` left `MYTH_BRIDGE_URL`; `update-world-life-and-constants` left lower-case actor ids, the `pray` action, and `nexus.ui.inspiration_atlas` because the refactor flow focused on higher-level names.",
+      "evidence": "Round-1 scrutiny found `MYTH_BRIDGE_URL`, lower-case actor ids, the `pray` action, and `nexus.ui.inspiration_atlas` because the refactor flow focused on higher-level names.",
       "isSystemic": true
     },
     {
       "target": "skill:refactor-worker",
       "suggestion": "When backend API or event contracts change, require verification of checked-in client consumers or temporary compatibility aliases before declaring the milestone working.",
-      "evidence": "`update-api-and-records` renamed server routes and WebSocket event types, but the checked-in frontend still calls `/api/muse/*`, `/api/witness*`, and listens for `muse_events`, creating a cross-surface regression not caught by the worker's recorded verification.",
+      "evidence": "The original `update-api-and-records` review and this rerun both show the checked-in frontend still calling `/api/muse/*` and `/api/witness*` and still listening for `muse_events`, even though the backend has moved to `/api/agent/*`, `/api/continuity*`, and `agent_events`.",
       "isSystemic": true
     },
     {
       "target": "skill:refactor-worker",
       "suggestion": "Renamed test files should either be executed directly or statically reconciled against the current exported API before handoff.",
-      "evidence": "`update-backend-tests` renamed `test_muse_runtime.py` to `test_agent_runtime.py`, but the file still uses `muse_id`, `list_muses()`, and `muse.*` expectations because no direct verification covered the renamed suite.",
+      "evidence": "`update-backend-tests` renamed `test_muse_runtime.py` to `test_agent_runtime.py`, but the file still used muse-era expectations until the rerun fix brought it in sync with the agent runtime API.",
+      "isSystemic": true
+    },
+    {
+      "target": "AGENTS.md",
+      "suggestion": "Clarify that `python3 -m code.tests.test_*` only provides reliable suite execution when the module contains a `__main__` runner (or otherwise self-executes), and either require such runners or document alternate wrapper commands for modules that currently only perform import-time checks.",
+      "evidence": "The rerun review for `fix-backend-scrutiny-issues` found that mission guidance and `.factory/services.yaml` still treat `python3 -m code.tests.test_*` as definitive execution even though `test_world_life.py`, `test_attribution.py`, and `test_world_web_pm2.py` currently lack `if __name__ == '__main__':` runners while `test_agent_runtime.py` needed one added during the fix.",
       "isSystemic": true
     }
   ],
   "rejectedObservations": [
     {
-      "observation": "`VAL-BR-002a` is broader than the `rename-core-data-model` feature slice because other `world_web` narrative modules were only renamed by the later `rename-narrative-modules` feature.",
-      "reason": "Rejected as a shared-state update candidate because it is mission-specific planning metadata rather than durable repository guidance; the milestone already has concrete code-level failures that explain the review outcome."
-    },
-    {
-      "observation": "`.factory/library/architecture.md` should be updated immediately to replace all old API paths and module names.",
-      "reason": "Rejected for now because the repository is still mid-refactor with frontend consumers intentionally pending in a later milestone; rewriting the architecture note now would blur the current mixed-state contract instead of clarifying it."
+      "observation": "`refactor-worker` should explicitly require checking checked-in client consumers when backend API/event names change.",
+      "reason": "Already captured in round-1 guidance and preserved here, so the rerun evidence was deduplicated instead of recording a second identical recommendation."
     }
   ],
-  "previousRound": null
+  "previousRound": "/home/shuv/repos/fork_tales/.factory/validation/backend-refactor/scrutiny/synthesis.round1.json"
 }
