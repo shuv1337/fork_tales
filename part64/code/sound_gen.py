@@ -303,7 +303,7 @@ def generate_trembling_hinge(filename: str, duration_sec: float = 30.0):
         wf.writeframes(packed_data)
 
 
-def generate_witness_collapse(filename: str, duration_sec: float = 30.0):
+def generate_observer_collapse(filename: str, duration_sec: float = 30.0):
     sample_rate = 44100
     total_samples = int(sample_rate * duration_sec)
     packed_data = bytearray()
@@ -379,9 +379,9 @@ if __name__ == "__main__":
     elif "hinge" in out:
         print(f"Generating trembling hinge {out}...")
         generate_trembling_hinge(out)
-    elif "witness_collapse" in out:
-        print(f"Generating witness collapse {out}...")
-        generate_witness_collapse(out)
+    elif "observer_collapse" in out or "witness_collapse" in out:
+        print(f"Generating observer collapse {out}...")
+        generate_observer_collapse(out)
     else:
         print(f"Generating lullaby {out}...")
         generate_glitch_lullaby(out)

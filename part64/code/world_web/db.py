@@ -64,21 +64,21 @@ _CHROMA_CLIENT_LOCK = threading.Lock()
 _CHROMA_WORLD_COLLECTION: Any = None
 
 
-def _load_myth_tracker_class() -> type[Any]:
-    for module_name in ("code.myth_bridge", "myth_bridge"):
+def _load_attribution_tracker_class() -> type[Any]:
+    for module_name in ("code.attribution", "attribution"):
         try:
             module = importlib.import_module(module_name)
-            tracker_class = getattr(module, "MythStateTracker", None)
+            tracker_class = getattr(module, "AttributionTracker", None)
             if tracker_class is not None:
                 return tracker_class
         except Exception:
             continue
 
-    class NullMythTracker:
+    class NullAttributionTracker:
         def snapshot(self, _catalog: dict[str, Any]) -> dict[str, Any]:
             return {}
 
-    return NullMythTracker
+    return NullAttributionTracker
 
 
 def _load_life_tracker_class() -> type[Any]:
@@ -95,7 +95,7 @@ def _load_life_tracker_class() -> type[Any]:
         def snapshot(
             self,
             _catalog: dict[str, Any],
-            _myth_summary: dict[str, Any],
+            _attribution_summary: dict[str, Any],
             _entity_manifest: list[dict[str, Any]],
         ) -> dict[str, Any]:
             return {}
@@ -119,8 +119,8 @@ def _load_life_interaction_builder() -> Any:
         return {
             "ok": False,
             "error": "interaction_unavailable",
-            "line_en": "The myth interface is not ready yet.",
-            "line_ja": "神話インターフェースはまだ準備中です。",
+            "line_en": "The interaction interface is not ready yet.",
+            "line_ja": "インタラクション・インターフェースはまだ準備中です。",
         }
 
     return _null_builder

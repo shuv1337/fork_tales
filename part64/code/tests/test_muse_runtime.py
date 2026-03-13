@@ -2,24 +2,24 @@ from __future__ import annotations
 
 from typing import Any
 
-from code.world_web.muse_runtime import (
-    BOOTSTRAP_MUSE_SPECS,
-    DEFAULT_MUSE_ID,
-    InMemoryMuseStorage,
-    MuseRuntimeManager,
+from code.world_web.agent_runtime import (
+    BOOTSTRAP_AGENT_SPECS,
+    DEFAULT_AGENT_ID,
+    InMemoryAgentStorage,
+    AgentRuntimeManager,
 )
 
 
-def _manager(*, turns_per_minute: int = 24) -> MuseRuntimeManager:
-    return MuseRuntimeManager(
-        storage=InMemoryMuseStorage(),
+def _manager(*, turns_per_minute: int = 24) -> AgentRuntimeManager:
+    return AgentRuntimeManager(
+        storage=InMemoryAgentStorage(),
         enabled=True,
         backend_name="memory",
         turns_per_minute=turns_per_minute,
         max_particles_per_turn=8,
         max_events=512,
         max_history_messages=96,
-        max_manifests_per_muse=48,
+        max_manifests_per_agent=48,
         audio_intent_enabled=True,
         audio_min_score=0.55,
         audio_particle_fanout=3,
@@ -41,7 +41,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     manager = _manager(turns_per_minute=1)
 
     paused = manager.set_pause(
-        DEFAULT_MUSE_ID,
+        DEFAULT_AGENT_ID,
         paused=True,
         reason="unit-test",
         user_intent_id="intent:pause",
@@ -49,7 +49,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert paused["ok"] is True
 
     blocked = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="hello while paused",
         mode="deterministic",
         token_budget=1024,
@@ -65,7 +65,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert blocked["status_code"] == 409
 
     resumed = manager.set_pause(
-        DEFAULT_MUSE_ID,
+        DEFAULT_AGENT_ID,
         paused=False,
         reason="unit-test",
         user_intent_id="intent:resume",
@@ -73,7 +73,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert resumed["ok"] is True
 
     first = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="hello after resume",
         mode="deterministic",
         token_budget=1024,
@@ -87,7 +87,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert first["ok"] is True
 
     limited = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="second turn in same minute",
         mode="deterministic",
         token_budget=1024,
@@ -117,7 +117,7 @@ def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="/study then report drift",
         mode="deterministic",
         token_budget=900,
@@ -157,7 +157,7 @@ def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
     )
 
     deduped = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="same idempotency should replay",
         mode="deterministic",
         token_budget=900,
@@ -203,7 +203,7 @@ def test_muse_tool_request_parses_facts_and_graph_commands() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="/facts then /graph overview",
         mode="deterministic",
         token_budget=900,
@@ -235,7 +235,7 @@ def test_muse_graph_neighbors_command_carries_argument_tail() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="/graph neighbors url:aaaa",
         mode="deterministic",
         token_budget=700,
@@ -267,7 +267,7 @@ def test_muse_tool_request_maps_natural_language_crawler_queries() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="what did the crawler learn from https://example.org/a and what is crawler status?",
         mode="deterministic",
         token_budget=900,
@@ -315,7 +315,7 @@ def test_muse_tool_request_maps_natural_language_arxiv_paper_query() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="what arxiv papers have we crawled so far?",
         mode="deterministic",
         token_budget=900,
@@ -375,7 +375,7 @@ def test_muse_tool_request_maps_natural_language_github_threat_radar() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="run github threat radar for security cve code review risks",
         mode="deterministic",
         token_budget=900,
@@ -412,7 +412,7 @@ def test_muse_tool_request_maps_natural_language_particle_outcome_queries() -> N
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_MUSE_ID,
+        muse_id=DEFAULT_AGENT_ID,
         text="why did particle field:observer_thread:001 die? show recent outcomes",
         mode="deterministic",
         token_budget=900,
@@ -439,7 +439,7 @@ def test_bootstrap_fixed_muses_are_present_and_typed() -> None:
     }
     expected_ids = {
         str(spec.get("id", "")).strip()
-        for spec in BOOTSTRAP_MUSE_SPECS
+        for spec in BOOTSTRAP_AGENT_SPECS
         if str(spec.get("id", "")).strip()
     }
     assert expected_ids.issubset(set(muse_by_id.keys()))

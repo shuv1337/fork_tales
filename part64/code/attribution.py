@@ -27,7 +27,7 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 
-MYTH_EVENT_TYPE = "cover_field_presence"
+ATTRIBUTION_EVENT_TYPE = "cover_field_presence"
 
 
 def decay_ledger(
@@ -36,8 +36,8 @@ def decay_ledger(
     decayed: dict[tuple[str, str], dict[str, Any]] = {}
     for key, value in ledger.items():
         next_value = dict(value)
-        next_value["buzz"] = float(next_value.get("buzz", 0.0)) * 0.90
-        next_value["tradition"] = float(next_value.get("tradition", 0.0)) * 0.995
+        next_value["short_term_score"] = float(next_value.get("short_term_score", 0.0)) * 0.90
+        next_value["long_term_score"] = float(next_value.get("long_term_score", 0.0)) * 0.995
         decayed[key] = next_value
     return decayed
 
@@ -54,8 +54,8 @@ def add_mention(
 
     updated = dict(ledger)
     row = dict(updated.get(key, {}))
-    row["buzz"] = float(row.get("buzz", 0.0)) + weight
-    row["tradition"] = float(row.get("tradition", 0.0)) + (
+    row["short_term_score"] = float(row.get("short_term_score", 0.0)) + weight
+    row["long_term_score"] = float(row.get("long_term_score", 0.0)) + (
         0.12 * math.log(1.0 + weight)
     )
     row["mentions"] = int(row.get("mentions", 0)) + 1
@@ -75,7 +75,7 @@ def attribution(
     rows: list[tuple[str, float]] = []
     for (current_event_type, claim), row in ledger.items():
         if current_event_type == event_type:
-            rows.append((claim, float(row.get("tradition", 0.0))))
+            rows.append((claim, float(row.get("long_term_score", 0.0))))
 
     total = max(sum(value for _claim, value in rows), 1.0e-9)
     return {claim: (value / total) for claim, value in rows}
@@ -87,7 +87,7 @@ def build_mentions_from_catalog(catalog: dict[str, Any]) -> list[dict[str, Any]]
     for cover in cover_fields:
         mentions.append(
             {
-                "event-type": MYTH_EVENT_TYPE,
+                "event-type": ATTRIBUTION_EVENT_TYPE,
                 "claim": str(cover.get("id", "unknown")),
                 "weight": 1.0,
                 "event-instance": f"{cover.get('part', 'part')}-{cover.get('id', 'unknown')}",
@@ -109,7 +109,7 @@ def build_mentions_from_catalog(catalog: dict[str, Any]) -> list[dict[str, Any]]
     return mentions
 
 
-def fetch_remote_myth_snapshot() -> dict[str, Any] | None:
+def fetch_remote_attribution() -> dict[str, Any] | None:
     source_url = str(os.getenv("MYTH_BRIDGE_URL", "")).strip()
     if not source_url:
         return None
@@ -126,7 +126,7 @@ def fetch_remote_myth_snapshot() -> dict[str, Any] | None:
     return None
 
 
-class MythStateTracker:
+class AttributionTracker:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._ledger: dict[tuple[str, str], dict[str, Any]] = {}
@@ -137,7 +137,7 @@ class MythStateTracker:
             for mention in build_mentions_from_catalog(catalog):
                 self._ledger = add_mention(self._ledger, mention)
 
-            cover_probs = attribution(self._ledger, MYTH_EVENT_TYPE)
+            cover_probs = attribution(self._ledger, ATTRIBUTION_EVENT_TYPE)
             media_probs = attribution(self._ledger, "media_presence")
 
             top_cover_claim = ""
@@ -147,11 +147,11 @@ class MythStateTracker:
                     cover_probs.items(), key=lambda item: item[1]
                 )
 
-            remote_snapshot = fetch_remote_myth_snapshot()
+            remote_snapshot = fetch_remote_attribution()
 
             return {
                 "generated_at": datetime.now(timezone.utc).isoformat(),
-                "event_type": MYTH_EVENT_TYPE,
+                "event_type": ATTRIBUTION_EVENT_TYPE,
                 "ledger_size": len(self._ledger),
                 "top_cover_claim": top_cover_claim,
                 "top_cover_weight": round(float(top_cover_weight), 6),

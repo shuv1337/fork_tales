@@ -1,6 +1,6 @@
 import unittest
 from array import array
-from code.world_web.nooi import (
+from code.world_web.field_state import (
     NOOI_GRID_COLS,
     NOOI_GRID_ROWS,
     NOOI_LAYERS,

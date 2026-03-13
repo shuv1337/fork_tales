@@ -13,20 +13,20 @@ from pathlib import Path
 from typing import Any
 
 
-MUSE_RUNTIME_RECORD = "eta-mu.muse-runtime.snapshot.v1"
-MUSE_RUNTIME_SCHEMA_VERSION = "muse.runtime.v1"
-MUSE_EVENT_RECORD = "eta-mu.muse-event.v1"
-MUSE_EVENT_SCHEMA_VERSION = "muse.events.v1"
-MUSE_CONTEXT_MANIFEST_RECORD = "eta-mu.muse-context-manifest.v1"
-MUSE_CONTEXT_MANIFEST_SCHEMA_VERSION = "muse.context-manifest.v1"
-MUSE_RESOURCE_NODE_RECORD = "eta-mu.resource-node.v1"
-MUSE_PARTICLE_RECORD = "eta-mu.agent-particle.v1"
-MUSE_GPU_CLAIM_RECORD = "eta-mu.muse-gpu-claim.v1"
-MUSE_STATE_FILE_RECORD = "eta-mu.muse-runtime-state.v1"
+AGENT_RUNTIME_RECORD = "eta-mu.muse-runtime.snapshot.v1"
+AGENT_RUNTIME_SCHEMA_VERSION = "muse.runtime.v1"
+AGENT_EVENT_RECORD = "eta-mu.muse-event.v1"
+AGENT_EVENT_SCHEMA_VERSION = "muse.events.v1"
+AGENT_CONTEXT_MANIFEST_RECORD = "eta-mu.muse-context-manifest.v1"
+AGENT_CONTEXT_MANIFEST_SCHEMA_VERSION = "muse.context-manifest.v1"
+AGENT_RESOURCE_NODE_RECORD = "eta-mu.resource-node.v1"
+AGENT_PARTICLE_RECORD = "eta-mu.agent-particle.v1"
+AGENT_GPU_CLAIM_RECORD = "eta-mu.muse-gpu-claim.v1"
+AGENT_STATE_FILE_RECORD = "eta-mu.muse-runtime-state.v1"
 
-DEFAULT_MUSE_ID = "witness_thread"
-DEFAULT_MUSE_LABEL = "Witness Thread"
-BOOTSTRAP_MUSE_SPECS: tuple[dict[str, Any], ...] = (
+DEFAULT_AGENT_ID = "witness_thread"
+DEFAULT_AGENT_LABEL = "Witness Thread"
+BOOTSTRAP_AGENT_SPECS: tuple[dict[str, Any], ...] = (
     {
         "id": "witness_thread",
         "label": "Witness Thread",
@@ -151,7 +151,7 @@ DEFAULT_TURNS_PER_MINUTE = 24
 DEFAULT_MAX_PARTICLES_PER_TURN = 18
 DEFAULT_MAX_EVENTS = 2400
 DEFAULT_MAX_HISTORY_MESSAGES = 320
-DEFAULT_MAX_MANIFESTS_PER_MUSE = 128
+DEFAULT_MAX_MANIFESTS_PER_AGENT = 128
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:
@@ -201,7 +201,7 @@ def _hash_unit(value: str) -> float:
     return raw / float(0xFFFFFFFFFF)
 
 
-def _slugify(text: str, *, fallback: str = "muse") -> str:
+def _slugify(text: str, *, fallback: str = "agent") -> str:
     raw = str(text or "").strip().lower()
     if not raw:
         raw = fallback
@@ -211,7 +211,7 @@ def _slugify(text: str, *, fallback: str = "muse") -> str:
     if not raw:
         return fallback
     if raw[0].isdigit():
-        raw = f"muse_{raw}"
+        raw = f"agent_{raw}"
     return raw
 
 
@@ -246,10 +246,10 @@ def _normalized_anchor(raw: Any) -> dict[str, Any]:
 
 def _default_state() -> dict[str, Any]:
     return {
-        "record": MUSE_STATE_FILE_RECORD,
-        "schema_version": MUSE_RUNTIME_SCHEMA_VERSION,
+        "record": AGENT_STATE_FILE_RECORD,
+        "schema_version": AGENT_RUNTIME_SCHEMA_VERSION,
         "seq": 0,
-        "muses": {},
+        "agents": {},
         "messages": {},
         "manifests": {},
         "events": [],
@@ -258,7 +258,7 @@ def _default_state() -> dict[str, Any]:
     }
 
 
-class InMemoryMuseStorage:
+class InMemoryAgentStorage:
     backend_name = "memory"
 
     def __init__(self) -> None:
@@ -278,7 +278,7 @@ class InMemoryMuseStorage:
             self._state = _default_state()
 
 
-class JsonFileMuseStorage:
+class JsonFileAgentStorage:
     backend_name = "json"
 
     def __init__(self, path: Path) -> None:
@@ -314,7 +314,7 @@ class JsonFileMuseStorage:
                 self._path.unlink()
 
 
-class MuseRuntimeManager:
+class AgentRuntimeManager:
     def __init__(
         self,
         *,
@@ -325,7 +325,7 @@ class MuseRuntimeManager:
         max_particles_per_turn: int,
         max_events: int,
         max_history_messages: int,
-        max_manifests_per_muse: int,
+        max_manifests_per_agent: int,
         audio_intent_enabled: bool,
         audio_min_score: float,
         audio_particle_fanout: int,
@@ -340,7 +340,7 @@ class MuseRuntimeManager:
         self._max_particles_per_turn = max(1, int(max_particles_per_turn))
         self._max_events = max(128, int(max_events))
         self._max_history_messages = max(24, int(max_history_messages))
-        self._max_manifests_per_muse = max(8, int(max_manifests_per_muse))
+        self._max_manifests_per_agent = max(8, int(max_manifests_per_agent))
         self._audio_intent_enabled = bool(audio_intent_enabled)
         self._audio_min_score = max(0.01, min(2.0, float(audio_min_score)))
         self._audio_particle_fanout = max(1, min(12, int(audio_particle_fanout)))
@@ -355,19 +355,19 @@ class MuseRuntimeManager:
         )
         self._lock = threading.Lock()
         self._state = self._coerce_state(storage.load_state() if self._enabled else {})
-        self._ensure_bootstrap_muses_locked()
+        self._ensure_bootstrap_agents_locked()
 
     def reset(self) -> None:
         with self._lock:
             self._state = _default_state()
-            self._ensure_bootstrap_muses_locked()
+            self._ensure_bootstrap_agents_locked()
             if self._enabled and self._storage is not None:
                 self._storage.save_state(self._state)
 
-    def list_muses(self) -> list[dict[str, Any]]:
+    def list_agents(self) -> list[dict[str, Any]]:
         with self._lock:
             rows = [
-                self._public_muse_row(muse) for muse in self._state["muses"].values()
+                self._public_agent_row(agent_entry) for agent_entry in self._state["agents"].values()
             ]
             rows.sort(key=lambda row: str(row.get("created_at", "")))
             return rows
@@ -375,33 +375,33 @@ class MuseRuntimeManager:
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
             rows = [
-                self._public_muse_row(muse)
-                for muse in self._state["muses"].values()
-                if isinstance(muse, dict)
+                self._public_agent_row(agent_entry)
+                for agent_entry in self._state["agents"].values()
+                if isinstance(agent_entry, dict)
             ]
             rows.sort(key=lambda row: str(row.get("created_at", "")))
             return {
-                "record": MUSE_RUNTIME_RECORD,
-                "schema_version": MUSE_RUNTIME_SCHEMA_VERSION,
+                "record": AGENT_RUNTIME_RECORD,
+                "schema_version": AGENT_RUNTIME_SCHEMA_VERSION,
                 "enabled": self._enabled,
                 "backend": self._backend_name,
                 "generated_at": _now_iso(),
-                "muse_count": len(self._state["muses"]),
+                "agent_count": len(self._state["agents"]),
                 "event_seq": _safe_int(self._state.get("seq", 0), 0),
-                "muses": rows,
+                "agents": rows,
             }
 
-    def create_muse(
+    def create_agent(
         self,
         *,
-        muse_id: str,
+        agent_id: str,
         label: str,
         anchor: dict[str, Any] | None,
         user_intent_id: str,
     ) -> dict[str, Any]:
         with self._lock:
-            payload = self._create_muse_locked(
-                muse_id=muse_id,
+            payload = self._create_agent_locked(
+                agent_id=agent_id,
                 label=label,
                 anchor=anchor,
                 user_intent_id=user_intent_id,
@@ -411,33 +411,33 @@ class MuseRuntimeManager:
 
     def set_pause(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         paused: bool,
         reason: str,
         user_intent_id: str,
     ) -> dict[str, Any]:
         with self._lock:
-            muse = self._state["muses"].get(str(muse_id).strip())
-            if muse is None:
-                return {"ok": False, "error": "muse_not_found"}
-            muse["status"] = "paused" if paused else "active"
-            kind = "muse.paused" if paused else "muse.resumed"
+            agent_entry = self._state["agents"].get(str(agent_id).strip())
+            if agent_entry is None:
+                return {"ok": False, "error": "agent_not_found"}
+            agent_entry["status"] = "paused" if paused else "active"
+            kind = "agent.paused" if paused else "agent.resumed"
             self._emit_event_locked(
                 kind=kind,
                 status="ok",
-                muse_id=str(muse_id),
+                agent_id=str(agent_id),
                 payload={
                     "reason": str(reason or ""),
                     "user_intent_id": str(user_intent_id or ""),
                 },
             )
             self._persist_locked()
-            return {"ok": True, "muse": self._public_muse_row(muse)}
+            return {"ok": True, "agent": self._public_agent_row(agent_entry)}
 
     def pin_node(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         node_id: str,
         user_intent_id: str,
@@ -445,7 +445,7 @@ class MuseRuntimeManager:
     ) -> dict[str, Any]:
         with self._lock:
             result = self._pin_node_locked(
-                muse_id,
+                agent_id,
                 node_id=node_id,
                 user_intent_id=user_intent_id,
                 reason=reason,
@@ -456,14 +456,14 @@ class MuseRuntimeManager:
 
     def unpin_node(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         node_id: str,
         user_intent_id: str,
     ) -> dict[str, Any]:
         with self._lock:
             result = self._unpin_node_locked(
-                muse_id,
+                agent_id,
                 node_id=node_id,
                 user_intent_id=user_intent_id,
             )
@@ -473,24 +473,24 @@ class MuseRuntimeManager:
 
     def bind_nexus(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         nexus_id: str,
         user_intent_id: str,
         reason: str,
     ) -> dict[str, Any]:
         with self._lock:
-            muse = self._state["muses"].get(str(muse_id).strip())
+            agent_entry = self._state["agents"].get(str(agent_id).strip())
             clean_nexus = str(nexus_id or "").strip()
-            if muse is None:
-                return {"ok": False, "error": "muse_not_found"}
+            if agent_entry is None:
+                return {"ok": False, "error": "agent_not_found"}
             if not clean_nexus:
                 return {"ok": False, "error": "invalid_nexus_id"}
-            muse["active_nexus_id"] = clean_nexus
+            agent_entry["active_nexus_id"] = clean_nexus
             self._emit_event_locked(
-                kind="muse.bind.nexus",
+                kind="agent.bind.nexus",
                 status="ok",
-                muse_id=str(muse_id),
+                agent_id=str(agent_id),
                 payload={
                     "nexus_id": clean_nexus,
                     "reason": str(reason or ""),
@@ -500,21 +500,21 @@ class MuseRuntimeManager:
             self._persist_locked()
             return {
                 "ok": True,
-                "muse": self._public_muse_row(muse),
+                "agent": self._public_agent_row(agent_entry),
             }
 
     def sync_workspace_pins(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         pinned_node_ids: list[str],
         user_intent_id: str,
         reason: str,
     ) -> dict[str, Any]:
         with self._lock:
-            muse = self._state["muses"].get(str(muse_id).strip())
-            if muse is None:
-                return {"ok": False, "error": "muse_not_found"}
+            agent_entry = self._state["agents"].get(str(agent_id).strip())
+            if agent_entry is None:
+                return {"ok": False, "error": "agent_not_found"}
             next_ids = [
                 str(item).strip()
                 for item in (
@@ -528,7 +528,7 @@ class MuseRuntimeManager:
                     deduped_next.append(item)
 
             current = [
-                str(item) for item in muse.get("pinned_node_ids", []) if str(item)
+                str(item) for item in agent_entry.get("pinned_node_ids", []) if str(item)
             ]
             current_set = set(current)
             next_set = set(deduped_next)
@@ -537,29 +537,29 @@ class MuseRuntimeManager:
             removed = sorted(current_set - next_set)
             for node_id in added:
                 self._pin_node_locked(
-                    muse_id,
+                    agent_id,
                     node_id=node_id,
                     user_intent_id=user_intent_id,
                     reason=reason,
                 )
             for node_id in removed:
                 self._unpin_node_locked(
-                    muse_id,
+                    agent_id,
                     node_id=node_id,
                     user_intent_id=user_intent_id,
                 )
-            muse["pinned_node_ids"] = deduped_next[:48]
+            agent_entry["pinned_node_ids"] = deduped_next[:48]
             self._persist_locked()
             return {
                 "ok": True,
-                "muse": self._public_muse_row(muse),
+                "agent": self._public_agent_row(agent_entry),
                 "added": added,
                 "removed": removed,
             }
 
-    def get_context_manifest(self, muse_id: str, turn_id: str) -> dict[str, Any] | None:
+    def get_context_manifest(self, agent_id: str, turn_id: str) -> dict[str, Any] | None:
         with self._lock:
-            manifests = self._state["manifests"].get(str(muse_id).strip(), {})
+            manifests = self._state["manifests"].get(str(agent_id).strip(), {})
             if not isinstance(manifests, dict):
                 return None
             payload = manifests.get(str(turn_id).strip())
@@ -570,7 +570,7 @@ class MuseRuntimeManager:
     def list_events(
         self,
         *,
-        muse_id: str = "",
+        agent_id: str = "",
         since_seq: int = 0,
         limit: int = 64,
     ) -> list[dict[str, Any]]:
@@ -578,14 +578,14 @@ class MuseRuntimeManager:
             rows = self._state.get("events", [])
             if not isinstance(rows, list):
                 return []
-            clean_id = str(muse_id or "").strip()
+            clean_id = str(agent_id or "").strip()
             clean_seq = max(0, int(since_seq))
             clean_limit = max(1, min(512, int(limit)))
             filtered: list[dict[str, Any]] = []
             for row in rows:
                 if not isinstance(row, dict):
                     continue
-                if clean_id and str(row.get("muse_id", "")).strip() != clean_id:
+                if clean_id and str(row.get("agent_id", "")).strip() != clean_id:
                     continue
                 if _safe_int(row.get("seq", 0), 0) <= clean_seq:
                     continue
@@ -598,7 +598,7 @@ class MuseRuntimeManager:
     def send_message(
         self,
         *,
-        muse_id: str,
+        agent_id: str,
         text: str,
         mode: str,
         token_budget: int,
@@ -610,10 +610,10 @@ class MuseRuntimeManager:
         seed: str,
     ) -> dict[str, Any]:
         with self._lock:
-            clean_muse_id = str(muse_id or "").strip()
-            muse = self._state["muses"].get(clean_muse_id)
-            if muse is None:
-                return {"ok": False, "error": "muse_not_found", "status_code": 404}
+            clean_agent_id = str(agent_id or "").strip()
+            agent_entry = self._state["agents"].get(clean_agent_id)
+            if agent_entry is None:
+                return {"ok": False, "error": "agent_not_found", "status_code": 404}
 
             clean_text = str(text or "").strip()
             if not clean_text:
@@ -623,11 +623,11 @@ class MuseRuntimeManager:
                     "status_code": 400,
                 }
 
-            if str(muse.get("status", "active")) == "paused":
+            if str(agent_entry.get("status", "active")) == "paused":
                 self._emit_event_locked(
-                    kind="muse.rejected",
+                    kind="agent.rejected",
                     status="blocked",
-                    muse_id=clean_muse_id,
+                    agent_id=clean_agent_id,
                     payload={
                         "reason": "paused",
                     },
@@ -635,12 +635,12 @@ class MuseRuntimeManager:
                 self._persist_locked()
                 return {
                     "ok": False,
-                    "error": "muse_paused",
+                    "error": "agent_paused",
                     "status_code": 409,
                 }
 
             now_ms = _now_ms()
-            window_rows = self._state["rate_windows"].setdefault(clean_muse_id, [])
+            window_rows = self._state["rate_windows"].setdefault(clean_agent_id, [])
             if not isinstance(window_rows, list):
                 window_rows = []
             horizon = now_ms - 60000
@@ -650,11 +650,11 @@ class MuseRuntimeManager:
                 if _safe_int(item, 0) >= horizon
             ]
             if len(fresh_window) >= self._turns_per_minute:
-                self._state["rate_windows"][clean_muse_id] = fresh_window
+                self._state["rate_windows"][clean_agent_id] = fresh_window
                 self._emit_event_locked(
-                    kind="muse.rate_limited",
+                    kind="agent.rate_limited",
                     status="blocked",
-                    muse_id=clean_muse_id,
+                    agent_id=clean_agent_id,
                     payload={
                         "limit": self._turns_per_minute,
                         "window_seconds": 60,
@@ -667,7 +667,7 @@ class MuseRuntimeManager:
                     "status_code": 429,
                 }
 
-            dedupe_map = self._state["idempotency"].setdefault(clean_muse_id, {})
+            dedupe_map = self._state["idempotency"].setdefault(clean_agent_id, {})
             if not isinstance(dedupe_map, dict):
                 dedupe_map = {}
             clean_key = str(idempotency_key or "").strip()
@@ -675,9 +675,9 @@ class MuseRuntimeManager:
                 cached = dedupe_map.get(clean_key)
                 if isinstance(cached, dict):
                     self._emit_event_locked(
-                        kind="muse.message.deduped",
+                        kind="agent.message.deduped",
                         status="ok",
-                        muse_id=clean_muse_id,
+                        agent_id=clean_agent_id,
                         payload={
                             "idempotency_key": clean_key,
                             "turn_id": str(cached.get("turn_id", "")),
@@ -686,17 +686,17 @@ class MuseRuntimeManager:
                     self._persist_locked()
                     return json.loads(json.dumps(cached, ensure_ascii=False))
 
-            turn_id = f"turn:{sha1(f'{clean_muse_id}|{now_ms}|{clean_text}'.encode('utf-8')).hexdigest()[:16]}"
+            turn_id = f"turn:{sha1(f'{clean_agent_id}|{now_ms}|{clean_text}'.encode('utf-8')).hexdigest()[:16]}"
             message_node = self._append_message_node_locked(
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 role="user",
                 text=clean_text,
             )
             self._emit_event_locked(
-                kind="muse.message.received",
+                kind="agent.message.received",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "message_node_id": str(message_node.get("id", "")),
@@ -705,7 +705,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind="resource.message.created",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "resource_node_id": str(message_node.get("id", "")),
@@ -720,12 +720,12 @@ class MuseRuntimeManager:
             resolved_seed = str(seed or "").strip()
             if not resolved_seed:
                 resolved_seed = sha1(
-                    f"{clean_muse_id}|{turn_id}|{clean_text}".encode("utf-8")
+                    f"{clean_agent_id}|{turn_id}|{clean_text}".encode("utf-8")
                 ).hexdigest()[:16]
             rng = random.Random(_seed_to_int(resolved_seed))
 
             manifest = self._assemble_context_manifest_locked(
-                muse=muse,
+                agent_entry=agent_entry,
                 turn_id=turn_id,
                 graph_revision=graph_revision,
                 mode=clean_mode,
@@ -734,9 +734,9 @@ class MuseRuntimeManager:
                 surrounding_nodes=surrounding_nodes,
             )
             self._emit_event_locked(
-                kind="muse.context.assembled",
+                kind="agent.context.assembled",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "manifest_id": str(manifest.get("id", "")),
@@ -745,9 +745,9 @@ class MuseRuntimeManager:
                 },
             )
             self._emit_event_locked(
-                kind="muse.tet.compiled",
+                kind="agent.tet.compiled",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "tet_count": len(manifest.get("tet_units", [])),
@@ -756,37 +756,37 @@ class MuseRuntimeManager:
 
             tool_rows = self._run_tool_requests_locked(
                 clean_text,
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 tool_callback=tool_callback,
             )
             media_action = self._resolve_media_command_action_locked(
                 text=clean_text,
-                muse=muse,
+                agent_entry=agent_entry,
                 turn_id=turn_id,
                 manifest=manifest,
                 surrounding_nodes=surrounding_nodes,
             )
             particle_rows = self._emit_particles_locked(
-                muse=muse,
+                agent_entry=agent_entry,
                 manifest=manifest,
                 turn_id=turn_id,
                 rng=rng,
             )
             if isinstance(media_action, dict) and media_action:
                 media_action = self._route_media_action_with_particles_locked(
-                    muse_id=clean_muse_id,
+                    agent_id=clean_agent_id,
                     turn_id=turn_id,
                     action=media_action,
                     particle_rows=particle_rows,
                 )
             field_deltas = self._field_deltas_from_particles_locked(
-                muse=muse,
+                agent_entry=agent_entry,
                 turn_id=turn_id,
                 particle_rows=particle_rows,
             )
             gpu_claim = self._claim_gpu_locked(
-                muse=muse,
+                agent_entry=agent_entry,
                 turn_id=turn_id,
                 manifest=manifest,
                 rng=rng,
@@ -795,7 +795,7 @@ class MuseRuntimeManager:
 
             context_lines = [
                 "Muse context manifest:",
-                f"muse_id={clean_muse_id}",
+                f"agent_id={clean_agent_id}",
                 f"turn_id={turn_id}",
                 f"mode={clean_mode}",
                 f"graph_revision={graph_revision}",
@@ -836,7 +836,7 @@ class MuseRuntimeManager:
                 )
             context_block = "\n".join(context_lines)
 
-            history_rows = self._history_messages_locked(clean_muse_id, limit=14)
+            history_rows = self._history_messages_locked(clean_agent_id, limit=14)
             model_messages = [
                 {"role": str(row.get("role", "user")), "text": str(row.get("text", ""))}
                 for row in history_rows
@@ -863,7 +863,7 @@ class MuseRuntimeManager:
                         messages=model_messages,
                         context_block=context_block,
                         mode=clean_mode,
-                        muse_id=clean_muse_id,
+                        agent_id=clean_agent_id,
                         turn_id=turn_id,
                     )
                     if isinstance(built, dict):
@@ -890,7 +890,7 @@ class MuseRuntimeManager:
                     assistant_text += f" Opened image target: {selected_label}."
 
             assistant_node = self._append_message_node_locked(
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 role="assistant",
                 text=assistant_text,
@@ -898,7 +898,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind="resource.message.appended",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "resource_node_id": str(assistant_node.get("id", "")),
@@ -906,9 +906,9 @@ class MuseRuntimeManager:
                 },
             )
             self._emit_event_locked(
-                kind="muse.response.generated",
+                kind="agent.response.generated",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "mode": reply_mode,
@@ -919,9 +919,9 @@ class MuseRuntimeManager:
             )
             if grounded_receipts:
                 self._emit_event_locked(
-                    kind="muse_job_completed",
+                    kind="agent_job_completed",
                     status="ok",
-                    muse_id=clean_muse_id,
+                    agent_id=clean_agent_id,
                     turn_id=turn_id,
                     payload={
                         "snapshot_hash": str(
@@ -937,9 +937,9 @@ class MuseRuntimeManager:
                     },
                 )
             self._emit_event_locked(
-                kind="muse.turn.completed",
+                kind="agent.turn.completed",
                 status="ok",
-                muse_id=clean_muse_id,
+                agent_id=clean_agent_id,
                 turn_id=turn_id,
                 payload={
                     "manifest_id": str(manifest.get("id", "")),
@@ -958,19 +958,19 @@ class MuseRuntimeManager:
                 },
             )
 
-            self._release_gpu_claim_locked(muse=muse, turn_id=turn_id, claim=gpu_claim)
+            self._release_gpu_claim_locked(agent_entry=agent_entry, turn_id=turn_id, claim=gpu_claim)
 
             fresh_window.append(now_ms)
-            self._state["rate_windows"][clean_muse_id] = fresh_window[
+            self._state["rate_windows"][clean_agent_id] = fresh_window[
                 -self._turns_per_minute :
             ]
 
             response_payload = {
                 "ok": True,
                 "record": "eta-mu.muse-turn.v1",
-                "schema_version": MUSE_RUNTIME_SCHEMA_VERSION,
+                "schema_version": AGENT_RUNTIME_SCHEMA_VERSION,
                 "generated_at": _now_iso(),
-                "muse": self._public_muse_row(muse),
+                "agent": self._public_agent_row(agent_entry),
                 "turn_id": turn_id,
                 "reply": assistant_text,
                 "mode": reply_mode,
@@ -998,14 +998,14 @@ class MuseRuntimeManager:
                     oldest_keys = sorted(dedupe_map.keys())[: len(dedupe_map) - 128]
                     for key in oldest_keys:
                         dedupe_map.pop(key, None)
-                self._state["idempotency"][clean_muse_id] = dedupe_map
+                self._state["idempotency"][clean_agent_id] = dedupe_map
             self._persist_locked()
             return response_payload
 
     def _history_messages_locked(
-        self, muse_id: str, *, limit: int
+        self, agent_id: str, *, limit: int
     ) -> list[dict[str, Any]]:
-        rows = self._state["messages"].get(muse_id, [])
+        rows = self._state["messages"].get(agent_id, [])
         if not isinstance(rows, list):
             return []
         clean_limit = max(1, min(128, int(limit)))
@@ -1015,19 +1015,19 @@ class MuseRuntimeManager:
     def _append_message_node_locked(
         self,
         *,
-        muse_id: str,
+        agent_id: str,
         turn_id: str,
         role: str,
         text: str,
     ) -> dict[str, Any]:
-        rows = self._state["messages"].setdefault(muse_id, [])
+        rows = self._state["messages"].setdefault(agent_id, [])
         if not isinstance(rows, list):
             rows = []
-        node_id = f"resource:message:{sha1(f'{muse_id}|{turn_id}|{role}|{text}|{_now_ms()}'.encode('utf-8')).hexdigest()[:16]}"
+        node_id = f"resource:message:{sha1(f'{agent_id}|{turn_id}|{role}|{text}|{_now_ms()}'.encode('utf-8')).hexdigest()[:16]}"
         row = {
-            "record": MUSE_RESOURCE_NODE_RECORD,
+            "record": AGENT_RESOURCE_NODE_RECORD,
             "id": node_id,
-            "muse_id": muse_id,
+            "agent_id": agent_id,
             "turn_id": turn_id,
             "role": role,
             "text": text,
@@ -1035,23 +1035,23 @@ class MuseRuntimeManager:
             "kind": "message",
             "visibility": "private",
             "x": _safe_float(
-                self._state["muses"][muse_id].get("anchor", {}).get("x", 0.5), 0.5
+                self._state["agents"][agent_id].get("anchor", {}).get("x", 0.5), 0.5
             ),
             "y": _safe_float(
-                self._state["muses"][muse_id].get("anchor", {}).get("y", 0.5), 0.5
+                self._state["agents"][agent_id].get("anchor", {}).get("y", 0.5), 0.5
             ),
         }
         rows.append(row)
         if len(rows) > self._max_history_messages:
-            self._state["messages"][muse_id] = rows[-self._max_history_messages :]
+            self._state["messages"][agent_id] = rows[-self._max_history_messages :]
         else:
-            self._state["messages"][muse_id] = rows
+            self._state["messages"][agent_id] = rows
         return dict(row)
 
     def _assemble_context_manifest_locked(
         self,
         *,
-        muse: dict[str, Any],
+        agent_entry: dict[str, Any],
         turn_id: str,
         graph_revision: str,
         mode: str,
@@ -1059,8 +1059,8 @@ class MuseRuntimeManager:
         seed: str,
         surrounding_nodes: list[dict[str, Any]],
     ) -> dict[str, Any]:
-        muse_id = str(muse.get("id", "")).strip()
-        anchor = _normalized_anchor(muse.get("anchor", {}))
+        agent_id = str(agent_entry.get("id", "")).strip()
+        anchor = _normalized_anchor(agent_entry.get("anchor", {}))
         alpha = 3.2
         tau = 0.82
         explicit_budget = int(token_budget * 0.6)
@@ -1100,7 +1100,7 @@ class MuseRuntimeManager:
                 "ts": str(row.get("ts", "") or "").strip(),
             }
 
-        for row in self._history_messages_locked(muse_id, limit=10):
+        for row in self._history_messages_locked(agent_id, limit=10):
             node_id = str(row.get("id", "")).strip()
             if not node_id:
                 continue
@@ -1123,8 +1123,8 @@ class MuseRuntimeManager:
 
         explicit_ids: list[str] = []
         for node_id in (
-            muse.get("pinned_node_ids", [])
-            if isinstance(muse.get("pinned_node_ids"), list)
+            agent_entry.get("pinned_node_ids", [])
+            if isinstance(agent_entry.get("pinned_node_ids"), list)
             else []
         ):
             clean_node = str(node_id).strip()
@@ -1148,7 +1148,7 @@ class MuseRuntimeManager:
                 },
             )
 
-        active_nexus = str(muse.get("active_nexus_id", "")).strip()
+        active_nexus = str(agent_entry.get("active_nexus_id", "")).strip()
         if active_nexus:
             if active_nexus not in explicit_ids:
                 explicit_ids.append(active_nexus)
@@ -1170,7 +1170,7 @@ class MuseRuntimeManager:
 
         recent_message_ids = [
             str(row.get("id", "")).strip()
-            for row in self._history_messages_locked(muse_id, limit=6)
+            for row in self._history_messages_locked(agent_id, limit=6)
             if str(row.get("id", "")).strip()
         ]
         for node_id in recent_message_ids:
@@ -1238,7 +1238,7 @@ class MuseRuntimeManager:
             tags = [
                 str(item).strip() for item in node.get("tags", []) if str(item).strip()
             ]
-            if muse_id in tags:
+            if agent_id in tags:
                 affinity += 0.22
             if active_nexus and active_nexus in tags:
                 affinity += 0.22
@@ -1321,12 +1321,12 @@ class MuseRuntimeManager:
                 }
             )
 
-        manifest_id = f"manifest:{sha1(f'{muse_id}|{turn_id}|{seed}'.encode('utf-8')).hexdigest()[:18]}"
+        manifest_id = f"manifest:{sha1(f'{agent_id}|{turn_id}|{seed}'.encode('utf-8')).hexdigest()[:18]}"
         manifest = {
-            "record": MUSE_CONTEXT_MANIFEST_RECORD,
-            "schema_version": MUSE_CONTEXT_MANIFEST_SCHEMA_VERSION,
+            "record": AGENT_CONTEXT_MANIFEST_RECORD,
+            "schema_version": AGENT_CONTEXT_MANIFEST_SCHEMA_VERSION,
             "id": manifest_id,
-            "muse_id": muse_id,
+            "agent_id": agent_id,
             "turn_id": turn_id,
             "graph_revision": str(graph_revision or ""),
             "scorer_version": "muse.proximity.v1",
@@ -1340,27 +1340,27 @@ class MuseRuntimeManager:
             "dropped": dropped,
             "generated_at": _now_iso(),
         }
-        manifests = self._state["manifests"].setdefault(muse_id, {})
+        manifests = self._state["manifests"].setdefault(agent_id, {})
         if not isinstance(manifests, dict):
             manifests = {}
         manifests[turn_id] = manifest
-        if len(manifests) > self._max_manifests_per_muse:
+        if len(manifests) > self._max_manifests_per_agent:
             keys = sorted(manifests.keys())
-            for key in keys[: len(manifests) - self._max_manifests_per_muse]:
+            for key in keys[: len(manifests) - self._max_manifests_per_agent]:
                 manifests.pop(key, None)
-        self._state["manifests"][muse_id] = manifests
+        self._state["manifests"][agent_id] = manifests
         return manifest
 
     def _emit_particles_locked(
         self,
         *,
-        muse: dict[str, Any],
+        agent_entry: dict[str, Any],
         manifest: dict[str, Any],
         turn_id: str,
         rng: random.Random,
     ) -> list[dict[str, Any]]:
-        muse_id = str(muse.get("id", "")).strip()
-        anchor = _normalized_anchor(muse.get("anchor", {}))
+        agent_id = str(agent_entry.get("id", "")).strip()
+        anchor = _normalized_anchor(agent_entry.get("anchor", {}))
         tet_units = [
             item for item in manifest.get("tet_units", []) if isinstance(item, dict)
         ]
@@ -1375,14 +1375,14 @@ class MuseRuntimeManager:
         rows: list[dict[str, Any]] = []
         for idx, tet in enumerate(selected_units):
             source_id = str(tet.get("node_id", "")).strip() or f"node:{idx}"
-            embedding_seed = f"{muse_id}|{turn_id}|{source_id}|{idx}"
+            embedding_seed = f"{agent_id}|{turn_id}|{source_id}|{idx}"
             emb = self._embedding_preview(embedding_seed)
             jitter_x = (rng.random() - 0.5) * 0.06
             jitter_y = (rng.random() - 0.5) * 0.06
             row = {
-                "record": MUSE_PARTICLE_RECORD,
+                "record": AGENT_PARTICLE_RECORD,
                 "id": f"particle:{sha1(embedding_seed.encode('utf-8')).hexdigest()[:16]}",
-                "muse_id": muse_id,
+                "agent_id": agent_id,
                 "turn_id": turn_id,
                 "manifest_id": str(manifest.get("id", "")),
                 "source_node_id": source_id,
@@ -1399,7 +1399,7 @@ class MuseRuntimeManager:
         self._emit_event_locked(
             kind="agent.particles.emitted",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "count": len(rows),
@@ -1411,11 +1411,11 @@ class MuseRuntimeManager:
     def _field_deltas_from_particles_locked(
         self,
         *,
-        muse: dict[str, Any],
+        agent_entry: dict[str, Any],
         turn_id: str,
         particle_rows: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
-        muse_id = str(muse.get("id", "")).strip()
+        agent_id = str(agent_entry.get("id", "")).strip()
         deltas: list[dict[str, Any]] = []
         for row in particle_rows[:16]:
             energy = _clamp01(_safe_float(row.get("energy", 0.0), 0.0))
@@ -1423,7 +1423,7 @@ class MuseRuntimeManager:
             deltas.append(
                 {
                     "id": f"delta:{sha1((str(row.get('id', '')) + turn_id).encode('utf-8')).hexdigest()[:14]}",
-                    "muse_id": muse_id,
+                    "agent_id": agent_id,
                     "turn_id": turn_id,
                     "x": round(_clamp01(_safe_float(row.get("x", 0.5), 0.5)), 6),
                     "y": round(_clamp01(_safe_float(row.get("y", 0.5), 0.5)), 6),
@@ -1435,7 +1435,7 @@ class MuseRuntimeManager:
         self._emit_event_locked(
             kind="field.delta.applied",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "count": len(deltas),
@@ -1446,17 +1446,17 @@ class MuseRuntimeManager:
     def _claim_gpu_locked(
         self,
         *,
-        muse: dict[str, Any],
+        agent_entry: dict[str, Any],
         turn_id: str,
         manifest: dict[str, Any],
         rng: random.Random,
         surrounding_nodes: list[dict[str, Any]],
     ) -> dict[str, Any]:
-        muse_id = str(muse.get("id", "")).strip()
+        agent_id = str(agent_entry.get("id", "")).strip()
         self._emit_event_locked(
-            kind="muse.gpu.claim.requested",
+            kind="agent.gpu.claim.requested",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "manifest_id": str(manifest.get("id", "")),
@@ -1477,16 +1477,16 @@ class MuseRuntimeManager:
 
         if not candidate_devices:
             self._emit_event_locked(
-                kind="muse.gpu.claim.rejected",
+                kind="agent.gpu.claim.rejected",
                 status="blocked",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "reason": "no_gpu_devices_visible",
                 },
             )
             return {
-                "record": MUSE_GPU_CLAIM_RECORD,
+                "record": AGENT_GPU_CLAIM_RECORD,
                 "status": "rejected",
                 "reason": "no_gpu_devices_visible",
                 "claim_id": "",
@@ -1506,9 +1506,9 @@ class MuseRuntimeManager:
 
         if not best_device or best_util >= 0.97:
             self._emit_event_locked(
-                kind="muse.gpu.claim.rejected",
+                kind="agent.gpu.claim.rejected",
                 status="blocked",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "reason": "gpu_pressure_high",
@@ -1516,7 +1516,7 @@ class MuseRuntimeManager:
                 },
             )
             return {
-                "record": MUSE_GPU_CLAIM_RECORD,
+                "record": AGENT_GPU_CLAIM_RECORD,
                 "status": "rejected",
                 "reason": "gpu_pressure_high",
                 "claim_id": "",
@@ -1524,9 +1524,9 @@ class MuseRuntimeManager:
                 "utilization": round(best_util, 6),
             }
 
-        claim_id = f"gpu-claim:{sha1(f'{muse_id}|{turn_id}|{best_device}'.encode('utf-8')).hexdigest()[:16]}"
+        claim_id = f"gpu-claim:{sha1(f'{agent_id}|{turn_id}|{best_device}'.encode('utf-8')).hexdigest()[:16]}"
         claim = {
-            "record": MUSE_GPU_CLAIM_RECORD,
+            "record": AGENT_GPU_CLAIM_RECORD,
             "status": "granted",
             "claim_id": claim_id,
             "device": best_device,
@@ -1534,16 +1534,16 @@ class MuseRuntimeManager:
             "influence": round(best_score, 6),
             "granted_at": _now_iso(),
         }
-        muse["gpu_state"] = {
+        agent_entry["gpu_state"] = {
             "status": "claimed",
             "claim_id": claim_id,
             "device": best_device,
             "updated_at": _now_iso(),
         }
         self._emit_event_locked(
-            kind="muse.gpu.claim.granted",
+            kind="agent.gpu.claim.granted",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "claim_id": claim_id,
@@ -1556,7 +1556,7 @@ class MuseRuntimeManager:
     def _release_gpu_claim_locked(
         self,
         *,
-        muse: dict[str, Any],
+        agent_entry: dict[str, Any],
         turn_id: str,
         claim: dict[str, Any],
     ) -> None:
@@ -1564,17 +1564,17 @@ class MuseRuntimeManager:
             return
         if str(claim.get("status", "")) != "granted":
             return
-        muse_id = str(muse.get("id", "")).strip()
-        muse["gpu_state"] = {
+        agent_id = str(agent_entry.get("id", "")).strip()
+        agent_entry["gpu_state"] = {
             "status": "released",
             "claim_id": "",
             "device": str(claim.get("device", "")),
             "updated_at": _now_iso(),
         }
         self._emit_event_locked(
-            kind="muse.gpu.claim.released",
+            kind="agent.gpu.claim.released",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "claim_id": str(claim.get("claim_id", "")),
@@ -1586,7 +1586,7 @@ class MuseRuntimeManager:
         self,
         text: str,
         *,
-        muse_id: str,
+        agent_id: str,
         turn_id: str,
         tool_callback: Any | None,
     ) -> list[dict[str, Any]]:
@@ -1605,23 +1605,23 @@ class MuseRuntimeManager:
             )
             if is_grounding_tool:
                 self._emit_event_locked(
-                    kind="muse_job_enqueued",
+                    kind="agent_job_enqueued",
                     status="ok",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={"tool": tool_name},
                 )
                 self._emit_event_locked(
-                    kind="muse_job_started",
+                    kind="agent_job_started",
                     status="ok",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={"tool": tool_name},
                 )
             self._emit_event_locked(
-                kind="muse.tool.requested",
+                kind="agent.tool.requested",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={"tool": tool_name},
             )
@@ -1642,9 +1642,9 @@ class MuseRuntimeManager:
             }
             rows.append(row)
             self._emit_event_locked(
-                kind="muse.tool.result",
+                kind="agent.tool.result",
                 status="ok" if bool(row["result"].get("ok", False)) else "blocked",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "tool": tool_name,
@@ -1653,9 +1653,9 @@ class MuseRuntimeManager:
             )
             if is_grounding_tool:
                 self._emit_event_locked(
-                    kind="muse_job_completed",
+                    kind="agent_job_completed",
                     status="ok" if bool(row["result"].get("ok", False)) else "blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "tool": tool_name,
@@ -2066,7 +2066,7 @@ class MuseRuntimeManager:
         self,
         *,
         text: str,
-        muse: dict[str, Any],
+        agent_entry: dict[str, Any],
         turn_id: str,
         manifest: dict[str, Any],
         surrounding_nodes: list[dict[str, Any]],
@@ -2141,7 +2141,7 @@ class MuseRuntimeManager:
         elif explicit_image and not explicit_audio:
             strict_kind = "image"
 
-        muse_id = str(muse.get("id", "")).strip()
+        agent_id = str(agent_entry.get("id", "")).strip()
         query_tokens_by_kind = {
             "audio": [
                 token
@@ -2387,7 +2387,7 @@ class MuseRuntimeManager:
                     score += 0.78
                 if "workspace-pin" in tags:
                     score += 0.34
-                if muse_id.lower() in tags:
+                if agent_id.lower() in tags:
                     score += 0.24
                 if node_id in tet_distance:
                     score += (1.0 - tet_distance[node_id]) * 0.26
@@ -2405,7 +2405,7 @@ class MuseRuntimeManager:
                         0.0,
                     ),
                 )
-                score += _hash_unit(f"audio|{muse_id}|{node_id}") * 0.04
+                score += _hash_unit(f"audio|{agent_id}|{node_id}") * 0.04
                 candidates.append(
                     {
                         "media_kind": "audio",
@@ -2432,7 +2432,7 @@ class MuseRuntimeManager:
                     score += 0.78
                 if "workspace-pin" in tags:
                     score += 0.34
-                if muse_id.lower() in tags:
+                if agent_id.lower() in tags:
                     score += 0.24
                 if node_id in tet_distance:
                     score += (1.0 - tet_distance[node_id]) * 0.26
@@ -2450,7 +2450,7 @@ class MuseRuntimeManager:
                         0.0,
                     ),
                 )
-                score += _hash_unit(f"image|{muse_id}|{node_id}") * 0.04
+                score += _hash_unit(f"image|{agent_id}|{node_id}") * 0.04
                 candidates.append(
                     {
                         "media_kind": "image",
@@ -2494,7 +2494,7 @@ class MuseRuntimeManager:
         action = {
             "record": "eta-mu.media-command-action.v1",
             "schema_version": "muse.media-command.v1",
-            "muse_id": muse_id,
+            "agent_id": agent_id,
             "turn_id": turn_id,
             "intent": "command",
             "command": resolved_kind or "media",
@@ -2533,9 +2533,9 @@ class MuseRuntimeManager:
         }
 
         self._emit_event_locked(
-            kind="muse.media.intent.detected",
+            kind="agent.media.intent.detected",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "media_kind": resolved_kind,
@@ -2548,9 +2548,9 @@ class MuseRuntimeManager:
         )
         if resolved_kind == "audio":
             self._emit_event_locked(
-                kind="muse.audio.intent.detected",
+                kind="agent.audio.intent.detected",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "query": str(action.get("query", "")),
@@ -2558,9 +2558,9 @@ class MuseRuntimeManager:
             )
         if resolved_kind == "image":
             self._emit_event_locked(
-                kind="muse.image.intent.detected",
+                kind="agent.image.intent.detected",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "query": str(action.get("query", "")),
@@ -2583,7 +2583,7 @@ class MuseRuntimeManager:
                 self._emit_event_locked(
                     kind="audio.play.blocked",
                     status="blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "reason": reason,
@@ -2594,7 +2594,7 @@ class MuseRuntimeManager:
                 self._emit_event_locked(
                     kind="image.open.blocked",
                     status="blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "reason": reason,
@@ -2613,7 +2613,7 @@ class MuseRuntimeManager:
                 self._emit_event_locked(
                     kind="audio.play.blocked",
                     status="blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "reason": "confidence_too_low",
@@ -2626,7 +2626,7 @@ class MuseRuntimeManager:
                 self._emit_event_locked(
                     kind="image.open.blocked",
                     status="blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "reason": "confidence_too_low",
@@ -2654,7 +2654,7 @@ class MuseRuntimeManager:
     def _route_media_action_with_particles_locked(
         self,
         *,
-        muse_id: str,
+        agent_id: str,
         turn_id: str,
         action: dict[str, Any],
         particle_rows: list[dict[str, Any]],
@@ -2671,7 +2671,7 @@ class MuseRuntimeManager:
                 self._emit_event_locked(
                     kind="image.open.blocked",
                     status="blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "reason": "missing_target_node",
@@ -2681,7 +2681,7 @@ class MuseRuntimeManager:
                 self._emit_event_locked(
                     kind="audio.play.blocked",
                     status="blocked",
-                    muse_id=muse_id,
+                    agent_id=agent_id,
                     turn_id=turn_id,
                     payload={
                         "reason": "missing_target_node",
@@ -2737,7 +2737,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind=blocked_kind,
                 status="blocked",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "reason": "no_particles_available",
@@ -2749,7 +2749,7 @@ class MuseRuntimeManager:
         self._emit_event_locked(
             kind="agent.particles.media.collided",
             status="ok",
-            muse_id=muse_id,
+            agent_id=agent_id,
             turn_id=turn_id,
             payload={
                 "count": collisions,
@@ -2763,7 +2763,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind="agent.particles.image.collided",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "count": collisions,
@@ -2775,7 +2775,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind="image.open.requested",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "target_node_id": target_node_id,
@@ -2790,7 +2790,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind="agent.particles.audio.collided",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "count": collisions,
@@ -2802,7 +2802,7 @@ class MuseRuntimeManager:
             self._emit_event_locked(
                 kind="audio.play.requested",
                 status="ok",
-                muse_id=muse_id,
+                agent_id=agent_id,
                 turn_id=turn_id,
                 payload={
                     "target_node_id": target_node_id,
@@ -2817,31 +2817,31 @@ class MuseRuntimeManager:
 
     def _pin_node_locked(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         node_id: str,
         user_intent_id: str,
         reason: str,
     ) -> dict[str, Any]:
-        muse = self._state["muses"].get(str(muse_id).strip())
+        agent_entry = self._state["agents"].get(str(agent_id).strip())
         clean_node = str(node_id or "").strip()
-        if muse is None:
-            return {"ok": False, "error": "muse_not_found"}
+        if agent_entry is None:
+            return {"ok": False, "error": "agent_not_found"}
         if not clean_node:
             return {"ok": False, "error": "invalid_node_id"}
-        pins = [str(item) for item in muse.get("pinned_node_ids", []) if str(item)]
+        pins = [str(item) for item in agent_entry.get("pinned_node_ids", []) if str(item)]
         if clean_node in pins:
             return {
                 "ok": True,
-                "muse": self._public_muse_row(muse),
+                "agent": self._public_agent_row(agent_entry),
                 "changed": False,
             }
         pins.append(clean_node)
-        muse["pinned_node_ids"] = pins[:48]
+        agent_entry["pinned_node_ids"] = pins[:48]
         self._emit_event_locked(
-            kind="muse.pin.node",
+            kind="agent.pin.node",
             status="ok",
-            muse_id=str(muse_id),
+            agent_id=str(agent_id),
             payload={
                 "node_id": clean_node,
                 "reason": str(reason or ""),
@@ -2850,36 +2850,36 @@ class MuseRuntimeManager:
         )
         return {
             "ok": True,
-            "muse": self._public_muse_row(muse),
+            "agent": self._public_agent_row(agent_entry),
             "changed": True,
         }
 
-    def _create_muse_locked(
+    def _create_agent_locked(
         self,
         *,
-        muse_id: str,
+        agent_id: str,
         label: str,
         anchor: dict[str, Any] | None,
         user_intent_id: str,
     ) -> dict[str, Any]:
         created_at = _now_iso()
         clean_id = _slugify(
-            muse_id, fallback=_slugify(label or "muse", fallback="muse")
+            agent_id, fallback=_slugify(label or "agent", fallback="agent")
         )
         if not clean_id:
             clean_id = f"muse_{_safe_int(time.time(), 0)}"
-        if clean_id in self._state["muses"]:
+        if clean_id in self._state["agents"]:
             return {
                 "ok": False,
-                "error": "muse_already_exists",
-                "muse": self._public_muse_row(self._state["muses"][clean_id]),
+                "error": "agent_already_exists",
+                "agent": self._public_agent_row(self._state["agents"][clean_id]),
             }
 
         clean_label = str(label or "").strip() or clean_id.replace("_", " ").title()
-        muse = {
+        agent_entry = {
             "id": clean_id,
             "label": clean_label,
-            "presence_type": "muse",
+            "presence_type": "agent",
             "created_at": created_at,
             "status": "active",
             "anchor": _normalized_anchor(anchor),
@@ -2897,68 +2897,68 @@ class MuseRuntimeManager:
                 "updated_at": created_at,
             },
         }
-        self._state["muses"][clean_id] = muse
+        self._state["agents"][clean_id] = agent_entry
         self._state["messages"][clean_id] = []
         self._state["manifests"][clean_id] = {}
         self._state["idempotency"][clean_id] = {}
         self._state["rate_windows"][clean_id] = []
 
         self._emit_event_locked(
-            kind="muse.created",
+            kind="agent.created",
             status="ok",
-            muse_id=clean_id,
+            agent_id=clean_id,
             payload={
                 "label": clean_label,
-                "anchor": dict(muse["anchor"]),
+                "anchor": dict(agent_entry["anchor"]),
                 "user_intent_id": str(user_intent_id or ""),
             },
         )
         self._emit_event_locked(
-            kind="muse.anchored",
+            kind="agent.anchored",
             status="ok",
-            muse_id=clean_id,
+            agent_id=clean_id,
             payload={
-                "anchor": dict(muse["anchor"]),
+                "anchor": dict(agent_entry["anchor"]),
             },
         )
         self._emit_event_locked(
-            kind="muse.panel.opened",
+            kind="agent.panel.opened",
             status="ok",
-            muse_id=clean_id,
+            agent_id=clean_id,
             payload={
-                "panel_id": str(muse.get("panel_id", "")),
+                "panel_id": str(agent_entry.get("panel_id", "")),
             },
         )
         return {
             "ok": True,
-            "muse": self._public_muse_row(muse),
+            "agent": self._public_agent_row(agent_entry),
         }
 
     def _unpin_node_locked(
         self,
-        muse_id: str,
+        agent_id: str,
         *,
         node_id: str,
         user_intent_id: str,
     ) -> dict[str, Any]:
-        muse = self._state["muses"].get(str(muse_id).strip())
+        agent_entry = self._state["agents"].get(str(agent_id).strip())
         clean_node = str(node_id or "").strip()
-        if muse is None:
-            return {"ok": False, "error": "muse_not_found"}
+        if agent_entry is None:
+            return {"ok": False, "error": "agent_not_found"}
         if not clean_node:
             return {"ok": False, "error": "invalid_node_id"}
-        pins = [str(item) for item in muse.get("pinned_node_ids", []) if str(item)]
+        pins = [str(item) for item in agent_entry.get("pinned_node_ids", []) if str(item)]
         if clean_node not in pins:
             return {
                 "ok": True,
-                "muse": self._public_muse_row(muse),
+                "agent": self._public_agent_row(agent_entry),
                 "changed": False,
             }
-        muse["pinned_node_ids"] = [item for item in pins if item != clean_node]
+        agent_entry["pinned_node_ids"] = [item for item in pins if item != clean_node]
         self._emit_event_locked(
-            kind="muse.unpin.node",
+            kind="agent.unpin.node",
             status="ok",
-            muse_id=str(muse_id),
+            agent_id=str(agent_id),
             payload={
                 "node_id": clean_node,
                 "user_intent_id": str(user_intent_id or ""),
@@ -2966,34 +2966,34 @@ class MuseRuntimeManager:
         )
         return {
             "ok": True,
-            "muse": self._public_muse_row(muse),
+            "agent": self._public_agent_row(agent_entry),
             "changed": True,
         }
 
-    def _public_muse_row(self, muse: dict[str, Any]) -> dict[str, Any]:
-        muse_id = str(muse.get("id", "")).strip()
-        messages = self._state["messages"].get(muse_id, [])
+    def _public_agent_row(self, agent_entry: dict[str, Any]) -> dict[str, Any]:
+        agent_id = str(agent_entry.get("id", "")).strip()
+        messages = self._state["messages"].get(agent_id, [])
         history_count = len(messages) if isinstance(messages, list) else 0
         return {
-            "id": muse_id,
-            "label": str(muse.get("label", muse_id) or muse_id),
-            "presence_type": str(muse.get("presence_type", "muse") or "muse"),
-            "created_at": str(muse.get("created_at", "")),
-            "status": str(muse.get("status", "active")),
-            "anchor": _normalized_anchor(muse.get("anchor", {})),
-            "panel_id": str(muse.get("panel_id", f"nexus.ui.chat.{muse_id}")),
-            "active_nexus_id": str(muse.get("active_nexus_id", "")),
+            "id": agent_id,
+            "label": str(agent_entry.get("label", agent_id) or agent_id),
+            "presence_type": str(agent_entry.get("presence_type", "agent") or "agent"),
+            "created_at": str(agent_entry.get("created_at", "")),
+            "status": str(agent_entry.get("status", "active")),
+            "anchor": _normalized_anchor(agent_entry.get("anchor", {})),
+            "panel_id": str(agent_entry.get("panel_id", f"nexus.ui.chat.{agent_id}")),
+            "active_nexus_id": str(agent_entry.get("active_nexus_id", "")),
             "pinned_node_ids": [
                 str(item)
                 for item in (
-                    muse.get("pinned_node_ids", [])
-                    if isinstance(muse.get("pinned_node_ids"), list)
+                    agent_entry.get("pinned_node_ids", [])
+                    if isinstance(agent_entry.get("pinned_node_ids"), list)
                     else []
                 )
                 if str(item).strip()
             ],
             "chat_history_count": history_count,
-            "gpu_state": dict(muse.get("gpu_state", {})),
+            "gpu_state": dict(agent_entry.get("gpu_state", {})),
         }
 
     def _emit_event_locked(
@@ -3001,20 +3001,20 @@ class MuseRuntimeManager:
         *,
         kind: str,
         status: str,
-        muse_id: str,
+        agent_id: str,
         payload: dict[str, Any] | None = None,
         turn_id: str = "",
     ) -> dict[str, Any]:
         seq = _safe_int(self._state.get("seq", 0), 0) + 1
         self._state["seq"] = seq
         event = {
-            "record": MUSE_EVENT_RECORD,
-            "schema_version": MUSE_EVENT_SCHEMA_VERSION,
+            "record": AGENT_EVENT_RECORD,
+            "schema_version": AGENT_EVENT_SCHEMA_VERSION,
             "event_id": f"mev:{seq}",
             "seq": seq,
             "kind": str(kind or "muse.event"),
             "status": str(status or "ok"),
-            "muse_id": str(muse_id or ""),
+            "agent_id": str(agent_id or ""),
             "turn_id": str(turn_id or ""),
             "ts": _now_iso(),
             "payload": payload if isinstance(payload, dict) else {},
@@ -3037,37 +3037,37 @@ class MuseRuntimeManager:
         state = _default_state()
         if not isinstance(payload, dict):
             return state
-        state["record"] = str(payload.get("record", MUSE_STATE_FILE_RECORD))
+        state["record"] = str(payload.get("record", AGENT_STATE_FILE_RECORD))
         state["schema_version"] = str(
-            payload.get("schema_version", MUSE_RUNTIME_SCHEMA_VERSION)
+            payload.get("schema_version", AGENT_RUNTIME_SCHEMA_VERSION)
         )
         state["seq"] = _safe_int(payload.get("seq", 0), 0)
-        for key in ("muses", "messages", "manifests", "idempotency", "rate_windows"):
+        for key in ("agents", "messages", "manifests", "idempotency", "rate_windows"):
             value = payload.get(key)
             state[key] = value if isinstance(value, dict) else {}
         events = payload.get("events")
         state["events"] = events if isinstance(events, list) else []
         return state
 
-    def _ensure_bootstrap_muses_locked(self) -> None:
-        for spec in BOOTSTRAP_MUSE_SPECS:
-            muse_id = str(spec.get("id", "")).strip()
-            if not muse_id:
+    def _ensure_bootstrap_agents_locked(self) -> None:
+        for spec in BOOTSTRAP_AGENT_SPECS:
+            agent_id = str(spec.get("id", "")).strip()
+            if not agent_id:
                 continue
-            existing = self._state["muses"].get(muse_id)
+            existing = self._state["agents"].get(agent_id)
             if isinstance(existing, dict):
-                existing.setdefault("presence_type", "muse")
-                existing.setdefault("panel_id", f"nexus.ui.chat.{muse_id}")
+                existing.setdefault("presence_type", "agent")
+                existing.setdefault("panel_id", f"nexus.ui.chat.{agent_id}")
                 if not str(existing.get("label", "")).strip():
-                    existing["label"] = str(spec.get("label", muse_id) or muse_id)
-                self._state["messages"].setdefault(muse_id, [])
-                self._state["manifests"].setdefault(muse_id, {})
-                self._state["idempotency"].setdefault(muse_id, {})
-                self._state["rate_windows"].setdefault(muse_id, [])
+                    existing["label"] = str(spec.get("label", agent_id) or agent_id)
+                self._state["messages"].setdefault(agent_id, [])
+                self._state["manifests"].setdefault(agent_id, {})
+                self._state["idempotency"].setdefault(agent_id, {})
+                self._state["rate_windows"].setdefault(agent_id, [])
                 continue
-            self._create_muse_locked(
-                muse_id=muse_id,
-                label=str(spec.get("label", muse_id) or muse_id),
+            self._create_agent_locked(
+                agent_id=agent_id,
+                label=str(spec.get("label", agent_id) or agent_id),
                 anchor=spec.get("anchor", {}),
                 user_intent_id="bootstrap",
             )
@@ -3092,12 +3092,12 @@ class MuseRuntimeManager:
             return -1
 
 
-_MUSE_RUNTIME_MANAGER_LOCK = threading.Lock()
-_MUSE_RUNTIME_MANAGER: MuseRuntimeManager | None = None
-_MUSE_RUNTIME_MANAGER_SIGNATURE = ""
+_AGENT_RUNTIME_MANAGER_LOCK = threading.Lock()
+_AGENT_RUNTIME_MANAGER: AgentRuntimeManager | None = None
+_AGENT_RUNTIME_MANAGER_SIGNATURE = ""
 
 
-def _muse_runtime_signature_from_env() -> str:
+def _agent_runtime_signature_from_env() -> str:
     return "|".join(
         [
             str(os.getenv("MUSE_RUNTIME_BACKEND", "memory") or "memory").strip(),
@@ -3141,7 +3141,7 @@ def _muse_runtime_signature_from_env() -> str:
     )
 
 
-def _build_muse_runtime_manager_from_env() -> MuseRuntimeManager:
+def _build_agent_runtime_manager_from_env() -> AgentRuntimeManager:
     backend = (
         str(os.getenv("MUSE_RUNTIME_BACKEND", "memory") or "memory").strip().lower()
     )
@@ -3167,17 +3167,17 @@ def _build_muse_runtime_manager_from_env() -> MuseRuntimeManager:
         raw_path = str(
             os.getenv(
                 "MUSE_RUNTIME_STATE_PATH",
-                "./part64/world_state/muse_runtime_state.json",
+                "./part64/world_state/agent_runtime_state.json",
             )
-            or "./part64/world_state/muse_runtime_state.json"
+            or "./part64/world_state/agent_runtime_state.json"
         ).strip()
-        storage = JsonFileMuseStorage(Path(raw_path))
+        storage = JsonFileAgentStorage(Path(raw_path))
         backend_name = "json"
     else:
-        storage = InMemoryMuseStorage()
+        storage = InMemoryAgentStorage()
         backend_name = "memory"
 
-    return MuseRuntimeManager(
+    return AgentRuntimeManager(
         storage=storage,
         enabled=True,
         backend_name=backend_name,
@@ -3191,12 +3191,12 @@ def _build_muse_runtime_manager_from_env() -> MuseRuntimeManager:
             ),
             DEFAULT_MAX_HISTORY_MESSAGES,
         ),
-        max_manifests_per_muse=_safe_int(
+        max_manifests_per_agent=_safe_int(
             os.getenv(
                 "MUSE_RUNTIME_MAX_MANIFESTS_PER_MUSE",
-                str(DEFAULT_MAX_MANIFESTS_PER_MUSE),
+                str(DEFAULT_MAX_MANIFESTS_PER_AGENT),
             ),
-            DEFAULT_MAX_MANIFESTS_PER_MUSE,
+            DEFAULT_MAX_MANIFESTS_PER_AGENT,
         ),
         audio_intent_enabled=_safe_bool(
             os.getenv("MUSE_RUNTIME_AUDIO_INTENT_ENABLED", "1"),
@@ -3242,23 +3242,23 @@ def _build_muse_runtime_manager_from_env() -> MuseRuntimeManager:
     )
 
 
-def get_muse_runtime_manager() -> MuseRuntimeManager:
-    global _MUSE_RUNTIME_MANAGER, _MUSE_RUNTIME_MANAGER_SIGNATURE
-    signature = _muse_runtime_signature_from_env()
-    with _MUSE_RUNTIME_MANAGER_LOCK:
+def get_agent_runtime_manager() -> AgentRuntimeManager:
+    global _AGENT_RUNTIME_MANAGER, _AGENT_RUNTIME_MANAGER_SIGNATURE
+    signature = _agent_runtime_signature_from_env()
+    with _AGENT_RUNTIME_MANAGER_LOCK:
         if (
-            _MUSE_RUNTIME_MANAGER is None
-            or _MUSE_RUNTIME_MANAGER_SIGNATURE != signature
+            _AGENT_RUNTIME_MANAGER is None
+            or _AGENT_RUNTIME_MANAGER_SIGNATURE != signature
         ):
-            _MUSE_RUNTIME_MANAGER = _build_muse_runtime_manager_from_env()
-            _MUSE_RUNTIME_MANAGER_SIGNATURE = signature
-        return _MUSE_RUNTIME_MANAGER
+            _AGENT_RUNTIME_MANAGER = _build_agent_runtime_manager_from_env()
+            _AGENT_RUNTIME_MANAGER_SIGNATURE = signature
+        return _AGENT_RUNTIME_MANAGER
 
 
-def reset_muse_runtime_state_for_tests() -> None:
-    global _MUSE_RUNTIME_MANAGER, _MUSE_RUNTIME_MANAGER_SIGNATURE
-    with _MUSE_RUNTIME_MANAGER_LOCK:
-        if _MUSE_RUNTIME_MANAGER is not None:
-            _MUSE_RUNTIME_MANAGER.reset()
-        _MUSE_RUNTIME_MANAGER = None
-        _MUSE_RUNTIME_MANAGER_SIGNATURE = ""
+def reset_agent_runtime_state_for_tests() -> None:
+    global _AGENT_RUNTIME_MANAGER, _AGENT_RUNTIME_MANAGER_SIGNATURE
+    with _AGENT_RUNTIME_MANAGER_LOCK:
+        if _AGENT_RUNTIME_MANAGER is not None:
+            _AGENT_RUNTIME_MANAGER.reset()
+        _AGENT_RUNTIME_MANAGER = None
+        _AGENT_RUNTIME_MANAGER_SIGNATURE = ""

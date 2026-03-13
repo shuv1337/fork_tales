@@ -112,7 +112,7 @@ from .db import (
     _load_life_interaction_builder,
     _load_life_tracker_class,
     _load_mycelial_echo_documents,
-    _load_myth_tracker_class,
+    _load_attribution_tracker_class,
     _normalize_embedding_vector,
     _upsert_presence_account,
     _upsert_simulation_metadata,
@@ -132,7 +132,7 @@ from .meta_ops import (
     list_meta_notes,
     list_meta_runs,
 )
-from .muse_runtime import get_muse_runtime_manager
+from .agent_runtime import get_agent_runtime_manager
 from .governor import LaneType, Packet, get_governor
 from .graph_queries import build_facts_snapshot, run_named_graph_query
 from .paths import _ensure_receipts_log_path
@@ -5622,7 +5622,7 @@ class WorldHandler(BaseHTTPRequestHandler):
     host_label: str = "127.0.0.1:8787"
     task_queue: TaskQueue
     council_chamber: CouncilChamber
-    myth_tracker: Any
+    attribution_tracker: Any
     life_tracker: Any
     life_interaction_builder: Any
 
@@ -5752,7 +5752,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                     part_root=self.part_root,
                 )
                 catalog["presence_runtime"] = influence_snapshot
-                catalog["muse_runtime"] = self._muse_manager().snapshot()
+                catalog["muse_runtime"] = self._agent_manager().snapshot()
                 attach_ui_projection(
                     catalog,
                     perspective=perspective,
@@ -5908,8 +5908,8 @@ class WorldHandler(BaseHTTPRequestHandler):
             return b""
         return self.rfile.read(length)
 
-    def _muse_manager(self) -> Any:
-        return get_muse_runtime_manager()
+    def _agent_manager(self) -> Any:
+        return get_agent_runtime_manager()
 
     def _muse_threat_radar_status(self) -> dict[str, Any]:
         with _MUSE_THREAT_RADAR_LOCK:
@@ -5976,7 +5976,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                 "runtime": self._muse_threat_radar_status(),
             }
 
-        manager = self._muse_manager()
+        manager = self._agent_manager()
         runtime = manager.snapshot()
         muse_rows = runtime.get("muses", []) if isinstance(runtime, dict) else []
         muse_ids = {
@@ -6510,8 +6510,8 @@ class WorldHandler(BaseHTTPRequestHandler):
             part_root=self.part_root,
         )
         catalog["presence_runtime"] = influence_snapshot
-        muse_runtime = self._muse_manager().snapshot()
-        catalog["muse_runtime"] = muse_runtime
+        agent_runtime = self._agent_manager().snapshot()
+        catalog["muse_runtime"] = agent_runtime
 
         if include_projection:
             attach_ui_projection(
@@ -6539,13 +6539,13 @@ class WorldHandler(BaseHTTPRequestHandler):
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         simulation_catalog = _simulation_http_trim_catalog(catalog)
         try:
-            myth_summary = self.myth_tracker.snapshot(simulation_catalog)
+            attribution_summary = self.attribution_tracker.snapshot(simulation_catalog)
         except Exception:
-            myth_summary = {}
+            attribution_summary = {}
         try:
             world_summary = self.life_tracker.snapshot(
                 simulation_catalog,
-                myth_summary,
+                attribution_summary,
                 ENTITY_MANIFEST,
             )
         except Exception:
@@ -6554,7 +6554,7 @@ class WorldHandler(BaseHTTPRequestHandler):
         docker_snapshot = collect_docker_simulation_snapshot()
         simulation = build_simulation_state(
             simulation_catalog,
-            myth_summary,
+            attribution_summary,
             world_summary,
             influence_snapshot=influence_snapshot,
             queue_snapshot=queue_snapshot,
@@ -7144,7 +7144,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                 pass
 
             previous_muse_seq = muse_event_seq
-            muse_events = self._muse_manager().list_events(
+            muse_events = self._agent_manager().list_events(
                 since_seq=previous_muse_seq,
                 limit=96,
             )
@@ -7190,7 +7190,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                         "mix": mix_meta,
                     }
                 )
-            muse_bootstrap_events = self._muse_manager().list_events(
+            muse_bootstrap_events = self._agent_manager().list_events(
                 since_seq=0,
                 limit=96,
             )
@@ -9065,7 +9065,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/muse/runtime":
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             self._send_json({"ok": True, "runtime": manager.snapshot()})
             return
 
@@ -9180,7 +9180,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/muse/events":
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             muse_id = str(params.get("muse_id", [""])[0] or "").strip()
             since_seq = max(
                 0,
@@ -9228,7 +9228,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/muse/context":
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             muse_id = str(params.get("muse_id", [""])[0] or "").strip()
             turn_id = str(params.get("turn_id", [""])[0] or "").strip()
             if not muse_id or not turn_id:
@@ -9587,22 +9587,22 @@ class WorldHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/myth":
             catalog = self._collect_catalog_fast()
             try:
-                myth_summary = self.myth_tracker.snapshot(catalog)
+                attribution_summary = self.attribution_tracker.snapshot(catalog)
             except Exception:
-                myth_summary = {}
-            self._send_json(myth_summary)
+                attribution_summary = {}
+            self._send_json(attribution_summary)
             return
 
         if parsed.path == "/api/world":
             catalog = self._collect_catalog_fast()
             try:
-                myth_summary = self.myth_tracker.snapshot(catalog)
+                attribution_summary = self.attribution_tracker.snapshot(catalog)
             except Exception:
-                myth_summary = {}
+                attribution_summary = {}
             try:
                 world_summary = self.life_tracker.snapshot(
                     catalog,
-                    myth_summary,
+                    attribution_summary,
                     ENTITY_MANIFEST,
                 )
             except Exception:
@@ -11333,7 +11333,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/create":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             payload = manager.create_muse(
                 muse_id=str(req.get("muse_id", "") or "").strip(),
                 label=str(req.get("label", "") or "").strip(),
@@ -11352,7 +11352,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/pause":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             muse_id = str(req.get("muse_id", "") or "").strip()
             paused = _safe_bool_query(
                 str(req.get("paused", "true") or "true"), default=True
@@ -11377,7 +11377,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/pin":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             payload = manager.pin_node(
                 str(req.get("muse_id", "") or "").strip(),
                 node_id=str(req.get("node_id", "") or "").strip(),
@@ -11398,7 +11398,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/unpin":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             payload = manager.unpin_node(
                 str(req.get("muse_id", "") or "").strip(),
                 node_id=str(req.get("node_id", "") or "").strip(),
@@ -11418,7 +11418,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/bind-nexus":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             payload = manager.bind_nexus(
                 str(req.get("muse_id", "") or "").strip(),
                 nexus_id=str(req.get("nexus_id", "") or "").strip(),
@@ -11439,7 +11439,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/sync-pins":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             pinned_node_ids = req.get("pinned_node_ids", [])
             payload = manager.sync_workspace_pins(
                 str(req.get("muse_id", "") or "").strip(),
@@ -11463,7 +11463,7 @@ class WorldHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/muse/message":
             req = self._read_json_body() or {}
-            manager = self._muse_manager()
+            manager = self._agent_manager()
             self._muse_tool_cache = {}
             catalog = self._runtime_catalog_base()
             graph_revision = str(
@@ -11550,13 +11550,13 @@ class WorldHandler(BaseHTTPRequestHandler):
 
             catalog = self._collect_catalog_fast()
             try:
-                myth_summary = self.myth_tracker.snapshot(catalog)
+                attribution_summary = self.attribution_tracker.snapshot(catalog)
             except Exception:
-                myth_summary = {}
+                attribution_summary = {}
             try:
                 world_summary = self.life_tracker.snapshot(
                     catalog,
-                    myth_summary,
+                    attribution_summary,
                     ENTITY_MANIFEST,
                 )
             except Exception:
@@ -12025,19 +12025,19 @@ def make_handler(
         vault_root=vault_root,
     )
 
-    myth_tracker_class = _load_myth_tracker_class()
+    attribution_tracker_class = _load_attribution_tracker_class()
     life_tracker_class = _load_life_tracker_class()
     life_interaction_builder = _load_life_interaction_builder()
 
     try:
-        myth_tracker = myth_tracker_class()
+        attribution_tracker = attribution_tracker_class()
     except Exception:
 
-        class _NullMythTracker:
+        class _NullAttributionTracker:
             def snapshot(self, _catalog: dict[str, Any]) -> dict[str, Any]:
                 return {}
 
-        myth_tracker = _NullMythTracker()
+        attribution_tracker = _NullAttributionTracker()
 
     try:
         life_tracker = life_tracker_class()
@@ -12047,7 +12047,7 @@ def make_handler(
             def snapshot(
                 self,
                 _catalog: dict[str, Any],
-                _myth_summary: dict[str, Any],
+                _attribution_summary: dict[str, Any],
                 _entity_manifest: list[dict[str, Any]],
             ) -> dict[str, Any]:
                 return {}
@@ -12062,7 +12062,7 @@ def make_handler(
     BoundWorldHandler.host_label = f"{host}:{port}"
     BoundWorldHandler.task_queue = task_queue
     BoundWorldHandler.council_chamber = council_chamber
-    BoundWorldHandler.myth_tracker = myth_tracker
+    BoundWorldHandler.attribution_tracker = attribution_tracker
     BoundWorldHandler.life_tracker = life_tracker
     BoundWorldHandler.life_interaction_builder = life_interaction_builder
     return BoundWorldHandler

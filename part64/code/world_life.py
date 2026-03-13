@@ -165,15 +165,15 @@ class LifeStateTracker:
     def snapshot(
         self,
         catalog: dict[str, Any],
-        myth_summary: dict[str, Any],
+        attribution_summary: dict[str, Any],
         entity_manifest: list[dict[str, Any]],
     ) -> dict[str, Any]:
         with self._lock:
             self._tick += 1
 
             audio_count = int(catalog.get("counts", {}).get("audio", 0))
-            myth_weight = float(myth_summary.get("top_cover_weight", 0.0))
-            top_claim = str(myth_summary.get("top_cover_claim", ""))
+            attribution_weight = float(attribution_summary.get("top_cover_weight", 0.0))
+            top_claim = str(attribution_summary.get("top_cover_claim", ""))
 
             people_out: list[dict[str, Any]] = []
             songs: list[dict[str, Any]] = []
@@ -188,12 +188,12 @@ class LifeStateTracker:
                     0.0,
                     min(
                         1.0,
-                        devotion * 0.6 + myth_weight * 0.3 + min(audio_count, 9) / 30.0,
+                        devotion * 0.6 + attribution_weight * 0.3 + min(audio_count, 9) / 30.0,
                     ),
                 )
                 prayer_total += prayer
 
-                mood = max(0.0, min(1.0, 0.42 + 0.4 * pulse + 0.2 * myth_weight))
+                mood = max(0.0, min(1.0, 0.42 + 0.4 * pulse + 0.2 * attribution_weight))
                 hymn_bpm = 72 + int((seed % 16) + pulse * 8)
 
                 people_out.append(

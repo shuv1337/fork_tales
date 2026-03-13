@@ -100,7 +100,7 @@ from .db import (
     _cosine_similarity,
     _load_eta_mu_knowledge_entries,
 )
-from .nooi import NooiField
+from .field_state import NooiField
 from .particle_probabilistic import (
     build_probabilistic_particles,
     PARTICLE_JOB_KEYS,
@@ -9859,7 +9859,7 @@ def _build_user_presence_embedded_particle_rows(
 
 def build_simulation_state(
     catalog: dict[str, Any],
-    myth_summary: dict[str, Any] | None = None,
+    attribution_summary: dict[str, Any] | None = None,
     world_summary: dict[str, Any] | None = None,
     *,
     influence_snapshot: dict[str, Any] | None = None,
@@ -11142,7 +11142,7 @@ def build_simulation_state(
         "fork_tax": fork_tax,
         "ghost": ghost,
         "presence_dynamics": presence_dynamics,
-        "myth": myth_summary or {},
+        "myth": attribution_summary or {},
         "world": world_summary or {},
         # =====================================================================
         # CANONICAL UNIFIED MODEL (v2) - single source of truth

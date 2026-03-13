@@ -1,4 +1,4 @@
-from code.world_web.lith_ecs import LithECS
+from code.world_web.ecs import LithECS
 
 
 def test_lith_ecs_dsl():
