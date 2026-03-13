@@ -1,0 +1,46 @@
+{
+  "groupId": "cleanup-files",
+  "surface": "repo-shell",
+  "assertions": [
+    {
+      "id": "VAL-FC-001",
+      "status": "pass",
+      "summary": "Confirmed root-level narrative file targets are absent, including explicit files plus empty root matches for NEW_LYRICS_*.md, PLAN-*.md, and 01_* through 04_* .lisp files.",
+      "evidence": [
+        "file-cleanup/cleanup-files/cleanup-files-evidence.json"
+      ]
+    },
+    {
+      "id": "VAL-FC-002",
+      "status": "pass",
+      "summary": "Confirmed the root directories docs/, narrative/, world_building/, hacks/, and specs/ do not exist.",
+      "evidence": [
+        "file-cleanup/cleanup-files/cleanup-files-evidence.json"
+      ]
+    },
+    {
+      "id": "VAL-FC-003",
+      "status": "pass",
+      "summary": "Confirmed part64/ has no direct-child matches for the narrative markdown patterns and named markdown files listed in the contract.",
+      "evidence": [
+        "file-cleanup/cleanup-files/cleanup-files-evidence.json"
+      ]
+    },
+    {
+      "id": "VAL-FC-007",
+      "status": "pass",
+      "summary": "Confirmed the dead backup file and all listed legacy narrative script paths are absent; this satisfies the delete-or-neutral-rename allowance because no old filenames remain.",
+      "evidence": [
+        "file-cleanup/cleanup-files/cleanup-files-evidence.json"
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "Read",
+    "LS",
+    "Glob",
+    "python3"
+  ],
+  "frictions": [],
+  "blockers": []
+}

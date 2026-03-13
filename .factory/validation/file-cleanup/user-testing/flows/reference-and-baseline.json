@@ -1,0 +1,129 @@
+{
+  "groupId": "reference-and-baseline",
+  "surface": "repo-shell",
+  "assertions": [
+    {
+      "id": "VAL-FC-004",
+      "title": "No broken references to deleted files",
+      "status": "fail",
+      "steps": [
+        {
+          "action": "Read validation guidance and cleanup baseline notes.",
+          "expected": "Understand which deleted-file residues are acceptable and which are not.",
+          "observed": "Guidance confirmed explanatory comments/skip reasons/stub stderr strings are acceptable, but functional/config references are not."
+        },
+        {
+          "action": "Run a broad deleted-file rg sweep excluding .factory, part64/world_state, and build artifacts.",
+          "expected": "Either zero matches or a reviewable list of current references.",
+          "observed": "reference-search.txt recorded 93 raw matches, mostly archived knowledge snapshots, generic demo.txt test fixtures, and acceptable explanatory script-removal residues."
+        },
+        {
+          "action": "Run a focused rg sweep for deleted narrative/script filenames in active repo files.",
+          "expected": "Zero actionable references in active files.",
+          "observed": "reference-search-focused.txt recorded 16 matches: 9 acceptable explanatory/stub residues and 7 broken references across 3 active files."
+        }
+      ],
+      "evidence": {
+        "files": [
+          "file-cleanup/reference-and-baseline/reference-search.txt",
+          "file-cleanup/reference-and-baseline/reference-search-focused.txt"
+        ],
+        "commandSummary": [
+          "cd /home/shuv/repos/fork_tales && rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!part64/world_state/**' -g '!.opencode/knowledge/archive/**' -g '!artifacts/**' -g '!**/node_modules/**' 'opmf\\.lisp|SIMULATION_WORKFLOW\\.md|WEB_GRAPH_WEAVER\\.md|WHISPER_BENCHMARK\\.md|MODEL_BENCH_RUNNER\\.md|deep-research-report\\.md|muse_semantic_training_lab\\.py|bench_muse_song_lab\\.py|muse_song_lab_ctl\\.py|monitor_daimoi\\.py|demo_daimoi_crawler_muse\\.sh|world_web_massive\\.py\\.bak|NEW_LYRICS_[^[:space:]]*\\.md|GATES_OF_TRUTH_[^[:space:]]*\\.md|DIALOG_[^[:space:]]*\\.md' ."
+        ],
+        "observedCounts": {
+          "rawMatchCount": 93,
+          "focusedMatchCount": 16,
+          "acceptableResidueLineCount": 9,
+          "brokenReferenceLineCount": 7,
+          "brokenReferenceFileCount": 3
+        },
+        "brokenReferences": [
+          "opencode.jsonc:3 -> active config still points instructions at deleted opmf.lisp",
+          "frame_firewall.dl:25-29 -> utterance source field still points at deleted DIALOG_Anchor_Registry.md",
+          ".opencode/skills/simulation-ops/SKILL.md:63 -> skill guidance still points at deleted part64/SIMULATION_WORKFLOW.md"
+        ],
+        "acceptableResidue": [
+          "part64/scripts/eval_sim_learning_suite.py:429,449,461,469 -> explanatory comments and stub stderr strings for removed scripts",
+          "part64/code/tests/test_muse_semantic_training_lab.py:3,11,16,21,26 -> explanatory note and skip reasons for removed script"
+        ],
+        "manifestCheck": "manifest.json contains only README.md and no deleted-file entries."
+      },
+      "issues": "VAL-FC-004 fails because broken references remain in active files: opencode.jsonc, frame_firewall.dl, and .opencode/skills/simulation-ops/SKILL.md."
+    },
+    {
+      "id": "VAL-FC-005",
+      "title": "Tests maintain baseline after cleanup",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Run frontend baseline command.",
+          "expected": "Vitest should maintain the recorded baseline of 111 passed and 12 failed tests.",
+          "observed": "vitest.log shows 111 passed and 12 failed tests across 34 files (28 passed, 6 failed), matching the recorded baseline exactly."
+        },
+        {
+          "action": "Run python3 -m code.tests.test_world_life.",
+          "expected": "Suite exits successfully.",
+          "observed": "test_world_life.log exited with code 0."
+        },
+        {
+          "action": "Run python3 -m code.tests.test_myth_bridge.",
+          "expected": "Suite exits successfully.",
+          "observed": "test_myth_bridge.log exited with code 0."
+        },
+        {
+          "action": "Run python3 -m code.tests.test_sonify_determinism.",
+          "expected": "Suite exits successfully.",
+          "observed": "test_sonify_determinism.log exited with code 0."
+        }
+      ],
+      "evidence": {
+        "files": [
+          "file-cleanup/reference-and-baseline/vitest.log",
+          "file-cleanup/reference-and-baseline/test_world_life.log",
+          "file-cleanup/reference-and-baseline/test_myth_bridge.log",
+          "file-cleanup/reference-and-baseline/test_sonify_determinism.log"
+        ],
+        "commandSummary": [
+          "cd /home/shuv/repos/fork_tales/part64/frontend && npx vitest run --exclude 'e2e/**'",
+          "cd /home/shuv/repos/fork_tales/part64 && python3 -m code.tests.test_world_life",
+          "cd /home/shuv/repos/fork_tales/part64 && python3 -m code.tests.test_myth_bridge",
+          "cd /home/shuv/repos/fork_tales/part64 && python3 -m code.tests.test_sonify_determinism"
+        ],
+        "observedCounts": {
+          "frontend": {
+            "passedTests": 111,
+            "failedTests": 12,
+            "passedFiles": 28,
+            "failedFiles": 6,
+            "exitCode": 1
+          },
+          "pythonSuites": {
+            "passedSuites": 3,
+            "failedSuites": 0,
+            "exitCodes": {
+              "test_world_life": 0,
+              "test_myth_bridge": 0,
+              "test_sonify_determinism": 0
+            }
+          }
+        },
+        "baselineComparison": {
+          "frontendBaseline": "111 passed / 12 failed",
+          "frontendObserved": "111 passed / 12 failed",
+          "frontendDelta": "no change",
+          "pythonBaseline": "world_life, myth_bridge, and sonify_determinism should pass",
+          "pythonObserved": "all 3 suites exited 0"
+        }
+      },
+      "issues": null
+    }
+  ],
+  "toolsUsed": [
+    "Read",
+    "Grep",
+    "Execute"
+  ],
+  "frictions": [],
+  "blockers": []
+}

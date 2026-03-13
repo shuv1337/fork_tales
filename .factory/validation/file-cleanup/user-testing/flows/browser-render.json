@@ -1,0 +1,54 @@
+{
+  "groupId": "browser-render",
+  "surface": "browser-ui",
+  "testedAt": "2026-03-13T02:31:15-07:00",
+  "isolation": {
+    "appUrl": "http://127.0.0.1:5173",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "evidenceDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/file-cleanup/browser-render",
+    "browserSession": "fc-browser-render"
+  },
+  "toolsUsed": [
+    "agent-browser"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-FC-006",
+      "title": "App renders after cleanup",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Navigate to http://127.0.0.1:5173 in an isolated named agent-browser session",
+          "expected": "Frontend loads in the browser",
+          "observed": "Page loaded successfully with title 'frontend' at http://127.0.0.1:5173/"
+        },
+        {
+          "action": "Wait for the app to settle and capture a screenshot",
+          "expected": "Rendered UI is visible",
+          "observed": "The app rendered a populated dashboard UI with multiple visible panels and a disconnected status indicator. Screenshot captured."
+        },
+        {
+          "action": "Inspect page errors and console output",
+          "expected": "No new uncaught JavaScript errors",
+          "observed": "agent-browser page errors returned none. Console contained only Vite connection info and expected fetch warnings caused by the disconnected backend during this milestone."
+        }
+      ],
+      "evidence": {
+        "screenshots": [
+          "file-cleanup/browser-render/VAL-FC-006-app-render.png"
+        ],
+        "consoleErrors": "none",
+        "consoleWarnings": [
+          "Initial catalog stream fetch failed AbortError: signal is aborted without reason",
+          "Initial catalog stream fetch failed TypeError: Failed to fetch",
+          "Initial simulation fetch failed TypeError: Failed to fetch",
+          "Initial catalog fetch failed TypeError: Failed to fetch"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "VAL-FC-006 passed: the frontend rendered successfully in the browser and no uncaught JavaScript errors were reported. Expected console warnings appeared because the live backend was disconnected for this milestone."
+}
