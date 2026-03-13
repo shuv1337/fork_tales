@@ -128,7 +128,7 @@ vi.mock("./components/App/CoreControlPanel", () => {
         <button type="button" onClick={props.onResetInterfaceOpacity}>reset opacity</button>
         <button type="button" onClick={() => props.onSetCoreSimulationDial?.("motionSpeed", 1.7)}>set sim dial</button>
         <button type="button" onClick={() => props.onSetCoreVisualDial?.("brightness", 1.2)}>set visual dial</button>
-        <button type="button" onClick={() => props.onSetMouseDaimonTuning?.({ enabled: false })}>set mouse particle</button>
+        <button type="button" onClick={() => props.onSetMouseParticleTuning?.({ enabled: false })}>set mouse particle</button>
         <button type="button" onClick={props.onOpenRuntimeConfig}>open runtime config</button>
         <button type="button" onClick={() => props.onSelectPerspective?.("causal-time")}>set perspective</button>
       </div>

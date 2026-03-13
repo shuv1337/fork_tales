@@ -39,7 +39,7 @@ function makeProps(overrides: Partial<CoreBackdropProps> = {}): CoreBackdropProp
       saturation: 1,
       hueRotate: 0,
       backgroundWash: 0.3,
-      vignette: 0.55,
+      edgeDarkening: 0.55,
     },
     coreLayerVisibility: {
       presence: true,
@@ -51,7 +51,7 @@ function makeProps(overrides: Partial<CoreBackdropProps> = {}): CoreBackdropProp
       "pain-field": false,
     },
     agentWorkspaceBindings: { witness_thread: ["file:1"] },
-    mouseDaimonTuning: {
+    mouseParticleTuning: {
       enabled: true,
       message: "witness",
       mode: "orbit",
@@ -77,7 +77,7 @@ afterEach(() => {
 });
 
 describe("CoreBackdrop", () => {
-  it("passes core simulation and mouse daimon props to SimulationCanvas", () => {
+  it("passes core simulation and mouse particle props to SimulationCanvas", () => {
     render(<CoreBackdrop {...makeProps()} />);
 
     expect(screen.getByTestId("simulation-canvas-proxy")).toBeTruthy();
@@ -88,9 +88,9 @@ describe("CoreBackdrop", () => {
     expect(lastCanvasProps?.compactHud).toBe(true);
     expect(lastCanvasProps?.height).toBe(420);
     expect(lastCanvasProps?.defaultOverlayView).toBe("omni");
-    expect(lastCanvasProps?.mouseDaimonEnabled).toBe(true);
-    expect(lastCanvasProps?.mouseDaimonMode).toBe("orbit");
-    expect(lastCanvasProps?.mouseDaimonMessage).toBe("witness");
+    expect(lastCanvasProps?.mouseParticleEnabled).toBe(true);
+    expect(lastCanvasProps?.mouseParticleMode).toBe("orbit");
+    expect(lastCanvasProps?.mouseParticleMessage).toBe("witness");
     expect(screen.getByText(/drag pan/i)).toBeTruthy();
   });
 

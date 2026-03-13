@@ -13,7 +13,7 @@ import type {
   CoreSimulationTuning,
   CoreVisualTuning,
 } from "../../app/coreSimulationConfig";
-import type { MouseDaimonTuning } from "./CoreControlPanel";
+import type { MouseParticleTuning } from "./CoreControlPanel";
 
 interface Props {
   simulation: SimulationState | null;
@@ -26,7 +26,7 @@ interface Props {
   coreVisualTuning: CoreVisualTuning;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
   agentWorkspaceBindings: Record<string, string[]>;
-  mouseDaimonTuning: MouseDaimonTuning;
+  mouseParticleTuning: MouseParticleTuning;
   onUserPresenceInput: (payload: {
     kind: string;
     target: string;
@@ -56,7 +56,7 @@ export function CoreBackdrop({
   coreVisualTuning,
   coreLayerVisibility,
   agentWorkspaceBindings,
-  mouseDaimonTuning,
+  mouseParticleTuning,
   onUserPresenceInput,
   onOverlayInit,
   onNexusInteraction,
@@ -99,15 +99,15 @@ export function CoreBackdrop({
           backgroundWash={coreVisualTuning.backgroundWash}
           layerVisibility={coreLayerVisibility}
           agentWorkspaceBindings={agentWorkspaceBindings}
-          mouseDaimonEnabled={mouseDaimonTuning.enabled}
-          mouseDaimonMessage={mouseDaimonTuning.message}
-          mouseDaimonMode={mouseDaimonTuning.mode}
-          mouseDaimonRadius={mouseDaimonTuning.radius}
-          mouseDaimonStrength={mouseDaimonTuning.strength}
+          mouseParticleEnabled={mouseParticleTuning.enabled}
+          mouseParticleMessage={mouseParticleTuning.message}
+          mouseParticleMode={mouseParticleTuning.mode}
+          mouseParticleRadius={mouseParticleTuning.radius}
+          mouseParticleStrength={mouseParticleTuning.strength}
           className="simulation-core-canvas"
         />
       </div>
-      <p className="simulation-core-hint">drag pan • wheel zoom • wasd strafe/drive • r/f rise/fall • enable orbit for galaxy sweep</p>
+      <p className="simulation-core-hint">drag pan • wheel zoom • wasd strafe/drive • r/f rise/fall • enable orbit for orbit sweep</p>
     </div>
   );
 }

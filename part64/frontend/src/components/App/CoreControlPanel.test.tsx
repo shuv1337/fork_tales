@@ -45,7 +45,7 @@ function makeProps(overrides: Partial<CoreControlPanelProps> = {}): CoreControlP
       saturation: 1.06,
       hueRotate: 0,
       backgroundWash: 0.33,
-      vignette: 0.52,
+      edgeDarkening: 0.52,
     },
     coreOverlayView: "omni",
     activeChatLens: { presence: "witness_thread", status: "listening" },
@@ -54,7 +54,7 @@ function makeProps(overrides: Partial<CoreControlPanelProps> = {}): CoreControlP
       { id: "hybrid", name: "Hybrid", description: "Default" },
       { id: "causal-time", name: "Causal", description: "Causal ordering" },
     ],
-    mouseDaimonTuning: {
+    mouseParticleTuning: {
       enabled: true,
       message: "witness",
       mode: "push",
@@ -78,7 +78,7 @@ function makeProps(overrides: Partial<CoreControlPanelProps> = {}): CoreControlP
     onResetCoreSimulationTuning: vi.fn(),
     onSetCoreSimulationDial: vi.fn(),
     onSetCoreOrbitSpeed: vi.fn(),
-    onSetMouseDaimonTuning: vi.fn(),
+    onSetMouseParticleTuning: vi.fn(),
     onOpenRuntimeConfig: vi.fn(),
     ...overrides,
   };
@@ -140,11 +140,11 @@ describe("CoreControlPanel", () => {
     expect(props.onSelectPerspective).toHaveBeenCalledWith("causal-time");
   });
 
-  it("exposes visual, simulation, and mouse daimon dial callbacks", () => {
+  it("exposes visual, simulation, and mouse particle dial callbacks", () => {
     const props = makeProps({
       autopilotEnabled: false,
       coreOrbitEnabled: true,
-      mouseDaimonTuning: {
+      mouseParticleTuning: {
         enabled: false,
         message: "alpha",
         mode: "push",
@@ -183,10 +183,10 @@ describe("CoreControlPanel", () => {
     expect(props.onResetCoreSimulationTuning).toHaveBeenCalledTimes(1);
     expect(props.onSetCoreSimulationDial).toHaveBeenCalledWith("particleDensity", 0.72);
     expect(props.onSetCoreOrbitSpeed).toHaveBeenCalledWith(0.66);
-    expect(props.onSetMouseDaimonTuning).toHaveBeenCalledWith({ enabled: true });
-    expect(props.onSetMouseDaimonTuning).toHaveBeenCalledWith({ message: "beta" });
-    expect(props.onSetMouseDaimonTuning).toHaveBeenCalledWith({ mode: "orbit" });
-    expect(props.onSetMouseDaimonTuning).toHaveBeenCalledWith({ radius: 0.3 });
-    expect(props.onSetMouseDaimonTuning).toHaveBeenCalledWith({ strength: 0.6 });
+    expect(props.onSetMouseParticleTuning).toHaveBeenCalledWith({ enabled: true });
+    expect(props.onSetMouseParticleTuning).toHaveBeenCalledWith({ message: "beta" });
+    expect(props.onSetMouseParticleTuning).toHaveBeenCalledWith({ mode: "orbit" });
+    expect(props.onSetMouseParticleTuning).toHaveBeenCalledWith({ radius: 0.3 });
+    expect(props.onSetMouseParticleTuning).toHaveBeenCalledWith({ strength: 0.6 });
   });
 });

@@ -3,7 +3,7 @@
 // Copyright (C) 2024-2025 Fork Tales Contributors
 
 import { useState, useCallback, useDeferredValue, useMemo } from "react";
-import type { MouseDaimonTuning } from "../components/App/CoreControlPanel";
+import type { MouseParticleTuning } from "../components/App/CoreControlPanel";
 import {
   CORE_LAYER_OPTIONS,
   CORE_SIM_GRAPH_NODE_SMOOTHING_MAX,
@@ -28,8 +28,8 @@ import {
   CORE_VISUAL_HUE_MIN,
   CORE_VISUAL_SATURATION_MAX,
   CORE_VISUAL_SATURATION_MIN,
-  CORE_VISUAL_VIGNETTE_MAX,
-  CORE_VISUAL_VIGNETTE_MIN,
+  CORE_VISUAL_EDGE_DARKENING_MAX,
+  CORE_VISUAL_EDGE_DARKENING_MIN,
   CORE_VISUAL_WASH_MAX,
   CORE_VISUAL_WASH_MIN,
   DEFAULT_CORE_LAYER_VISIBILITY,
@@ -54,7 +54,7 @@ export interface SimulationTuningState {
   deferredCoreSimulationTuning: CoreSimulationTuning;
   coreVisualTuning: CoreVisualTuning;
   coreSimulationFilter: string;
-  mouseDaimonTuning: MouseDaimonTuning;
+  mouseParticleTuning: MouseParticleTuning;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
   coreLayerManagerOpen: boolean;
   coreOverlayView: OverlayViewId;
@@ -65,7 +65,7 @@ export interface SimulationTuningState {
 export interface SimulationTuningActions {
   setCoreSimulationDial: (dial: keyof CoreSimulationTuning, value: number) => void;
   resetCoreSimulationTuning: () => void;
-  updateMouseDaimonTuning: (partial: Partial<MouseDaimonTuning>) => void;
+  updateMouseParticleTuning: (partial: Partial<MouseParticleTuning>) => void;
   setCoreVisualDial: (dial: keyof CoreVisualTuning, value: number) => void;
   resetCoreVisualTuning: () => void;
   boostCoreVisibility: () => void;
@@ -81,7 +81,7 @@ export function useSimulationTuning(): SimulationTuningState & SimulationTuningA
   const [coreSimulationTuning, setCoreSimulationTuning] = useState<CoreSimulationTuning>(DEFAULT_CORE_SIMULATION_TUNING);
   const deferredCoreSimulationTuning = useDeferredValue(coreSimulationTuning);
   const [coreVisualTuning, setCoreVisualTuning] = useState<CoreVisualTuning>(DEFAULT_CORE_VISUAL_TUNING);
-  const [mouseDaimonTuning, setMouseDaimonTuning] = useState<MouseDaimonTuning>({
+  const [mouseParticleTuning, setMouseParticleTuning] = useState<MouseParticleTuning>({
     enabled: true, message: "witness", mode: "push", radius: 0.18, strength: 0.42,
   });
   const [coreLayerVisibility, setCoreLayerVisibility] = useState<Record<CoreLayerId, boolean>>(DEFAULT_CORE_LAYER_VISIBILITY);
@@ -132,8 +132,8 @@ export function useSimulationTuning(): SimulationTuningState & SimulationTuningA
     setCoreSimulationTuning(DEFAULT_CORE_SIMULATION_TUNING);
   }, []);
 
-  const updateMouseDaimonTuning = useCallback((partial: Partial<MouseDaimonTuning>) => {
-    setMouseDaimonTuning((prev) => ({ ...prev, ...partial }));
+  const updateMouseParticleTuning = useCallback((partial: Partial<MouseParticleTuning>) => {
+    setMouseParticleTuning((prev) => ({ ...prev, ...partial }));
   }, []);
 
   const setCoreVisualDial = useCallback((dial: keyof CoreVisualTuning, value: number) => {
@@ -144,10 +144,10 @@ export function useSimulationTuning(): SimulationTuningState & SimulationTuningA
         saturation: [CORE_VISUAL_SATURATION_MIN, CORE_VISUAL_SATURATION_MAX],
         hueRotate: [CORE_VISUAL_HUE_MIN, CORE_VISUAL_HUE_MAX],
         backgroundWash: [CORE_VISUAL_WASH_MIN, CORE_VISUAL_WASH_MAX],
-        vignette: [CORE_VISUAL_VIGNETTE_MIN, CORE_VISUAL_VIGNETTE_MAX],
+        edgeDarkening: [CORE_VISUAL_EDGE_DARKENING_MIN, CORE_VISUAL_EDGE_DARKENING_MAX],
       };
       const range = clampMap[dial];
-      if (!range) return { ...prev, vignette: clamp(value, CORE_VISUAL_VIGNETTE_MIN, CORE_VISUAL_VIGNETTE_MAX) };
+      if (!range) return { ...prev, edgeDarkening: clamp(value, CORE_VISUAL_EDGE_DARKENING_MIN, CORE_VISUAL_EDGE_DARKENING_MAX) };
       return { ...prev, [dial]: clamp(value, range[0], range[1]) };
     });
   }, []);
@@ -202,11 +202,11 @@ export function useSimulationTuning(): SimulationTuningState & SimulationTuningA
   return {
     coreSimulationTuning, deferredCoreSimulationTuning,
     coreVisualTuning, coreSimulationFilter,
-    mouseDaimonTuning, coreLayerVisibility,
+    mouseParticleTuning, coreLayerVisibility,
     coreLayerManagerOpen, coreOverlayView,
     activeCoreLayerCount, interfaceOpacity,
     setCoreSimulationDial, resetCoreSimulationTuning,
-    updateMouseDaimonTuning,
+    updateMouseParticleTuning,
     setCoreVisualDial, resetCoreVisualTuning,
     boostCoreVisibility,
     setCoreLayerEnabled, setAllCoreLayers,

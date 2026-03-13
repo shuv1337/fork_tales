@@ -41,11 +41,11 @@ interface Props {
   agentWorkspaceBindings?: Record<string, string[]>;
   className?: string;
   // Mouse daimon controls
-  mouseDaimonEnabled?: boolean;
-  mouseDaimonMessage?: string;
-  mouseDaimonMode?: "push" | "pull" | "orbit" | "calm";
-  mouseDaimonRadius?: number;
-  mouseDaimonStrength?: number;
+  mouseParticleEnabled?: boolean;
+  mouseParticleMessage?: string;
+  mouseParticleMode?: "push" | "pull" | "orbit" | "calm";
+  mouseParticleRadius?: number;
+  mouseParticleStrength?: number;
 }
 
 export interface NexusInteractionEvent {
@@ -2239,11 +2239,11 @@ export function SimulationCanvas({
   glassCenterRatio = { x: 0.5, y: 0.5 },
   agentWorkspaceBindings = {},
   className = "",
-  mouseDaimonEnabled = true,
-  mouseDaimonMessage = "witness",
-  mouseDaimonMode = "push",
-  mouseDaimonRadius = 0.18,
-  mouseDaimonStrength = 0.42,
+  mouseParticleEnabled = true,
+  mouseParticleMessage = "witness",
+  mouseParticleMode = "push",
+  mouseParticleRadius = 0.18,
+  mouseParticleStrength = 0.42,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -2335,17 +2335,17 @@ export function SimulationCanvas({
   }, [musicNexusSpotlight]);
 
   // Mouse Daimon refs - synced from props (managed in CoreControlPanel)
-  const mouseDaimonEnabledRef = useRef(mouseDaimonEnabled);
-  const mouseDaimonMessageRef = useRef(mouseDaimonMessage);
-  const mouseDaimonModeRef = useRef(mouseDaimonMode);
-  const mouseDaimonRadiusRef = useRef(mouseDaimonRadius);
-  const mouseDaimonStrengthRef = useRef(mouseDaimonStrength);
+  const mouseParticleEnabledRef = useRef(mouseParticleEnabled);
+  const mouseParticleMessageRef = useRef(mouseParticleMessage);
+  const mouseParticleModeRef = useRef(mouseParticleMode);
+  const mouseParticleRadiusRef = useRef(mouseParticleRadius);
+  const mouseParticleStrengthRef = useRef(mouseParticleStrength);
 
-  useEffect(() => { mouseDaimonEnabledRef.current = mouseDaimonEnabled; }, [mouseDaimonEnabled]);
-  useEffect(() => { mouseDaimonMessageRef.current = mouseDaimonMessage; }, [mouseDaimonMessage]);
-  useEffect(() => { mouseDaimonModeRef.current = mouseDaimonMode; }, [mouseDaimonMode]);
-  useEffect(() => { mouseDaimonRadiusRef.current = mouseDaimonRadius; }, [mouseDaimonRadius]);
-  useEffect(() => { mouseDaimonStrengthRef.current = mouseDaimonStrength; }, [mouseDaimonStrength]);
+  useEffect(() => { mouseParticleEnabledRef.current = mouseParticleEnabled; }, [mouseParticleEnabled]);
+  useEffect(() => { mouseParticleMessageRef.current = mouseParticleMessage; }, [mouseParticleMessage]);
+  useEffect(() => { mouseParticleModeRef.current = mouseParticleMode; }, [mouseParticleMode]);
+  useEffect(() => { mouseParticleRadiusRef.current = mouseParticleRadius; }, [mouseParticleRadius]);
+  useEffect(() => { mouseParticleStrengthRef.current = mouseParticleStrength; }, [mouseParticleStrength]);
 
   const lastNexusPointerTapRef = useRef<{ key: string; atMs: number } | null>(null);
 
@@ -6898,7 +6898,7 @@ export function SimulationCanvas({
             }
           >
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_0%,#22283e_48%,transparent_100%)] bg-[length:100%_3px] opacity-40" />
-            <div className="pointer-events-none absolute -inset-8 bg-[radial-gradient(circle_at_75%_8%,#264c64,transparent_42%),radial-gradient(circle_at_22%_88%,#473437,transparent_46%)]" />
+            <div className="pointer-events-none absolute -inset-8 bg-[#0b1424]" />
             <header className="relative h-14 px-4 flex items-center justify-between border-b border-[#3f5573] bg-[#0b1424]">
               <div className="min-w-0">
                 <p className="text-[12px] uppercase tracking-[0.14em] text-[#a9dbff]">hologram worldscreen / 投影スクリーン</p>

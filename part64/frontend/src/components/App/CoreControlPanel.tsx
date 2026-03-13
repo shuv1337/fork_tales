@@ -32,12 +32,12 @@ import {
   type CoreVisualTuning,
 } from "../../app/coreSimulationConfig";
 
-export type MouseDaimonMode = "push" | "pull" | "orbit" | "calm";
+export type MouseParticleMode = "push" | "pull" | "orbit" | "calm";
 
-export interface MouseDaimonTuning {
+export interface MouseParticleTuning {
   enabled: boolean;
   message: string;
-  mode: MouseDaimonMode;
+  mode: MouseParticleMode;
   radius: number;
   strength: number;
 }
@@ -68,7 +68,7 @@ interface Props {
   activeChatLens: { presence: string; status: string } | null;
   latestAutopilotEvent: { actionId: string; result: string } | null;
   projectionOptions: ProjectionOption[];
-  mouseDaimonTuning: MouseDaimonTuning;
+  mouseParticleTuning: MouseParticleTuning;
   onToggleAutopilot: () => void;
   onToggleCoreFlight: () => void;
   onToggleCoreOrbit: () => void;
@@ -86,7 +86,7 @@ interface Props {
   onResetCoreSimulationTuning: () => void;
   onSetCoreSimulationDial: (dial: keyof CoreSimulationTuning, value: number) => void;
   onSetCoreOrbitSpeed: (value: number) => void;
-  onSetMouseDaimonTuning: (tuning: Partial<MouseDaimonTuning>) => void;
+  onSetMouseParticleTuning: (tuning: Partial<MouseParticleTuning>) => void;
   onOpenRuntimeConfig: () => void;
 }
 
@@ -113,7 +113,7 @@ export function CoreControlPanel({
   activeChatLens,
   latestAutopilotEvent,
   projectionOptions,
-  mouseDaimonTuning,
+  mouseParticleTuning,
   onToggleAutopilot,
   onToggleCoreFlight,
   onToggleCoreOrbit,
@@ -131,7 +131,7 @@ export function CoreControlPanel({
   onResetCoreSimulationTuning,
   onSetCoreSimulationDial,
   onSetCoreOrbitSpeed,
-  onSetMouseDaimonTuning,
+  onSetMouseParticleTuning,
   onOpenRuntimeConfig,
 }: Props) {
   const [showVisualDials, setShowVisualDials] = useState(false);
@@ -534,17 +534,17 @@ export function CoreControlPanel({
 
           <div className={`${showSimulationControls ? "mt-3" : ""} rounded-md border border-[#5a3f37] bg-[#1b1a2a] px-2 py-2`}>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[12px] uppercase tracking-[0.12em] text-[#ffc878]">mouse daimon</p>
+              <p className="text-[12px] uppercase tracking-[0.12em] text-[#ffc878]">mouse particle</p>
               <button
                 type="button"
-                onClick={() => onSetMouseDaimonTuning({ enabled: !mouseDaimonTuning.enabled })}
+                onClick={() => onSetMouseParticleTuning({ enabled: !mouseParticleTuning.enabled })}
                 className={`rounded border px-2 py-0.5 text-[12px] font-semibold transition-colors ${
-                  mouseDaimonTuning.enabled
+                  mouseParticleTuning.enabled
                     ? "border-[#8c6749] bg-[#503a36] text-[#ffd4a0]"
                     : "border-[#433b41] bg-[#221f2c] text-[#c8b090]"
                 }`}
                 >
-                  {mouseDaimonTuning.enabled ? "enabled" : "disabled"}
+                  {mouseParticleTuning.enabled ? "enabled" : "disabled"}
                 </button>
               </div>
 
@@ -553,8 +553,8 @@ export function CoreControlPanel({
                   <span className="text-[12px] text-[#e8c8a0]">message</span>
                   <input
                     type="text"
-                    value={mouseDaimonTuning.message}
-                    onChange={(e) => onSetMouseDaimonTuning({ message: e.target.value })}
+                    value={mouseParticleTuning.message}
+                    onChange={(e) => onSetMouseParticleTuning({ message: e.target.value })}
                     maxLength={24}
                     className="rounded border border-[#5e483e] bg-[#211c21] px-2 py-1 text-[12px] text-[#ffe4c4] placeholder-[#715d53] focus:border-[#8c7153] focus:outline-none"
                     placeholder="witness"
@@ -568,9 +568,9 @@ export function CoreControlPanel({
                       <button
                         key={mode}
                         type="button"
-                        onClick={() => onSetMouseDaimonTuning({ mode })}
+                        onClick={() => onSetMouseParticleTuning({ mode })}
                         className={`rounded px-2 py-0.5 text-[12px] font-semibold transition-colors ${
-                          mouseDaimonTuning.mode === mode
+                          mouseParticleTuning.mode === mode
                             ? "bg-[#754f3b] text-[#fff4e0]"
                             : "text-[#d4b890] hover:bg-[#473030]"
                         }`}
@@ -582,27 +582,27 @@ export function CoreControlPanel({
                 </div>
 
                 <label className="grid gap-1">
-                  <span className="text-[12px] text-[#e8c8a0]">radius <code>{Math.round(mouseDaimonTuning.radius * 100)}%</code></span>
+                  <span className="text-[12px] text-[#e8c8a0]">radius <code>{Math.round(mouseParticleTuning.radius * 100)}%</code></span>
                   <input
                     type="range"
                     min={0.06}
                     max={0.42}
                     step={0.02}
-                    value={mouseDaimonTuning.radius}
-                    onChange={(e) => onSetMouseDaimonTuning({ radius: Number(e.target.value) })}
+                    value={mouseParticleTuning.radius}
+                    onChange={(e) => onSetMouseParticleTuning({ radius: Number(e.target.value) })}
                     className="h-1 w-full accent-[#ffaa55]"
                   />
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[12px] text-[#e8c8a0]">strength <code>{Math.round(mouseDaimonTuning.strength * 100)}%</code></span>
+                  <span className="text-[12px] text-[#e8c8a0]">strength <code>{Math.round(mouseParticleTuning.strength * 100)}%</code></span>
                   <input
                     type="range"
                     min={0.1}
                     max={0.9}
                     step={0.05}
-                    value={mouseDaimonTuning.strength}
-                    onChange={(e) => onSetMouseDaimonTuning({ strength: Number(e.target.value) })}
+                    value={mouseParticleTuning.strength}
+                    onChange={(e) => onSetMouseParticleTuning({ strength: Number(e.target.value) })}
                     className="h-1 w-full accent-[#ffaa55]"
                   />
                 </label>

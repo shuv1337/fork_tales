@@ -29,7 +29,7 @@ export function WorldSimulationPanel({
         {world.people.map((person) => (
           <article
             key={person.id}
-            className="border border-line rounded-xl bg-white/70 p-3"
+            className="border border-line rounded-xl bg-[#2a3042] p-3"
           >
             <div className="flex items-baseline justify-between">
               <strong className="text-sm">{person.name.en}</strong>
@@ -53,7 +53,7 @@ export function WorldSimulationPanel({
                 type="button"
                 onClick={() => onInteract(person.id, "speak")}
                 disabled={interactingPersonId === person.id}
-                className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
+                className="text-[12px] px-2 py-1 rounded border border-line bg-[#2a3042] hover:bg-[#334155] disabled:opacity-60"
               >
                 Speak / 話す
               </button>
@@ -61,7 +61,7 @@ export function WorldSimulationPanel({
                 type="button"
                 onClick={() => onInteract(person.id, "boost")}
                 disabled={interactingPersonId === person.id}
-                className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
+                className="text-[12px] px-2 py-1 rounded border border-line bg-[#2a3042] hover:bg-[#334155] disabled:opacity-60"
               >
                 Boost / 増幅
               </button>
@@ -69,7 +69,7 @@ export function WorldSimulationPanel({
                 type="button"
                 onClick={() => onInteract(person.id, "sing")}
                 disabled={interactingPersonId === person.id}
-                className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
+                className="text-[12px] px-2 py-1 rounded border border-line bg-[#2a3042] hover:bg-[#334155] disabled:opacity-60"
               >
                 Generate / 生成
               </button>
@@ -93,7 +93,7 @@ export function WorldSimulationPanel({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <section className="border border-line rounded-xl bg-white/55 p-3">
+        <section className="border border-line rounded-xl bg-[#1e293b] p-3">
           <h4 className="font-bold text-sm mb-2">Tracks / トラック帳</h4>
           <div className="space-y-2">
             {world.songs.slice(0, 4).map((song) => (
@@ -106,7 +106,7 @@ export function WorldSimulationPanel({
           </div>
         </section>
 
-        <section className="border border-line rounded-xl bg-white/55 p-3">
+        <section className="border border-line rounded-xl bg-[#1e293b] p-3">
           <h4 className="font-bold text-sm mb-2">Library / 文庫</h4>
           <div className="space-y-2">
             {world.books.length === 0 && (

@@ -245,7 +245,7 @@ export default function App() {
         coreVisualTuning={simTuning.coreVisualTuning}
         coreLayerVisibility={simTuning.coreLayerVisibility}
         agentWorkspaceBindings={agentWithDeps.agentWorkspaceBindings}
-        mouseDaimonTuning={simTuning.mouseDaimonTuning}
+        mouseParticleTuning={simTuning.mouseParticleTuning}
         onUserPresenceInput={handleUserPresenceInput}
         onOverlayInit={agentWithDeps.handleOverlayInit}
         onNexusInteraction={handleNexusInteraction}
@@ -285,7 +285,7 @@ export default function App() {
           activeChatLens={activeChatLens}
           latestAutopilotEvent={latestAutopilotEvent}
           projectionOptions={projectionOptions}
-          mouseDaimonTuning={simTuning.mouseDaimonTuning}
+          mouseParticleTuning={simTuning.mouseParticleTuning}
           activeCoreLayerCount={simTuning.activeCoreLayerCount}
           coreLayerManagerOpen={simTuning.coreLayerManagerOpen}
           coreLayerVisibility={simTuning.coreLayerVisibility}
@@ -310,7 +310,7 @@ export default function App() {
           onResetCoreSimulationTuning={simTuning.resetCoreSimulationTuning}
           onSetCoreSimulationDial={simTuning.setCoreSimulationDial}
           onSetCoreOrbitSpeed={camera.setCoreOrbitSpeed}
-          onSetMouseDaimonTuning={simTuning.updateMouseDaimonTuning}
+          onSetMouseParticleTuning={simTuning.updateMouseParticleTuning}
           onOpenRuntimeConfig={panelManager.openRuntimeConfigPanel}
           onToggleCoreLayerManagerOpen={() => simTuning.setCoreLayerManagerOpen(!simTuning.coreLayerManagerOpen)}
           onSetAllLayers={simTuning.setAllCoreLayers}

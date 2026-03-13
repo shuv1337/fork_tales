@@ -34,8 +34,8 @@ import {
   CORE_VISUAL_HUE_MIN,
   CORE_VISUAL_SATURATION_MAX,
   CORE_VISUAL_SATURATION_MIN,
-  CORE_VISUAL_VIGNETTE_MAX,
-  CORE_VISUAL_VIGNETTE_MIN,
+  CORE_VISUAL_EDGE_DARKENING_MAX,
+  CORE_VISUAL_EDGE_DARKENING_MIN,
   CORE_VISUAL_WASH_MAX,
   CORE_VISUAL_WASH_MIN,
   DEFAULT_CORE_LAYER_VISIBILITY,
@@ -83,7 +83,7 @@ describe("coreSimulationConfig", () => {
     expect(CORE_VISUAL_SATURATION_MIN).toBeLessThan(CORE_VISUAL_SATURATION_MAX);
     expect(CORE_VISUAL_HUE_MIN).toBeLessThan(CORE_VISUAL_HUE_MAX);
     expect(CORE_VISUAL_WASH_MIN).toBeLessThan(CORE_VISUAL_WASH_MAX);
-    expect(CORE_VISUAL_VIGNETTE_MIN).toBeLessThan(CORE_VISUAL_VIGNETTE_MAX);
+    expect(CORE_VISUAL_EDGE_DARKENING_MIN).toBeLessThan(CORE_VISUAL_EDGE_DARKENING_MAX);
   });
 
   it("keeps default simulation dials inside declared ranges", () => {
@@ -110,7 +110,7 @@ describe("coreSimulationConfig", () => {
       "saturation",
       "hueRotate",
       "backgroundWash",
-      "vignette",
+      "edgeDarkening",
     ] as const;
 
     const ranges = {
@@ -119,7 +119,7 @@ describe("coreSimulationConfig", () => {
       saturation: [CORE_VISUAL_SATURATION_MIN, CORE_VISUAL_SATURATION_MAX],
       hueRotate: [CORE_VISUAL_HUE_MIN, CORE_VISUAL_HUE_MAX],
       backgroundWash: [CORE_VISUAL_WASH_MIN, CORE_VISUAL_WASH_MAX],
-      vignette: [CORE_VISUAL_VIGNETTE_MIN, CORE_VISUAL_VIGNETTE_MAX],
+      edgeDarkening: [CORE_VISUAL_EDGE_DARKENING_MIN, CORE_VISUAL_EDGE_DARKENING_MAX],
     } as const;
 
     visualKeys.forEach((key) => {

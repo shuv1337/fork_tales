@@ -3,7 +3,7 @@
 // Copyright (C) 2024-2025 Fork Tales Contributors
 
 import type { ReactNode } from "react";
-import { CoreControlPanel, type MouseDaimonTuning } from "../App/CoreControlPanel";
+import { CoreControlPanel, type MouseParticleTuning } from "../App/CoreControlPanel";
 import { CoreLayerManagerOverlay } from "../App/CoreLayerManagerOverlay";
 import type { CoreLayerId, CoreSimulationTuning, CoreVisualTuning } from "../../app/coreSimulationConfig";
 import type { OverlayViewId } from "../Simulation/Canvas";
@@ -35,7 +35,7 @@ interface ControlSidebarProps {
   activeChatLens: { presence: string; status: string } | null;
   latestAutopilotEvent: { actionId: string; result: string } | null;
   projectionOptions: ProjectionOption[];
-  mouseDaimonTuning: MouseDaimonTuning;
+  mouseParticleTuning: MouseParticleTuning;
   activeCoreLayerCount: number;
   coreLayerManagerOpen: boolean;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
@@ -60,7 +60,7 @@ interface ControlSidebarProps {
   onResetCoreSimulationTuning: () => void;
   onSetCoreSimulationDial: (dial: keyof CoreSimulationTuning, value: number) => void;
   onSetCoreOrbitSpeed: (value: number) => void;
-  onSetMouseDaimonTuning: (partial: Partial<MouseDaimonTuning>) => void;
+  onSetMouseParticleTuning: (partial: Partial<MouseParticleTuning>) => void;
   onOpenRuntimeConfig: () => void;
   onToggleCoreLayerManagerOpen: () => void;
   onSetAllLayers: (enabled: boolean) => void;
@@ -91,7 +91,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
     activeChatLens,
     latestAutopilotEvent,
     projectionOptions,
-    mouseDaimonTuning,
+    mouseParticleTuning,
     activeCoreLayerCount,
     coreLayerManagerOpen,
     coreLayerVisibility,
@@ -116,7 +116,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
     onResetCoreSimulationTuning,
     onSetCoreSimulationDial,
     onSetCoreOrbitSpeed,
-    onSetMouseDaimonTuning,
+    onSetMouseParticleTuning,
     onOpenRuntimeConfig,
     onToggleCoreLayerManagerOpen,
     onSetAllLayers,
@@ -155,7 +155,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
         activeChatLens={activeChatLens}
         latestAutopilotEvent={latestAutopilotEvent}
         projectionOptions={projectionOptions}
-        mouseDaimonTuning={mouseDaimonTuning}
+        mouseParticleTuning={mouseParticleTuning}
         onToggleAutopilot={onToggleAutopilot}
         onToggleCoreFlight={onToggleCoreFlight}
         onToggleCoreOrbit={onToggleCoreOrbit}
@@ -173,7 +173,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
         onResetCoreSimulationTuning={onResetCoreSimulationTuning}
         onSetCoreSimulationDial={onSetCoreSimulationDial}
         onSetCoreOrbitSpeed={onSetCoreOrbitSpeed}
-        onSetMouseDaimonTuning={onSetMouseDaimonTuning}
+        onSetMouseParticleTuning={onSetMouseParticleTuning}
         onOpenRuntimeConfig={onOpenRuntimeConfig}
       />
 

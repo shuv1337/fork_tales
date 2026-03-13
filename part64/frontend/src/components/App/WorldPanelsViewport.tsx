@@ -2156,7 +2156,7 @@ function WorldPanelsViewportInner({
     <section className="world-council-root" aria-label="council ranked window manager">
       <header className="world-council-toolbar">
         <div>
-          <p className="world-council-kicker">presence operating rail</p>
+          <p className="world-council-kicker">system operating rail</p>
           <p className="world-council-title">
             one card per presence · drag vertical seams to resize lanes · double click seams to collapse
           </p>

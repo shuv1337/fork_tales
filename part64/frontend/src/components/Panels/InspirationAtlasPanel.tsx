@@ -163,11 +163,11 @@ export function InspirationAtlasPanel({ simulation }: Props) {
           <b>{Math.round(witnessContinuity * 100)}%</b>
         </div>
         <div className="inspiration-signal">
-          <span>ghost pulse</span>
+          <span>auto-agent pulse</span>
           <b>{Math.round(ghostPulse * 100)}%</b>
         </div>
         <div className="inspiration-signal">
-          <span>fork tax paid</span>
+          <span>fork cost paid</span>
           <b>{Math.round(forkTaxPaidRatio * 100)}%</b>
         </div>
       </div>

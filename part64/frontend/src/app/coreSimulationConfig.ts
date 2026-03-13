@@ -4,7 +4,7 @@ export interface CoreVisualTuning {
   saturation: number;
   hueRotate: number;
   backgroundWash: number;
-  vignette: number;
+  edgeDarkening: number;
 }
 
 export interface CoreSimulationTuning {
@@ -98,8 +98,8 @@ export const CORE_VISUAL_HUE_MIN = -85;
 export const CORE_VISUAL_HUE_MAX = 85;
 export const CORE_VISUAL_WASH_MIN = 0.24;
 export const CORE_VISUAL_WASH_MAX = 0.82;
-export const CORE_VISUAL_VIGNETTE_MIN = 0.3;
-export const CORE_VISUAL_VIGNETTE_MAX = 1.28;
+export const CORE_VISUAL_EDGE_DARKENING_MIN = 0.3;
+export const CORE_VISUAL_EDGE_DARKENING_MAX = 1.28;
 
 export const DEFAULT_CORE_VISUAL_TUNING: CoreVisualTuning = {
   brightness: 1.34,
@@ -107,7 +107,7 @@ export const DEFAULT_CORE_VISUAL_TUNING: CoreVisualTuning = {
   saturation: 1.08,
   hueRotate: 0,
   backgroundWash: 0.34,
-  vignette: 0.52,
+  edgeDarkening: 0.52,
 };
 
 export const HIGH_VISIBILITY_CORE_VISUAL_TUNING: CoreVisualTuning = {
@@ -116,7 +116,7 @@ export const HIGH_VISIBILITY_CORE_VISUAL_TUNING: CoreVisualTuning = {
   saturation: 1.12,
   hueRotate: 0,
   backgroundWash: 0.26,
-  vignette: 0.36,
+  edgeDarkening: 0.36,
 };
 
 export const DEFAULT_CORE_SIMULATION_TUNING: CoreSimulationTuning = {

@@ -538,7 +538,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
             </span>
           </div>
           
-          <div className="relative rounded-lg overflow-hidden bg-black/40 border border-white/5 p-1">
+          <div className="relative rounded-lg overflow-hidden bg-[#1a1a2e] border border-white/5 p-1">
              <audio ref={remoteAudioRef} controls autoPlay className="w-full h-8 opacity-80 hover:opacity-100 transition-opacity">
                <track kind="captions" />
              </audio>
