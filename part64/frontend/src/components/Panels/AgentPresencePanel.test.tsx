@@ -53,7 +53,7 @@ beforeEach(() => {
         },
       });
     }
-    if (url.includes("/api/witness/lineage")) {
+    if (url.includes("/api/continuity/lineage")) {
       return mockJsonResponse({
         ok: true,
         generated_at: "2026-02-20T12:00:00.000Z",

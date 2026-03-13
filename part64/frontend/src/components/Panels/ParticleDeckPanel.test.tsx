@@ -9,7 +9,7 @@ import type { Catalog, SimulationState } from "../../types";
 function createCatalogFixture(): Catalog {
   return {
     entity_manifest: [
-      { id: "witness_thread", en: "Witness Thread", hue: 200 },
+      { id: "witness_thread", en: "Observer Thread", hue: 200 },
       { id: "gates_of_truth", en: "Gates of Truth", hue: 120 },
     ],
   } as unknown as Catalog;
@@ -134,7 +134,7 @@ describe("ParticleDeckPanel", () => {
       expect(screen.getByText(/transient edges:/)).toBeTruthy();
       expect(screen.getByText("nexus · h2 · life 50%")).toBeTruthy();
       expect(screen.getByText("witness_thread · h4 · s 80%")).toBeTruthy();
-      expect(screen.getByText(/Witness Thread/)).toBeTruthy();
+      expect(screen.getByText(/Observer Thread/)).toBeTruthy();
       expect(screen.getAllByText(/route_message/).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText("daimoi-1")).toBeTruthy();
     });
@@ -177,7 +177,7 @@ describe("ParticleDeckPanel", () => {
       expect(screen.getByText("Query emitted: trace anomaly")).toBeTruthy();
     });
 
-    const presenceLabel = screen.getAllByText("Witness Thread").find((element) => element.closest("button"));
+    const presenceLabel = screen.getAllByText("Observer Thread").find((element) => element.closest("button"));
     const presenceButton = presenceLabel?.closest("button");
     if (!(presenceButton instanceof HTMLButtonElement)) {
       throw new Error("presence focus button not found");
@@ -190,7 +190,7 @@ describe("ParticleDeckPanel", () => {
         id: "witness_thread",
       }));
       expect(screen.getByText("focus locked ->")).toBeTruthy();
-      expect(screen.getByText("presence Witness Thread")).toBeTruthy();
+      expect(screen.getByText("presence Observer Thread")).toBeTruthy();
     });
 
     const particleLabel = screen.getAllByText("daimoi-1").find((element) => element.closest("button"));

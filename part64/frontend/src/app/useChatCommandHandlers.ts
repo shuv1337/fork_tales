@@ -179,7 +179,7 @@ async function requestSayCommand(
   simulationTimestamp: string | undefined,
   catalogGeneratedAt: string | undefined,
 ): Promise<SayCommandResponse> {
-  const response = await fetch(runtimeUrl("/api/muse/message"), {
+  const response = await fetch(runtimeUrl("/api/agent/message"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

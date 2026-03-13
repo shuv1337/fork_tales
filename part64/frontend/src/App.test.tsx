@@ -128,7 +128,7 @@ vi.mock("./components/App/CoreControlPanel", () => {
         <button type="button" onClick={props.onResetInterfaceOpacity}>reset opacity</button>
         <button type="button" onClick={() => props.onSetCoreSimulationDial?.("motionSpeed", 1.7)}>set sim dial</button>
         <button type="button" onClick={() => props.onSetCoreVisualDial?.("brightness", 1.2)}>set visual dial</button>
-        <button type="button" onClick={() => props.onSetMouseDaimonTuning?.({ enabled: false })}>set mouse daimon</button>
+        <button type="button" onClick={() => props.onSetMouseDaimonTuning?.({ enabled: false })}>set mouse particle</button>
         <button type="button" onClick={props.onOpenRuntimeConfig}>open runtime config</button>
         <button type="button" onClick={() => props.onSelectPerspective?.("causal-time")}>set perspective</button>
       </div>
@@ -161,7 +161,7 @@ vi.mock("./components/App/WorldPanelsViewport", () => {
           onClick={() => props.onFlyCameraToAnchor?.({
             kind: "node",
             id: "witness_thread",
-            label: "Witness Thread",
+            label: "Observer Thread",
             x: 0.52,
             y: 0.42,
             radius: 0.18,
@@ -208,7 +208,7 @@ function createCatalogFixture(): Catalog {
   return {
     part_roots: ["/tmp/part64"],
     entity_manifest: [
-      { id: "witness_thread", en: "Witness Thread", ja: "証人の糸", x: 0.45, y: 0.44, hue: 210 },
+      { id: "witness_thread", en: "Observer Thread", ja: "証人の糸", x: 0.45, y: 0.44, hue: 210 },
       { id: "anchor_registry", en: "Anchor Registry", ja: "錨台帳", x: 0.55, y: 0.58, hue: 180 },
     ],
     projection: {
@@ -330,7 +330,7 @@ beforeEach(() => {
 
   vi.spyOn(globalThis, "fetch").mockImplementation(async (input: RequestInfo | URL) => {
     const url = String(input);
-    if (url.includes("/api/muse/create")) {
+    if (url.includes("/api/agent/create")) {
       return mockResponse({ ok: true, muse_id: "muse.archive_witness" });
     }
     return mockResponse({ ok: true, entries: [] });
@@ -359,7 +359,7 @@ describe("App", () => {
     fireEvent.click(screen.getByRole("button", { name: "reset opacity" }));
     fireEvent.click(screen.getByRole("button", { name: "set sim dial" }));
     fireEvent.click(screen.getByRole("button", { name: "set visual dial" }));
-    fireEvent.click(screen.getByRole("button", { name: "set mouse daimon" }));
+    fireEvent.click(screen.getByRole("button", { name: "set mouse particle" }));
     fireEvent.click(screen.getByRole("button", { name: "open runtime config" }));
     fireEvent.click(screen.getByRole("button", { name: "set perspective" }));
 
@@ -426,7 +426,7 @@ describe("App", () => {
   it("shows create failure toast when muse create endpoint fails", async () => {
     vi.mocked(globalThis.fetch).mockImplementationOnce(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes("/api/muse/create")) {
+      if (url.includes("/api/agent/create")) {
         return mockResponse({ ok: false, error: "intent_conflict" }, 409);
       }
       return mockResponse({ ok: true, entries: [] });

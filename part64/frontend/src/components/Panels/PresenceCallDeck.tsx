@@ -470,7 +470,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
       
       <header className="border-b border-white/5 pb-4">
         <div className="flex justify-between items-start">
-          <h2 className="text-2xl font-bold mb-1 text-ink tracking-tight">Presence Call Deck</h2>
+          <h2 className="text-2xl font-bold mb-1 text-ink tracking-tight">Particle Deck</h2>
           <div className="px-2 py-0.5 rounded bg-white/5 text-[12px] font-mono text-muted border border-white/5">
             WEBRTC LANE
           </div>

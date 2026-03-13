@@ -22,7 +22,7 @@ describe("ThreatRadarPanel", () => {
   it("loads report data and conversation preview", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes("/api/muse/threat-radar/report")) {
+      if (url.includes("/api/agent/threat-radar/report")) {
         return mockJsonResponse({
           ok: true,
           runtime: {
@@ -62,7 +62,7 @@ describe("ThreatRadarPanel", () => {
           markdown: "## Conversation Chain\n\n- example line",
         });
       }
-      if (url.includes("/api/muse/threat-radar/tick")) {
+      if (url.includes("/api/agent/threat-radar/tick")) {
         return mockJsonResponse({ ok: true, status: "triggered" });
       }
       return mockJsonResponse({ ok: true });
@@ -95,7 +95,7 @@ describe("ThreatRadarPanel", () => {
     let reportCall = 0;
     vi.spyOn(globalThis, "fetch").mockImplementation(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes("/api/muse/threat-radar/report")) {
+      if (url.includes("/api/agent/threat-radar/report")) {
         reportCall += 1;
         if (reportCall === 1) {
           return mockJsonResponse({
@@ -139,7 +139,7 @@ describe("ThreatRadarPanel", () => {
           },
         });
       }
-      if (url.includes("/api/muse/threat-radar/tick")) {
+      if (url.includes("/api/agent/threat-radar/tick")) {
         return mockJsonResponse({ ok: true, status: "triggered" });
       }
       if (url.includes("/api/github/conversation")) {

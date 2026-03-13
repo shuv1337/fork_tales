@@ -204,7 +204,7 @@ function setupCanvasFetchMock(seedComments: Array<Record<string, unknown>> = [])
   const presenceAccounts: Array<Record<string, unknown>> = [
     {
       presence_id: "witness_thread",
-      display_name: "Witness Thread",
+      display_name: "Observer Thread",
       handle: "witness_thread",
       avatar: "",
       bio: "",
@@ -240,7 +240,7 @@ function setupCanvasFetchMock(seedComments: Array<Record<string, unknown>> = [])
       body: parsedBody,
     });
 
-    if (url.includes("/api/witness")) {
+    if (url.includes("/api/continuity")) {
       return mockResponse({ ok: true });
     }
 
@@ -567,7 +567,7 @@ describe("SimulationCanvas", () => {
       expect(screen.queryByText(/hologram worldscreen/i)).toBeNull();
     });
 
-    expect(fetchSpy.mock.calls.some(([url]) => String(url).includes("/api/witness"))).toBe(true);
+    expect(fetchSpy.mock.calls.some(([url]) => String(url).includes("/api/continuity"))).toBe(true);
   });
 
   it("loads and posts image comments in conversation mode", async () => {

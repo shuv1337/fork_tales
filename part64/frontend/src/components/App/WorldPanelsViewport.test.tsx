@@ -41,7 +41,7 @@ function makePanel(overrides: Partial<SortedPanel> = {}): SortedPanel {
     councilBoost: 1,
     councilReason: "running lane",
     presenceId: "witness_thread",
-    presenceLabel: "Witness Thread",
+    presenceLabel: "Observer Thread",
     presenceLabelJa: "証人の糸",
     presenceRole: "camera-guidance",
     particleDisposition: "role-bound",
@@ -72,7 +72,7 @@ function makeProps(overrides: Partial<WorldPanelsViewportProps> = {}): WorldPane
     [
       makePanel({
         id: "nexus.ui.chat.witness_thread",
-        presenceLabel: "Witness Thread",
+        presenceLabel: "Observer Thread",
         presenceId: "witness_thread",
         presenceRole: "camera-guidance",
       }),

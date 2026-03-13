@@ -46,7 +46,7 @@ function makeInteraction(): WorldInteractionResponse {
   return {
     ok: true,
     speaker: { en: "Aiko", ja: "アイコ" },
-    presence: { name: { en: "Witness Thread", ja: "証人の糸" } },
+    presence: { name: { en: "Observer Thread", ja: "証人の糸" } },
     line_en: "Follow the chain from first signal.",
     line_ja: "最初の信号から連鎖を追って。",
   } as unknown as WorldInteractionResponse;

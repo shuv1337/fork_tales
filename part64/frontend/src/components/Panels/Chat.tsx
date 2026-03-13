@@ -516,7 +516,7 @@ export function ChatPanel({
     }
 
     try {
-      const lineageResponse = await fetch(runtimeApiUrl("/api/witness/lineage"));
+      const lineageResponse = await fetch(runtimeApiUrl("/api/continuity/lineage"));
       if (!lineageResponse.ok) {
         errors.push(`lineage(${lineageResponse.status})`);
       } else {

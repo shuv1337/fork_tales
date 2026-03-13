@@ -26,7 +26,7 @@ describe("PresenceCallDeck", () => {
         return mockJsonResponse({
           rendered_text: "Witness thread response.",
           presence_name: {
-            en: "Witness Thread",
+            en: "Observer Thread",
           },
         });
       }

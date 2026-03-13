@@ -5887,7 +5887,7 @@ export function SimulationCanvas({
         target,
       };
       const baseUrl = runtimeBaseUrl();
-      fetch(`${baseUrl}/api/witness`, {
+      fetch(`${baseUrl}/api/continuity`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "touch", target }),

@@ -14,7 +14,7 @@ function makeCatalog(): Catalog {
     canonical_terms: [],
     cover_fields: [],
     entity_manifest: [
-      { id: "witness_thread", en: "Witness Thread", ja: "証人の糸", hue: 196 },
+      { id: "witness_thread", en: "Observer Thread", ja: "証人の糸", hue: 196 },
       { id: "chaos", en: "Chaos", ja: "カオス", hue: 328 },
     ],
   } as unknown as Catalog;
@@ -42,7 +42,7 @@ function makeEntities(): EntityState[] {
 function makePresenceDynamics(): PresenceDynamics {
   return {
     witness_thread: {
-      en: "Witness Thread",
+      en: "Observer Thread",
       ja: "証人の糸",
       notes_en: "Keeps continuity anchored.",
       notes_ja: "連続性を固定する。",
@@ -93,7 +93,7 @@ describe("VitalsPanel", () => {
       />,
     );
 
-    expect(screen.getByText("Witness Thread / 証人の糸")).toBeTruthy();
+    expect(screen.getByText("Observer Thread / 証人の糸")).toBeTruthy();
     expect(screen.getByText("Growth Guard / 増殖監視")).toBeTruthy();
     expect(screen.getByText("mode=balanced pressure=37% action=compact")).toBeTruthy();
     expect(screen.getByText(/Linked presences: Chaos \/ カオス/)).toBeTruthy();

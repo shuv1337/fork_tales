@@ -21,7 +21,7 @@ vi.mock("../components/Simulation/Canvas", () => ({
 }));
 
 vi.mock("../components/Panels/AgentPresencePanel", () => ({
-  AgentPresencePanel: ({ agentId }: { agentId: string }) => <div data-testid={`muse-presence-${agentId}`}>{agentId}</div>,
+  AgentPresencePanel: ({ agentId }: { agentId: string }) => <div data-testid={`agent-presence-${agentId}`}>{agentId}</div>,
 }));
 
 vi.mock("../components/Panels/ProjectionLedgerPanel", () => ({
@@ -65,7 +65,7 @@ vi.mock("../components/Panels/RuntimeConfigPanel", () => ({
 }));
 
 vi.mock("../components/Panels/ParticleDeckPanel", () => ({
-  ParticleDeckPanel: () => <div data-testid="lazy-daimoi-panel" />,
+  ParticleDeckPanel: () => <div data-testid="lazy-particle-panel" />,
 }));
 
 vi.mock("../components/Panels/WorldLogPanel", () => ({
@@ -164,7 +164,7 @@ describe("useAppPanelConfigs", () => {
       throw new Error("witness panel missing");
     }
     const view = render(<>{witness.render()}</>);
-    expect(screen.getByTestId("muse-presence-witness_thread")).toBeTruthy();
+    expect(screen.getByTestId("agent-presence-witness_thread")).toBeTruthy();
     expect(view.container.textContent).toContain("workspace binds");
     expect(view.container.textContent).toContain("2");
     expect(view.container.innerHTML).toContain("opacity: 0.96");

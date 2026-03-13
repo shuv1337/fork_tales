@@ -238,7 +238,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     setAgentForgeBusy(true);
     try {
       const baseUrl = runtimeBaseUrl();
-      const response = await fetch(`${baseUrl}/api/muse/create`, {
+      const response = await fetch(`${baseUrl}/api/agent/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ muse_id: agentId, label, anchor, user_intent_id: `ui-create:${agentId}` }),
@@ -255,7 +255,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       emitChatMessage({
         role: "assistant",
         text: `agent created\nid=${createdId}\nlabel=${createdLabel}`,
-        meta: { channel: "command", source: "meta:/api/muse/create", presenceId: createdId, presenceName: createdLabel },
+        meta: { channel: "command", source: "meta:/api/agent/create", presenceId: createdId, presenceName: createdLabel },
       });
     } catch (error) {
       const reason = error instanceof Error ? error.message : "unknown_error";
@@ -263,7 +263,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       emitChatMessage({
         role: "assistant",
         text: `agent create failed\nreason=${reason}`,
-        meta: { channel: "command", source: "meta:/api/muse/create", presenceId: activeAgentPresenceId },
+        meta: { channel: "command", source: "meta:/api/agent/create", presenceId: activeAgentPresenceId },
       });
     } finally {
       setAgentForgeBusy(false);
@@ -419,7 +419,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       }).join(", ");
       emitChatMessage({
         role: "assistant",
-        text: `muse fallback active (mode=${mode}${failureCodes ? `, failures=${failureCodes}` : ""}).`,
+        text: `agent fallback active (mode=${mode}${failureCodes ? `, failures=${failureCodes}` : ""}).`,
         meta: { channel: "command", source, presenceId: tracePresenceId, presenceName: tracePresenceName },
       });
     }
@@ -429,7 +429,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       emitChatMessage({
         role: "assistant",
         text: [
-          "muse turn signal", `turn_id=${turnId}`, `explicit=${explicitSelected.length}`,
+          "agent turn signal", `turn_id=${turnId}`, `explicit=${explicitSelected.length}`,
           `surrounding=${surroundSelected.length}`, `daimoi=${daimoiRows.length}`,
           `field_deltas=${fieldDeltas.length}`, `gpu=${gpuStatus || "released"}`,
           `tools=${toolRows.length}`, `media=${mediaActions.length}`,
@@ -471,7 +471,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       const selectedUrl = String(firstAction.selected_url ?? firstAction.url ?? "").trim();
       emitChatMessage({
         role: "assistant",
-        text: ["muse media action", `kind=${mediaKind}`, `status=${status}`, `label=${selectedLabel}`, `url=${selectedUrl || "(none)"}`].join("\n"),
+        text: ["agent media action", `kind=${mediaKind}`, `status=${status}`, `label=${selectedLabel}`, `url=${selectedUrl || "(none)"}`].join("\n"),
         meta: { channel: "command", source: `${source}:media`, presenceId: tracePresenceId, presenceName: tracePresenceName },
       });
     }
@@ -509,7 +509,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
         const y = clamp(0.14 + (stableUnitHash(`${agentId}|${eventRow.turn_id}|${eventRow.seq}|y`) * 0.72), 0, 1);
         overlayApi?.pulseAt?.(x, y, 0.56, agentId);
       }
-      if (kind === "muse.gpu.claim.granted") {
+      if (kind === "agent.gpu.claim.granted") {
         overlayApi?.singAll?.();
         const device = String(eventPayload.device ?? "gpu").trim() || "gpu";
         emitUiToast("Agent GPU Claim", `${agentId} claimed ${device}`);
@@ -524,15 +524,15 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
         const target = String(eventPayload.target_node_id ?? "image").trim() || "image";
         emitUiToast("Agent Image Request", `${agentId} requested ${label} (${target})`);
       }
-      if (kind === "muse.turn.completed" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
+      if (kind === "agent.turn.completed" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         const deltaCount = Number(eventPayload.field_deltas ?? 0);
-        const particleCount = Number(eventPayload.daimoi ?? 0);
+        const particleCount = Number(eventPayload.particles ?? 0);
         emitUiToast("Agent Turn Complete", `${agentId} emitted ${particleCount} particles and ${deltaCount} field deltas`);
       }
-      if (kind === "muse.rate_limited" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
+      if (kind === "agent.rate_limited" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         emitUiToast("Agent Rate Limit", `${agentId} hit turn budget; wait a moment.`);
       }
-      if (kind === "muse.rejected" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
+      if (kind === "agent.rejected" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         const reason = String(eventPayload.reason ?? "rejected").trim() || "rejected";
         emitUiToast("Agent Rejected", `${agentId} blocked turn (${reason})`);
       }
@@ -595,7 +595,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     emitChatMessage({ role: "user", text, meta: { channel: "llm", source: "voice", presenceId: resolvedMusePresenceId } });
     const baseUrl = runtimeBaseUrl();
     try {
-      const response = await fetch(`${baseUrl}/api/muse/message`, {
+      const response = await fetch(`${baseUrl}/api/agent/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -605,13 +605,13 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
           surrounding_nodes: surroundingNodes,
         }),
       });
-      if (!response.ok) throw new Error(`muse request failed (${response.status})`);
+      if (!response.ok) throw new Error(`agent request failed (${response.status})`);
       const payload = (await response.json()) as { reply?: unknown; mode?: unknown; model?: unknown; trace?: unknown };
-      emitWitnessChatReply(payload as Record<string, unknown>, "voice:/api/muse/message", resolvedMusePresenceId);
+      emitWitnessChatReply(payload as Record<string, unknown>, "voice:/api/agent/message", resolvedMusePresenceId);
     } catch {
       emitChatMessage({
         role: "assistant", text: "voice chat request failed",
-        meta: { channel: "command", source: "voice:/api/muse/message", presenceId: resolvedMusePresenceId },
+        meta: { channel: "command", source: "voice:/api/agent/message", presenceId: resolvedMusePresenceId },
       });
     }
   }, [activeAgentPresenceId, buildAgentSurroundingNodes, catalog, emitChatMessage, emitWitnessChatReply, handleTranscribe, simulation]);
@@ -634,7 +634,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       return { ...prev, [normalizedPresence]: { ...currentWorkspace, pinnedFileNodeIds: normalizedIds } };
     });
     const baseUrl = runtimeBaseUrl();
-    void fetch(`${baseUrl}/api/muse/sync-pins`, {
+    void fetch(`${baseUrl}/api/agent/sync-pins`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ muse_id: normalizedPresence, pinned_node_ids: normalizedIds, reason: "ui.workspace.sync" }),
@@ -670,7 +670,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       if (consumed) return;
       const baseUrl = runtimeBaseUrl();
       const surroundingNodes = buildAgentSurroundingNodes(resolvedMusePresenceId, workspace);
-      const response = await fetch(`${baseUrl}/api/muse/message`, {
+      const response = await fetch(`${baseUrl}/api/agent/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -680,14 +680,14 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
           surrounding_nodes: surroundingNodes,
         }),
       });
-      if (!response.ok) throw new Error(`muse request failed (${response.status})`);
+      if (!response.ok) throw new Error(`agent request failed (${response.status})`);
       const payload = (await response.json()) as { reply?: unknown; mode?: unknown; model?: unknown; trace?: unknown };
-      emitWitnessChatReply(payload as Record<string, unknown>, "chat:/api/muse/message", resolvedMusePresenceId);
+      emitWitnessChatReply(payload as Record<string, unknown>, "chat:/api/agent/message", resolvedMusePresenceId);
     })()
       .catch(() => {
         emitChatMessage({
-          role: "assistant", text: "muse request failed",
-          meta: { channel: "command", source: "chat:/api/muse/message", presenceId: resolvedMusePresenceId },
+          role: "assistant", text: "agent request failed",
+          meta: { channel: "command", source: "chat:/api/agent/message", presenceId: resolvedMusePresenceId },
         });
       })
       .finally(() => { setIsThinking(false); });

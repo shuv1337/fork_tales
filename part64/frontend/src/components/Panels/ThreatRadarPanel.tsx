@@ -130,7 +130,7 @@ export function ThreatRadarPanel() {
       if (repoFilter) {
         params.set("repo", repoFilter);
       }
-      const response = await fetch(runtimeApiUrl(`/api/muse/threat-radar/report?${params.toString()}`));
+      const response = await fetch(runtimeApiUrl(`/api/agent/threat-radar/report?${params.toString()}`));
       if (!response.ok) {
         throw new Error(`threat radar report request failed (${response.status})`);
       }
@@ -200,7 +200,7 @@ export function ThreatRadarPanel() {
   const forceTick = useCallback(async () => {
     setForcingTick(true);
     try {
-      const response = await fetch(runtimeApiUrl("/api/muse/threat-radar/tick?force=true"));
+      const response = await fetch(runtimeApiUrl("/api/agent/threat-radar/tick?force=true"));
       if (!response.ok) {
         throw new Error(`threat radar tick request failed (${response.status})`);
       }
