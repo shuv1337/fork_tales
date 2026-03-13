@@ -1,0 +1,76 @@
+{
+  "groupId": "reference-rerun",
+  "testedAt": "2026-03-13T09:44:55.497739+00:00",
+  "surface": "repo-shell",
+  "isolation": {
+    "surface": "repo-shell",
+    "repoRoot": "/home/shuv/repos/fork_tales",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026",
+    "mode": "read-only validation except requested report/evidence outputs"
+  },
+  "toolsUsed": [
+    "Read",
+    "Grep",
+    "Execute"
+  ],
+  "assertions": [
+    {
+      "id": "VAL-FC-004",
+      "title": "No broken references to deleted files",
+      "status": "pass",
+      "steps": [
+        {
+          "action": "Review repo-shell guidance, the VAL-FC-004 contract text, and the prior failing synthesis/report.",
+          "expected": "Know which residues are allowed and which prior stale references must be rechecked.",
+          "observed": "Guidance confirmed explanatory comments for already-deleted scripts are acceptable, and the prior failure was limited to opencode.jsonc, frame_firewall.dl, and .opencode/skills/simulation-ops/SKILL.md."
+        },
+        {
+          "action": "Re-run the focused deleted-file rg sweep used in round 1, excluding .git, .factory, part64/world_state, artifacts, node_modules, and .opencode/knowledge/archive.",
+          "expected": "No active imports/requires/file references to deleted targets should remain; any residual hits should be explanatory-only.",
+          "observed": "Focused sweep returned 9 matches across 2 files, all limited to explanatory comments / skip reasons / stderr stub strings for removed scripts in part64/code/tests/test_muse_semantic_training_lab.py, part64/scripts/eval_sim_learning_suite.py."
+        },
+        {
+          "action": "Specifically recheck the three previously failing targets and manifest.json.",
+          "expected": "No matches for opmf.lisp, DIALOG_Anchor_Registry.md, or SIMULATION_WORKFLOW.md in active repo files or manifest.json.",
+          "observed": "The repo-wide three-target sweep returned zero matches, and targeted checks for opencode.jsonc, frame_firewall.dl, .opencode/skills/simulation-ops/SKILL.md, and manifest.json each returned zero matches."
+        }
+      ],
+      "evidence": {
+        "files": [
+          "file-cleanup/reference-rerun/focused-reference-rg.txt",
+          "file-cleanup/reference-rerun/targeted-reference-checks.txt",
+          "file-cleanup/reference-rerun/manifest-check.txt"
+        ],
+        "commandSummary": [
+          "cd /home/shuv/repos/fork_tales && rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!part64/world_state/**' -g '!.opencode/knowledge/archive/**' -g '!artifacts/**' -g '!**/node_modules/**' 'opmf\\.lisp|SIMULATION_WORKFLOW\\.md|WEB_GRAPH_WEAVER\\.md|WHISPER_BENCHMARK\\.md|MODEL_BENCH_RUNNER\\.md|deep-research-report\\.md|muse_semantic_training_lab\\.py|bench_muse_song_lab\\.py|muse_song_lab_ctl\\.py|monitor_daimoi\\.py|demo_daimoi_crawler_muse\\.sh|world_web_massive\\.py\\.bak|NEW_LYRICS_[^[:space:]]*\\.md|GATES_OF_TRUTH_[^[:space:]]*\\.md|DIALOG_[^[:space:]]*\\.md' .",
+          "cd /home/shuv/repos/fork_tales && rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!part64/world_state/**' -g '!.opencode/knowledge/archive/**' -g '!artifacts/**' -g '!**/node_modules/**' 'opmf\\.lisp|DIALOG_Anchor_Registry\\.md|SIMULATION_WORKFLOW\\.md' .",
+          "cd /home/shuv/repos/fork_tales && rg -n 'opmf\\.lisp|DIALOG_Anchor_Registry\\.md|SIMULATION_WORKFLOW\\.md' manifest.json",
+          "cd /home/shuv/repos/fork_tales && rg -n 'opmf\\.lisp|DIALOG_Anchor_Registry\\.md|SIMULATION_WORKFLOW\\.md' opencode.jsonc frame_firewall.dl .opencode/skills/simulation-ops/SKILL.md"
+        ],
+        "observedCounts": {
+          "focusedMatchCount": 9,
+          "acceptableResidueLineCount": 9,
+          "acceptableResidueFileCount": 2,
+          "brokenReferenceLineCount": 0,
+          "brokenReferenceFileCount": 0,
+          "threeTargetSweepMatchCount": 0,
+          "manifestMatchCount": 0
+        },
+        "previousFailureTargets": {
+          "opencode.jsonc": "clear",
+          "frame_firewall.dl": "clear",
+          ".opencode/skills/simulation-ops/SKILL.md": "clear",
+          "manifest.json": "clear"
+        },
+        "acceptableResidue": [
+          "part64/scripts/eval_sim_learning_suite.py -> explanatory comments and stderr stub strings for removed scripts",
+          "part64/code/tests/test_muse_semantic_training_lab.py -> explanatory note and skip reasons for removed script"
+        ]
+      },
+      "issues": null
+    }
+  ],
+  "frictions": [],
+  "blockers": [],
+  "summary": "Tested 1 assertion: VAL-FC-004 passed. The three previously failing stale references are gone, manifest.json contains no relevant deleted-file entries, and the only remaining focused sweep hits are acceptable explanatory residues for already-deleted scripts."
+}

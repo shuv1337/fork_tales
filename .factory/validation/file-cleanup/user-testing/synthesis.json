@@ -1,40 +1,25 @@
 {
   "milestone": "file-cleanup",
-  "round": 1,
-  "status": "fail",
-  "generatedAt": "2026-03-13T09:36:52.504495+00:00",
+  "round": 2,
+  "status": "pass",
+  "generatedAt": "2026-03-13T09:45:46.768370+00:00",
   "assertionsSummary": {
     "total": 7,
-    "passed": 6,
-    "failed": 1,
+    "passed": 7,
+    "failed": 0,
     "blocked": 0
   },
   "passedAssertions": [
     "VAL-FC-001",
     "VAL-FC-002",
     "VAL-FC-003",
+    "VAL-FC-004",
     "VAL-FC-005",
     "VAL-FC-006",
     "VAL-FC-007"
   ],
-  "failedAssertions": [
-    {
-      "id": "VAL-FC-004",
-      "reason": "VAL-FC-004 fails because broken references remain in active files: opencode.jsonc, frame_firewall.dl, and .opencode/skills/simulation-ops/SKILL.md."
-    }
-  ],
+  "failedAssertions": [],
   "blockedAssertions": [],
-  "appliedUpdates": [
-    {
-      "target": "user-testing.md",
-      "description": "Added repo-shell and browser-ui concurrency/isolation guidance for file-cleanup validation, including explicit validator boundaries.",
-      "source": "setup"
-    },
-    {
-      "target": "user-testing.md",
-      "description": "Recorded that the live service on port 8787 returned HTTP 404 for / and /api/catalog during this run, so VAL-FC-006 browser validation should focus on frontend render and uncaught JS errors.",
-      "source": "setup"
-    }
-  ],
-  "previousRound": null
+  "appliedUpdates": [],
+  "previousRound": ".factory/validation/file-cleanup/user-testing/synthesis.round1.json"
 }
