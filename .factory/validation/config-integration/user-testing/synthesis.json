@@ -1,0 +1,80 @@
+{
+  "milestone": "config-integration",
+  "round": 1,
+  "status": "fail",
+  "generatedAt": "2026-03-13T15:06:12.519037+00:00",
+  "assertionsSummary": {
+    "total": 13,
+    "passed": 9,
+    "failed": 4,
+    "blocked": 0
+  },
+  "scopeAssertions": [
+    "VAL-CI-001",
+    "VAL-CI-002",
+    "VAL-CI-003",
+    "VAL-CI-004",
+    "VAL-CI-005",
+    "VAL-CI-006",
+    "VAL-CI-007",
+    "VAL-CROSS-001",
+    "VAL-CROSS-002",
+    "VAL-CROSS-003",
+    "VAL-CROSS-004",
+    "VAL-CROSS-005",
+    "VAL-CROSS-006"
+  ],
+  "testedThisRound": [
+    "VAL-CI-001",
+    "VAL-CI-002",
+    "VAL-CI-003",
+    "VAL-CI-004",
+    "VAL-CI-005",
+    "VAL-CI-006",
+    "VAL-CI-007",
+    "VAL-CROSS-001",
+    "VAL-CROSS-002",
+    "VAL-CROSS-003",
+    "VAL-CROSS-004",
+    "VAL-CROSS-005",
+    "VAL-CROSS-006"
+  ],
+  "passedAssertions": [
+    "VAL-CI-001",
+    "VAL-CI-002",
+    "VAL-CI-003",
+    "VAL-CI-004",
+    "VAL-CI-006",
+    "VAL-CI-007",
+    "VAL-CROSS-004",
+    "VAL-CROSS-005",
+    "VAL-CROSS-006"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-CI-005",
+      "reason": "Stale Docker/config metadata remains in `part64/code/world_web/chamber.py`, `part64/code/tests/test_docker_runtime.py`, `part64/code/tests/test_world_web_pm2.py`, and `docker-llm-proxy/src/rotator_library/client.py`."
+    },
+    {
+      "id": "VAL-CROSS-001",
+      "reason": "The live UI stayed `Disconnected` and captured requests to `http://127.0.0.1:9787/...` without successful runtime or WebSocket connectivity."
+    },
+    {
+      "id": "VAL-CROSS-002",
+      "reason": "Catalog/runtime data did not render; the UI showed `no field particles in current stream` while requests to `http://127.0.0.1:9787/api/catalog` and `/api/catalog/stream` were observed."
+    },
+    {
+      "id": "VAL-CROSS-003",
+      "reason": "Visible UI still contains narrative residue including `witness thread`, `VIEW LENS KEEPER`, `ANCHOR REGISTRY`, and `FORK TAX CANTICLE`."
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [
+    {
+      "target": "services.yaml",
+      "description": "Updated `.factory/services.yaml` build command to `cd part64/frontend && npx tsc -b --pretty false && npx vite build` because bare `tsc` was not available on PATH during validation.",
+      "source": "flow-report"
+    }
+  ],
+  "previousRound": null
+}

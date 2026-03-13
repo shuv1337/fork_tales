@@ -1,0 +1,79 @@
+{
+  "surface": "repo-shell",
+  "assertions": [
+    {
+      "id": "VAL-CI-001",
+      "status": "pass",
+      "summary": "Docker compose files are free of `Fork Tales`/`fork.tales` narrative text, and the old `docker-compose.muse-song-lab` filename is absent.",
+      "evidence": [
+        "config-integration/repo-shell-config/repo-shell-config-checks.txt",
+        "`rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!artifacts/**' -g '!**/node_modules/**' -g '**/docker-compose*.yml' -g '**/docker-compose*.yaml' 'Fork Tales|fork\\.tales' /home/shuv/repos/fork_tales` returned no matches.",
+        "`/home/shuv/repos/fork_tales/part64` currently contains `docker-compose.agent-song-lab.yml`, `docker-compose.embed-bench.yml`, `docker-compose.local-llm.yml`, `docker-compose.sim-slice-bench.yml`, `docker-compose.whisper-bench.yml`, and `docker-compose.yml`; globbing found no `docker-compose.muse-song-lab.yml` or `.yaml`."
+      ]
+    },
+    {
+      "id": "VAL-CI-002",
+      "status": "pass",
+      "summary": "`part64/ecosystem.config.cjs` is clean of Fork Tales narrative references.",
+      "evidence": [
+        "config-integration/repo-shell-config/repo-shell-config-checks.txt",
+        "`rg -n 'Fork Tales|fork_tales|fork\\.tales' /home/shuv/repos/fork_tales/part64/ecosystem.config.cjs` returned no matches.",
+        "Manual read of `/home/shuv/repos/fork_tales/part64/ecosystem.config.cjs` showed only `eta-mu-world`, `eta-mu-io`, `eta-mu-tts`, and `web-graph-weaver` process names."
+      ]
+    },
+    {
+      "id": "VAL-CI-003",
+      "status": "pass",
+      "summary": "Root and frontend package manifests contain no Fork Tales narrative references.",
+      "evidence": [
+        "config-integration/repo-shell-config/repo-shell-config-checks.txt",
+        "`rg -n 'Fork Tales|fork_tales|fork\\.tales' /home/shuv/repos/fork_tales/package.json /home/shuv/repos/fork_tales/part64/frontend/package.json` returned no matches.",
+        "Manual reads showed `/home/shuv/repos/fork_tales/package.json` named `eta-mu-frame-firewall` and `/home/shuv/repos/fork_tales/part64/frontend/package.json` contains only neutral frontend package metadata."
+      ]
+    },
+    {
+      "id": "VAL-CI-005",
+      "status": "fail",
+      "summary": "Compose filenames and active compose labels are neutralized, but stale `fork_tales` / `io.fork_tales` metadata still remains in Python/test code and docker-llm-proxy code.",
+      "evidence": [
+        "config-integration/repo-shell-config/repo-shell-config-checks.txt",
+        "`rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!artifacts/**' -g '!**/node_modules/**' 'Fork Tales|fork_tales|fork\\.tales|io\\.fork_tales|docker-compose\\.muse-song-lab|muse-song-lab' /home/shuv/repos/fork_tales/part64 /home/shuv/repos/fork_tales/docker-llm-proxy` found residues at `/home/shuv/repos/fork_tales/part64/code/world_web/chamber.py:3783`, `/home/shuv/repos/fork_tales/part64/code/tests/test_docker_runtime.py:64,72,80,144-145,154,219,293,373`, `/home/shuv/repos/fork_tales/part64/code/tests/test_world_web_pm2.py:1012,1028`, and `/home/shuv/repos/fork_tales/docker-llm-proxy/src/rotator_library/client.py:1060`.",
+        "Targeted checks still showed no `fork_tales`/`io.fork_tales` matches in `/home/shuv/repos/fork_tales/part64/code/world_web/docker_runtime.py` or `/home/shuv/repos/fork_tales/part64/code/static/docker_simulations_dashboard.html`, and compose labels now read `io.eta_mu.*` in `part64/docker-compose.yml`, `part64/docker-compose.sim-slice-bench.yml`, and `part64/docker-compose.agent-song-lab.yml`."
+      ]
+    },
+    {
+      "id": "VAL-CI-006",
+      "status": "pass",
+      "summary": "`cli/`, `lib/`, and `contracts/` are clear of the contract-called narrative residue terms searched in this flow.",
+      "evidence": [
+        "config-integration/repo-shell-config/repo-shell-config-checks.txt",
+        "`rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!artifacts/**' -g '!**/node_modules/**' -g 'cli/**' -g 'lib/**' -g 'contracts/**' 'receipt_river|witness_thread|fork_tax_canticle|mage_of_receipts|keeper_of_receipts|gates_of_truth|file_sentinel|change_fog|path_ward|manifest_lith|core_pulse|chaos_butterfly|resolution_weaver|witness|canticle|myth|Fork Tales' /home/shuv/repos/fork_tales` returned no matches.",
+        "No hits were found under `/home/shuv/repos/fork_tales/cli`, `/home/shuv/repos/fork_tales/lib`, or `/home/shuv/repos/fork_tales/contracts`."
+      ]
+    },
+    {
+      "id": "VAL-CI-007",
+      "status": "pass",
+      "summary": "No `Fork Tales` source/header residue was found in repo source/config files outside `.factory` artifacts.",
+      "evidence": [
+        "config-integration/repo-shell-config/repo-shell-config-checks.txt",
+        "`rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!artifacts/**' -g '!**/node_modules/**' -g '!part64/frontend/.cov-tmp/**' -g '*.{py,js,mjs,cjs,ts,tsx,html,css,json,jsonc,yml,yaml,lith}' 'Fork Tales' /home/shuv/repos/fork_tales` returned no matches.",
+        "A case-insensitive follow-up search for `fork tales` over the same source/config globs also returned no matches."
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "Read",
+    "Grep",
+    "Glob",
+    "LS",
+    "Execute"
+  ],
+  "frictions": [],
+  "blockers": [],
+  "notes": [
+    "Checked at 2026-03-13T07:58:38-07:00.",
+    "Scope stayed read-only against repository code/configs; only the assigned flow report and evidence text file were created.",
+    "VAL-CI-005 is the only failing assigned assertion in this pass."
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "surface": "repo-shell",
+  "testedAt": "2026-03-13T15:06:12.519037+00:00",
+  "assertions": [
+    {
+      "id": "VAL-CI-004",
+      "status": "pass",
+      "summary": "The frontend build now succeeds using the corrected manifest command. Validation first exposed that bare `tsc` was unavailable on PATH, so `.factory/services.yaml` was updated to use `npx tsc -b --pretty false && npx vite build`, and that command exited 0.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CI-004-build.log",
+          "command": "cd part64/frontend && tsc -b && npx vite build",
+          "exitCode": 127,
+          "observation": "Initial run before manifest correction failed with `/bin/sh: line 1: tsc: command not found`."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CI-004-build-fixed.log",
+          "command": "cd part64/frontend && npx tsc -b --pretty false && npx vite build",
+          "exitCode": 0,
+          "observation": "After updating `.factory/services.yaml`, the build completed successfully; Vite produced the production bundle and only reported the existing >500 kB chunk-size warning."
+        }
+      ]
+    },
+    {
+      "id": "VAL-CROSS-004",
+      "status": "pass",
+      "summary": "Frontend and backend validators maintained or improved the documented baseline. Vitest exited 1 with the accepted baseline of 111 passing / 12 failing tests, ESLint exited 0 with 0 errors and 94 warnings, and all four Python suite commands exited 0.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-004-vitest.log",
+          "command": "cd part64/frontend && npx vitest run --exclude 'e2e/**'",
+          "exitCode": 1,
+          "observation": "Vitest reported 28 passed / 6 failed files and 111 passed / 12 failed tests, matching the mission baseline."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-004-eslint.log",
+          "command": "cd part64/frontend && npx eslint .",
+          "exitCode": 0,
+          "observation": "ESLint finished with 0 errors and 94 warnings, improving on the accepted 10-error baseline."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-004-python-world-life.log",
+          "command": "cd part64 && python3 -m code.tests.test_world_life",
+          "exitCode": 0,
+          "observation": "Exited 0 with no reported failures."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-004-python-attribution.log",
+          "command": "cd part64 && python3 -m code.tests.test_attribution",
+          "exitCode": 0,
+          "observation": "Exited 0 with no reported failures."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-004-python-sonify.log",
+          "command": "cd part64 && python3 -m code.tests.test_sonify_determinism",
+          "exitCode": 0,
+          "observation": "Exited 0 and printed `ok`."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-004-python-world-web-pm2.log",
+          "command": "cd part64 && python3 -m code.tests.test_world_web_pm2",
+          "exitCode": 0,
+          "observation": "Exited 0 with no reported failures."
+        }
+      ]
+    },
+    {
+      "id": "VAL-CROSS-006",
+      "status": "pass",
+      "summary": "Docker stack build validation succeeded directly. `cd part64 && docker compose build` exited 0 and `cd part64 && docker compose config --quiet` also exited 0.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-006-docker-compose-build.log",
+          "command": "cd part64 && docker compose build",
+          "exitCode": 0,
+          "observation": "Docker reported `Image part64-eta-mu-system Built` after completing the compose build."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/repo-shell-validators/VAL-CROSS-006-docker-compose-config.log",
+          "command": "cd part64 && docker compose config --quiet",
+          "exitCode": 0,
+          "observation": "Compose configuration validation exited 0 with no stderr output."
+        }
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "repo-shell",
+    "python3",
+    "npx",
+    "docker compose"
+  ],
+  "frictions": [
+    {
+      "description": "The original manifest build command used bare `tsc`, which was not available on PATH in this shell environment.",
+      "resolved": true,
+      "resolution": "Updated `.factory/services.yaml` to use `npx tsc -b --pretty false && npx vite build` and re-ran the build successfully.",
+      "affectedAssertions": [
+        "VAL-CI-004"
+      ]
+    }
+  ],
+  "blockers": [],
+  "notes": [
+    "Mission AGENTS guidance treats vitest 111 passing / 12 failing as an accepted baseline and only blocks on worse results.",
+    "Evidence logs were written only under the assigned mission evidence directory and the flow report path requested by the parent task."
+  ]
+}

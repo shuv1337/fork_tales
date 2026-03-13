@@ -1,0 +1,86 @@
+{
+  "surface": "browser-ui",
+  "testedAt": "2026-03-13T15:05:00Z",
+  "assertions": [
+    {
+      "id": "VAL-CROSS-001",
+      "status": "fail",
+      "summary": "The frontend did not establish runtime connectivity. The page title loaded as eta-mu, but the UI showed a red `Disconnected` status and captured network traffic targeted `http://127.0.0.1:9787` for simulation and agent APIs instead of a healthy connected backend.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/annotated-home.png",
+          "observation": "Header shows `eta-mu world daemon` with a red `Disconnected` status indicator."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/network-requests.txt",
+          "observation": "Reload captured repeated fetches to `http://127.0.0.1:9787/api/simulation?...` and `http://127.0.0.1:9787/api/agent/threat-radar/report?...` with no successful websocket or runtime connection evidence."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/browser-state.json",
+          "observation": "`disconnectedText` is true."
+        }
+      ]
+    },
+    {
+      "id": "VAL-CROSS-002",
+      "status": "fail",
+      "summary": "Catalog/runtime data did not render successfully in the frontend. The page text reported `no field particles in current stream`, and network capture showed requests to `http://127.0.0.1:9787/api/catalog` and `.../api/catalog/stream` without corresponding visible catalog data.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/body-text.txt",
+          "observation": "The rendered text includes `\u25cf no field particles in current stream` instead of loaded catalog content."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/network-requests.txt",
+          "observation": "Reload captured GET requests to `http://127.0.0.1:9787/api/catalog?perspective=hybrid` and `http://127.0.0.1:9787/api/catalog/stream?...`."
+        }
+      ]
+    },
+    {
+      "id": "VAL-CROSS-003",
+      "status": "fail",
+      "summary": "Visible UI still contains narrative residue. The page body and screenshot show labels such as `witness thread`, `VIEW LENS KEEPER`, `ANCHOR REGISTRY`, and `FORK TAX CANTICLE`.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/annotated-home.png",
+          "observation": "The operating rail and pane labels visibly include `WITNESS THREAD`, `VIEW LENS KEEPER`, `ANCHOR REGISTRY`, and `FORK TAX CANTICLE`."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/browser-state.json",
+          "observation": "Boolean checks for `witnessThreadVisible`, `viewLensKeeperVisible`, `anchorRegistryVisible`, and `forkTaxCanticleVisible` are all true."
+        }
+      ]
+    },
+    {
+      "id": "VAL-CROSS-005",
+      "status": "pass",
+      "summary": "The browser title no longer says Fork Tales. The page title is `eta-mu` and the main header reads `eta-mu world daemon`.",
+      "evidence": [
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/browser-state.json",
+          "observation": "`title` is `eta-mu`."
+        },
+        {
+          "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/evidence/config-integration/browser-ui-runtime/annotated-home.png",
+          "observation": "The header shows `eta-mu world daemon` and does not contain Fork Tales branding."
+        }
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "agent-browser",
+    "curl"
+  ],
+  "frictions": [
+    {
+      "description": "A dedicated browser-validator subagent could not proceed due to permission restrictions, so the parent validator collected the browser evidence directly with the required agent-browser session.",
+      "resolved": true,
+      "resolution": "Used agent-browser session 9a752a0a5ae8 to gather screenshots, page text, and network evidence."
+    }
+  ],
+  "blockers": [],
+  "notes": [
+    "The frontend dev server was already available on port 5173; the validator reused it instead of starting another instance.",
+    "Direct curl checks outside the browser also showed `http://127.0.0.1:8787/` and `/api/catalog` returning HTTP 404 while `http://127.0.0.1:9787` was unreachable."
+  ]
+}

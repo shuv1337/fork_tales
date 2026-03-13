@@ -1,7 +1,7 @@
 commands:
   install_frontend: cd part64/frontend && npm install --prefer-offline --no-audit
   typecheck: cd part64/frontend && npx tsc -b --pretty false
-  build: cd part64/frontend && tsc -b && npx vite build
+  build: cd part64/frontend && npx tsc -b --pretty false && npx vite build
   test_frontend: cd part64/frontend && npx vitest run --exclude 'e2e/**'
   lint: cd part64/frontend && npx eslint .
   test_python_world_life: cd part64 && python3 -m code.tests.test_world_life
