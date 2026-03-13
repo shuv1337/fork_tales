@@ -142,7 +142,7 @@ export function CoreControlPanel({
 
   return (
     <div className="grid gap-2">
-      <div className="text-[10px] text-muted space-y-0.5 font-mono opacity-70">
+      <div className="text-[12px] text-muted space-y-0.5 font-mono opacity-70">
         <div className="flex flex-wrap gap-x-3 gap-y-1">
           <span>perspective: <code>{projectionPerspective}</code></span>
           <span>autopilot: <code>{autopilotEnabled ? autopilotStatus : "stopped"}</code></span>
@@ -187,10 +187,10 @@ export function CoreControlPanel({
         <button
           type="button"
           onClick={onToggleAutopilot}
-          className={`border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+          className={`border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors ${
             autopilotEnabled
-              ? "bg-[rgba(166,226,46,0.16)] border-[rgba(166,226,46,0.48)] text-[#a6e22e]"
-              : "bg-[rgba(249,38,114,0.16)] border-[rgba(249,38,114,0.48)] text-[#f92672]"
+              ? "bg-[#303a2e] border-[#5d792e] text-[#a6e22e]"
+              : "bg-[#3d1b38] border-[#851f4e] text-[#f92672]"
           }`}
         >
           {autopilotEnabled ? "Autopilot On" : "Autopilot Off"}
@@ -199,10 +199,10 @@ export function CoreControlPanel({
         <button
           type="button"
           onClick={onToggleCoreFlight}
-          className={`border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+          className={`border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors ${
             coreFlightEnabled
-              ? "bg-[rgba(122,214,255,0.18)] border-[rgba(122,214,255,0.52)] text-[#9de3ff]"
-              : "bg-[rgba(180,180,180,0.14)] border-[rgba(182,182,182,0.34)] text-[#d2d7de]"
+              ? "bg-[#2b3b53] border-[#4b7b9a] text-[#9de3ff]"
+              : "bg-[#2f2f40] border-[#4f4f5c] text-[#d2d7de]"
           }`}
         >
           {coreFlightEnabled ? "Flight Armed" : "Flight Paused"}
@@ -211,21 +211,21 @@ export function CoreControlPanel({
         <button
           type="button"
           onClick={onToggleCoreOrbit}
-          className={`border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+          className={`border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors ${
             coreOrbitEnabled
-              ? "bg-[rgba(118,227,255,0.22)] border-[rgba(118,227,255,0.52)] text-[#9feaff]"
-              : "bg-[rgba(180,180,180,0.14)] border-[rgba(182,182,182,0.34)] text-[#d2d7de]"
+              ? "bg-[#2e465b] border-[#49829a] text-[#9feaff]"
+              : "bg-[#2f2f40] border-[#4f4f5c] text-[#d2d7de]"
           }`}
         >
           {coreOrbitEnabled ? "Orbit On" : "Orbit Off"}
         </button>
 
-        <div className="flex items-center gap-1 border rounded px-1 py-0.5 text-[10px] bg-[rgba(10,22,34,0.22)] border-[rgba(120,178,221,0.28)]">
+        <div className="flex items-center gap-1 border rounded px-1 py-0.5 text-[12px] bg-[#16192b] border-[#34445f]">
           <button type="button" onClick={() => onNudgeCoreFlightSpeed(-0.12)} className="px-1 text-[#bdd9f2]">thrust-</button>
           <button type="button" onClick={() => onNudgeCoreFlightSpeed(0.12)} className="px-1 text-[#9ed6f8]">thrust+</button>
         </div>
 
-        <div className="flex items-center gap-1 border rounded px-1 py-0.5 text-[10px] bg-[rgba(10,22,34,0.22)] border-[rgba(120,178,221,0.28)]">
+        <div className="flex items-center gap-1 border rounded px-1 py-0.5 text-[12px] bg-[#16192b] border-[#34445f]">
           <button type="button" onClick={() => onNudgeCoreOrbitSpeed(-0.08)} className="px-1 text-[#bdd9f2]">orbit-</button>
           <button type="button" onClick={() => onNudgeCoreOrbitSpeed(0.08)} className="px-1 text-[#9ed6f8]">orbit+</button>
         </div>
@@ -233,7 +233,7 @@ export function CoreControlPanel({
         <select
           value={coreOverlayView}
           onChange={(event) => onApplyCoreLayerPreset(event.target.value as OverlayViewId)}
-          className="border rounded px-2 py-0.5 text-[10px] font-semibold bg-[rgba(10,22,34,0.24)] text-[#9dd5f8] border-[rgba(120,178,221,0.32)]"
+          className="border rounded px-2 py-0.5 text-[12px] font-semibold bg-[#16192b] text-[#9dd5f8] border-[#384a66]"
           title="simulation-core layer preset"
         >
           {OVERLAY_VIEW_OPTIONS.map((option) => (
@@ -243,7 +243,7 @@ export function CoreControlPanel({
           ))}
         </select>
 
-        <div className="flex items-center gap-1 border rounded px-1 py-0.5 text-[10px] bg-[rgba(10,22,34,0.22)] border-[rgba(120,178,221,0.28)]">
+        <div className="flex items-center gap-1 border rounded px-1 py-0.5 text-[12px] bg-[#16192b] border-[#34445f]">
           <button type="button" onClick={() => onNudgeCoreZoom(-0.08)} className="px-1 text-[#9ed6f8]">-</button>
           <button type="button" onClick={() => onNudgeCoreZoom(0.08)} className="px-1 text-[#9ed6f8]">+</button>
           <button type="button" onClick={onResetCoreCamera} className="px-1 text-[#f3d9b8]">reset</button>
@@ -252,7 +252,7 @@ export function CoreControlPanel({
         <button
           type="button"
           onClick={() => setShowVisualDials((prev) => !prev)}
-          className="border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors bg-[rgba(11,24,36,0.24)] text-[#cbe9ff] border-[rgba(120,178,221,0.32)]"
+          className="border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors bg-[#16192b] text-[#cbe9ff] border-[#384a66]"
         >
           {showVisualDials ? "hide dials" : "show dials"}
         </button>
@@ -260,7 +260,7 @@ export function CoreControlPanel({
         <button
           type="button"
           onClick={() => setShowSimulationControls((prev) => !prev)}
-          className="border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors bg-[rgba(11,24,36,0.24)] text-[#cbe9ff] border-[rgba(120,178,221,0.32)]"
+          className="border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors bg-[#16192b] text-[#cbe9ff] border-[#384a66]"
         >
           {showSimulationControls ? "hide sim" : "show sim"}
         </button>
@@ -268,7 +268,7 @@ export function CoreControlPanel({
         <button
           type="button"
           onClick={onOpenRuntimeConfig}
-          className="border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors bg-[rgba(174,129,255,0.2)] text-[#efe2ff] border-[rgba(174,129,255,0.48)]"
+          className="border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors bg-[#372e57] text-[#efe2ff] border-[#614b92]"
           title="open runtime config interface"
         >
           runtime config
@@ -279,10 +279,10 @@ export function CoreControlPanel({
             key={option.id}
             type="button"
             onClick={() => onSelectPerspective(option.id as UIPerspective)}
-            className={`border rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+            className={`border rounded px-2 py-0.5 text-[12px] font-semibold transition-colors ${
               projectionPerspective === option.id
-                ? "bg-[rgba(102,217,239,0.2)] text-[#66d9ef] border-[rgba(102,217,239,0.7)]"
-                : "bg-[rgba(39,40,34,0.78)] text-[var(--ink)] border-[var(--line)] hover:bg-[rgba(55,56,48,0.92)]"
+                ? "bg-[#294054] text-[#66d9ef] border-[#4f9fb5]"
+                : "bg-[#242424] text-[var(--ink)] border-[var(--line)] hover:bg-[#373830]"
             }`}
             title={option.description}
           >
@@ -292,20 +292,20 @@ export function CoreControlPanel({
       </div>
 
       {showVisualDials || showSimulationControls ? (
-        <div className="rounded-lg border border-[rgba(122,184,226,0.28)] bg-[rgba(9,18,28,0.18)] px-2 py-2">
-          <div className="rounded-md border border-[rgba(122,184,226,0.24)] bg-[rgba(8,16,24,0.14)] px-2 py-2">
+        <div className="rounded-lg border border-[#344660] bg-[#16182a] px-2 py-2">
+          <div className="rounded-md border border-[#313f59] bg-[#17182a] px-2 py-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-[0.12em] text-[#9dd5f8]">interface transparency</p>
+              <p className="text-[12px] uppercase tracking-[0.12em] text-[#9dd5f8]">interface transparency</p>
               <button
                 type="button"
                 onClick={onResetInterfaceOpacity}
-                className="rounded border border-[rgba(178,205,228,0.36)] px-2 py-0.5 text-[10px] font-semibold text-[#d5e9fb] hover:bg-[rgba(102,154,196,0.2)]"
+                className="rounded border border-[#505a6f] px-2 py-0.5 text-[12px] font-semibold text-[#d5e9fb] hover:bg-[#29334c]"
               >
                 reset ui
               </button>
             </div>
             <label className="mt-2 grid gap-1">
-              <span className="text-[10px] text-[#cde4f8]">
+              <span className="text-[12px] text-[#cde4f8]">
                 transparency <code>{interfaceTransparencyPercent}%</code>
               </span>
               <input
@@ -323,19 +323,19 @@ export function CoreControlPanel({
           {showVisualDials ? (
             <>
               <div className="mt-3 flex items-center justify-between gap-2">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[#9dd5f8]">simulation dials</p>
+                <p className="text-[12px] uppercase tracking-[0.12em] text-[#9dd5f8]">simulation dials</p>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={onBoostCoreVisibility}
-                    className="rounded border border-[rgba(180,235,197,0.44)] px-2 py-0.5 text-[10px] font-semibold text-[#d4f5dc] hover:bg-[rgba(88,170,118,0.24)]"
+                    className="rounded border border-[#5d7570] px-2 py-0.5 text-[12px] font-semibold text-[#d4f5dc] hover:bg-[#283c3f]"
                   >
                     boost visibility
                   </button>
                   <button
                     type="button"
                     onClick={onResetCoreVisualTuning}
-                    className="rounded border border-[rgba(178,205,228,0.36)] px-2 py-0.5 text-[10px] font-semibold text-[#d5e9fb] hover:bg-[rgba(102,154,196,0.2)]"
+                    className="rounded border border-[#505a6f] px-2 py-0.5 text-[12px] font-semibold text-[#d5e9fb] hover:bg-[#29334c]"
                   >
                     reset look
                   </button>
@@ -344,7 +344,7 @@ export function CoreControlPanel({
 
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">brightness <code>{coreVisualTuning.brightness.toFixed(2)}</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">brightness <code>{coreVisualTuning.brightness.toFixed(2)}</code></span>
                   <input
                     type="range"
                     min={CORE_VISUAL_BRIGHTNESS_MIN}
@@ -357,7 +357,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">contrast <code>{coreVisualTuning.contrast.toFixed(2)}</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">contrast <code>{coreVisualTuning.contrast.toFixed(2)}</code></span>
                   <input
                     type="range"
                     min={CORE_VISUAL_CONTRAST_MIN}
@@ -370,7 +370,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">saturation <code>{coreVisualTuning.saturation.toFixed(2)}</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">saturation <code>{coreVisualTuning.saturation.toFixed(2)}</code></span>
                   <input
                     type="range"
                     min={CORE_VISUAL_SATURATION_MIN}
@@ -383,7 +383,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">hue shift <code>{coreVisualTuning.hueRotate.toFixed(0)}deg</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">hue shift <code>{coreVisualTuning.hueRotate.toFixed(0)}deg</code></span>
                   <input
                     type="range"
                     min={CORE_VISUAL_HUE_MIN}
@@ -396,7 +396,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">field dim <code>{coreVisualTuning.backgroundWash.toFixed(2)}</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">field dim <code>{coreVisualTuning.backgroundWash.toFixed(2)}</code></span>
                   <input
                     type="range"
                     min={CORE_VISUAL_WASH_MIN}
@@ -409,7 +409,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">edge vignette <code>{coreVisualTuning.vignette.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">edge vignette <code>{coreVisualTuning.vignette.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_VISUAL_VIGNETTE_MIN}
@@ -425,13 +425,13 @@ export function CoreControlPanel({
           ) : null}
 
           {showSimulationControls ? (
-            <div className={`${showVisualDials ? "mt-3" : ""} rounded-md border border-[rgba(116,176,216,0.24)] bg-[rgba(8,16,24,0.14)] px-2 py-2`}>
+            <div className={`${showVisualDials ? "mt-3" : ""} rounded-md border border-[#2f3e56] bg-[#17182a] px-2 py-2`}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[#9dd5f8]">simulation controls</p>
+                <p className="text-[12px] uppercase tracking-[0.12em] text-[#9dd5f8]">simulation controls</p>
                 <button
                   type="button"
                   onClick={onResetCoreSimulationTuning}
-                  className="rounded border border-[rgba(178,205,228,0.36)] px-2 py-0.5 text-[10px] font-semibold text-[#d5e9fb] hover:bg-[rgba(102,154,196,0.2)]"
+                  className="rounded border border-[#505a6f] px-2 py-0.5 text-[12px] font-semibold text-[#d5e9fb] hover:bg-[#29334c]"
                 >
                   reset sim
                 </button>
@@ -439,7 +439,7 @@ export function CoreControlPanel({
 
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">particles <code>{Math.round(coreSimulationTuning.particleDensity * 100)}%</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">particles <code>{Math.round(coreSimulationTuning.particleDensity * 100)}%</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_PARTICLE_DENSITY_MIN}
@@ -452,7 +452,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">particle size <code>{coreSimulationTuning.particleScale.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">particle size <code>{coreSimulationTuning.particleScale.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_PARTICLE_SCALE_MIN}
@@ -465,7 +465,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">field motion <code>{coreSimulationTuning.motionSpeed.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">field motion <code>{coreSimulationTuning.motionSpeed.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_MOTION_SPEED_MIN}
@@ -478,7 +478,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">mouse influence <code>{coreSimulationTuning.mouseInfluence.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">mouse influence <code>{coreSimulationTuning.mouseInfluence.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_MOUSE_INFLUENCE_MIN}
@@ -491,7 +491,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">layer depth <code>{coreSimulationTuning.layerDepth.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">layer depth <code>{coreSimulationTuning.layerDepth.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_LAYER_DEPTH_MIN}
@@ -504,7 +504,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">graph smooth <code>{coreSimulationTuning.graphNodeSmoothness.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">graph smooth <code>{coreSimulationTuning.graphNodeSmoothness.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_GRAPH_NODE_SMOOTHING_MIN}
@@ -517,7 +517,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">graph catch-up <code>{coreSimulationTuning.graphNodeStepScale.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">graph catch-up <code>{coreSimulationTuning.graphNodeStepScale.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_SIM_GRAPH_NODE_STEP_SCALE_MIN}
@@ -530,7 +530,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#cde4f8]">orbit speed <code>{coreOrbitSpeed.toFixed(2)}x</code></span>
+                  <span className="text-[12px] text-[#cde4f8]">orbit speed <code>{coreOrbitSpeed.toFixed(2)}x</code></span>
                   <input
                     type="range"
                     min={CORE_ORBIT_SPEED_MIN}
@@ -545,16 +545,16 @@ export function CoreControlPanel({
             </div>
           ) : null}
 
-          <div className={`${showSimulationControls ? "mt-3" : ""} rounded-md border border-[rgba(255,160,80,0.28)] bg-[rgba(40,28,16,0.12)] px-2 py-2`}>
+          <div className={`${showSimulationControls ? "mt-3" : ""} rounded-md border border-[#5a3f37] bg-[#1b1a2a] px-2 py-2`}>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-[0.12em] text-[#ffc878]">mouse daimon</p>
+              <p className="text-[12px] uppercase tracking-[0.12em] text-[#ffc878]">mouse daimon</p>
               <button
                 type="button"
                 onClick={() => onSetMouseDaimonTuning({ enabled: !mouseDaimonTuning.enabled })}
-                className={`rounded border px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                className={`rounded border px-2 py-0.5 text-[12px] font-semibold transition-colors ${
                   mouseDaimonTuning.enabled
-                    ? "border-[rgba(255,180,100,0.5)] bg-[rgba(255,160,80,0.24)] text-[#ffd4a0]"
-                    : "border-[rgba(140,120,100,0.36)] bg-[rgba(60,50,40,0.24)] text-[#c8b090]"
+                    ? "border-[#8c6749] bg-[#503a36] text-[#ffd4a0]"
+                    : "border-[#433b41] bg-[#221f2c] text-[#c8b090]"
                 }`}
                 >
                   {mouseDaimonTuning.enabled ? "enabled" : "disabled"}
@@ -563,29 +563,29 @@ export function CoreControlPanel({
 
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#e8c8a0]">message</span>
+                  <span className="text-[12px] text-[#e8c8a0]">message</span>
                   <input
                     type="text"
                     value={mouseDaimonTuning.message}
                     onChange={(e) => onSetMouseDaimonTuning({ message: e.target.value })}
                     maxLength={24}
-                    className="rounded border border-[rgba(255,180,100,0.3)] bg-[rgba(40,30,20,0.5)] px-2 py-1 text-[11px] text-[#ffe4c4] placeholder-[rgba(200,160,120,0.5)] focus:border-[rgba(255,200,120,0.5)] focus:outline-none"
+                    className="rounded border border-[#5e483e] bg-[#211c21] px-2 py-1 text-[12px] text-[#ffe4c4] placeholder-[#715d53] focus:border-[#8c7153] focus:outline-none"
                     placeholder="witness"
                   />
                 </label>
 
                 <div className="grid gap-1">
-                  <span className="text-[10px] text-[#e8c8a0]">mode</span>
+                  <span className="text-[12px] text-[#e8c8a0]">mode</span>
                   <div className="flex flex-wrap gap-1">
                     {(["push", "pull", "orbit", "calm"] as const).map((mode) => (
                       <button
                         key={mode}
                         type="button"
                         onClick={() => onSetMouseDaimonTuning({ mode })}
-                        className={`rounded px-2 py-0.5 text-[9px] font-semibold transition-colors ${
+                        className={`rounded px-2 py-0.5 text-[12px] font-semibold transition-colors ${
                           mouseDaimonTuning.mode === mode
-                            ? "bg-[rgba(255,160,80,0.4)] text-[#fff4e0]"
-                            : "text-[#d4b890] hover:bg-[rgba(255,140,60,0.2)]"
+                            ? "bg-[#754f3b] text-[#fff4e0]"
+                            : "text-[#d4b890] hover:bg-[#473030]"
                         }`}
                       >
                         {mode}
@@ -595,7 +595,7 @@ export function CoreControlPanel({
                 </div>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#e8c8a0]">radius <code>{Math.round(mouseDaimonTuning.radius * 100)}%</code></span>
+                  <span className="text-[12px] text-[#e8c8a0]">radius <code>{Math.round(mouseDaimonTuning.radius * 100)}%</code></span>
                   <input
                     type="range"
                     min={0.06}
@@ -608,7 +608,7 @@ export function CoreControlPanel({
                 </label>
 
                 <label className="grid gap-1">
-                  <span className="text-[10px] text-[#e8c8a0]">strength <code>{Math.round(mouseDaimonTuning.strength * 100)}%</code></span>
+                  <span className="text-[12px] text-[#e8c8a0]">strength <code>{Math.round(mouseDaimonTuning.strength * 100)}%</code></span>
                   <input
                     type="range"
                     min={0.1}

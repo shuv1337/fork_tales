@@ -26,21 +26,21 @@ export function CoreLayerManagerOverlay({
     ? "w-full"
     : "pointer-events-none fixed top-24 right-2 z-[70] w-[min(92vw,19rem)]";
   const cardClassName = inline
-    ? "pointer-events-auto rounded-xl border border-[rgba(130,190,232,0.32)] bg-[linear-gradient(170deg,rgba(7,18,29,0.18),rgba(10,24,38,0.14))] p-2 shadow-[0_6px_12px_rgba(0,7,14,0.16)]"
-    : "pointer-events-auto rounded-xl border border-[rgba(130,190,232,0.36)] bg-[linear-gradient(170deg,rgba(7,18,29,0.22),rgba(10,24,38,0.16))] p-2 shadow-[0_8px_18px_rgba(0,7,14,0.22)]";
+    ? "pointer-events-auto rounded-xl border border-[#3b4e69] bg-[linear-gradient(170deg,#16182a,#17192c)] p-2 shadow-[0_6px_12px_#151628]"
+    : "pointer-events-auto rounded-xl border border-[#3f5570] bg-[linear-gradient(170deg,#15182a,#17192c)] p-2 shadow-[0_8px_18px_#141526]";
 
   return (
     <div className={shellClassName}>
       <section className={cardClassName}>
         <header className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.12em] text-[#a4dcff]">layers manager</p>
-            <p className="text-[10px] text-[#c7e8ff]">active <code>{activeLayerCount}</code>/<code>{CORE_LAYER_OPTIONS.length}</code></p>
+            <p className="text-[12px] uppercase tracking-[0.12em] text-[#a4dcff]">layers manager</p>
+            <p className="text-[12px] text-[#c7e8ff]">active <code>{activeLayerCount}</code>/<code>{CORE_LAYER_OPTIONS.length}</code></p>
           </div>
           <button
             type="button"
             onClick={onToggleOpen}
-            className="rounded border border-[rgba(157,204,236,0.36)] px-2 py-0.5 text-[10px] font-semibold text-[#cde7fa] hover:bg-[rgba(97,151,191,0.24)]"
+            className="rounded border border-[#495a72] px-2 py-0.5 text-[12px] font-semibold text-[#cde7fa] hover:bg-[#2b3850]"
           >
             {isOpen ? "hide" : "show"}
           </button>
@@ -52,14 +52,14 @@ export function CoreLayerManagerOverlay({
               <button
                 type="button"
                 onClick={() => onSetAllLayers(true)}
-                className="rounded border border-[rgba(146,224,184,0.42)] px-2 py-0.5 text-[10px] font-semibold text-[#bcf5d7] hover:bg-[rgba(84,156,116,0.24)]"
+                className="rounded border border-[#4c6d67] px-2 py-0.5 text-[12px] font-semibold text-[#bcf5d7] hover:bg-[#27393e]"
               >
                 all on
               </button>
               <button
                 type="button"
                 onClick={() => onSetAllLayers(false)}
-                className="rounded border border-[rgba(236,170,160,0.42)] px-2 py-0.5 text-[10px] font-semibold text-[#ffd5ca] hover:bg-[rgba(184,108,89,0.24)]"
+                className="rounded border border-[#72565d] px-2 py-0.5 text-[12px] font-semibold text-[#ffd5ca] hover:bg-[#3f2d38]"
               >
                 all off
               </button>
@@ -69,9 +69,9 @@ export function CoreLayerManagerOverlay({
               {CORE_LAYER_OPTIONS.map((layer) => (
                 <label
                   key={layer.id}
-                  className="flex items-center justify-between gap-2 rounded-md border border-[rgba(112,172,213,0.28)] bg-[rgba(9,20,32,0.6)] px-2 py-1"
+                  className="flex items-center justify-between gap-2 rounded-md border border-[#32425c] bg-[#0f1625] px-2 py-1"
                 >
-                  <span className="text-[10px] text-[#d6ecff]">{layer.label}</span>
+                  <span className="text-[12px] text-[#d6ecff]">{layer.label}</span>
                   <input
                     type="checkbox"
                     checked={layerVisibility[layer.id]}

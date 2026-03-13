@@ -68,7 +68,7 @@ export interface BuildPanelConfigsArgs extends UseAppPanelConfigsArgs {
 
 function renderDeferredPanelPlaceholder(title: string) {
   return (
-    <div className="rounded-xl border border-[var(--line)] bg-[rgba(45,46,39,0.82)] px-4 py-5">
+    <div className="rounded-xl border border-[var(--line)] bg-[#292a28] px-4 py-5">
       <p className="text-sm font-semibold text-ink">{title}</p>
       <p className="text-xs text-muted mt-1">warming up panel...</p>
     </div>
@@ -86,18 +86,18 @@ function buildDedicatedViewsPanel(args: BuildPanelConfigsArgs): PanelConfig {
     id: "nexus.ui.dedicated_views",
     fallbackSpan: 12,
     render: () => (
-      <div className="mt-0 rounded-xl border border-[var(--line)] bg-[rgba(14,22,28,0.58)] p-3 h-full">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Dedicated World Views</p>
+      <div className="mt-0 rounded-xl border border-[var(--line)] bg-[#131723] p-3 h-full">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Dedicated World Views</p>
         <p className="text-xs text-muted mt-1">Each overlay lane rendered as its own live viewport.</p>
         <div className="mt-3 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
           {args.dedicatedOverlayViews.map((view) => (
             <section
               key={view.id}
-              className="rounded-lg border border-[rgba(126,166,192,0.32)] bg-[rgba(10,18,28,0.72)] p-2"
+              className="rounded-lg border border-[#3a465c] bg-[#0e1421] p-2"
             >
               <div className="mb-2">
                 <p className="text-sm font-semibold text-[#e5f3ff]">{view.label}</p>
-                <p className="text-[11px] text-[#9fc4dd]">{view.description}</p>
+                <p className="text-[12px] text-[#9fc4dd]">{view.description}</p>
               </div>
               <SimulationCanvas
                 simulation={args.simulation}
@@ -133,12 +133,12 @@ function buildGlassViewportPanel(): PanelConfig {
     worldSize: "xl",
     pinnedByDefault: true,
     render: () => (
-      <div className="mt-0 rounded-xl border border-[rgba(131,188,227,0.34)] bg-[rgba(8,20,31,0.7)] p-3 h-full">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#a6d6f5]">Glass Viewport Presence</p>
+      <div className="mt-0 rounded-xl border border-[#3d516b] bg-[#0d1523] p-3 h-full">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#a6d6f5]">Glass Viewport Presence</p>
         <p className="text-xs text-[#cfe6f7] mt-1">
           This lane is managed through transparent glass mode for camera guidance and gentle map panning.
         </p>
-        <p className="text-[11px] text-[#9ec7dd] mt-2">
+        <p className="text-[12px] text-[#9ec7dd] mt-2">
           Use the glass controls to let the view-lens keeper guide what you see in the simulation.
         </p>
       </div>
@@ -195,7 +195,7 @@ function buildAgentPresencePanels(args: BuildPanelConfigsArgs): PanelConfig[] {
             activeAgentPresenceId={args.activeAgentPresenceId}
             onAgentPresenceChange={args.setActiveAgentPresenceId}
           />
-          <p className="mt-2 text-[10px] text-[#8db3ca]">
+          <p className="mt-2 text-[12px] text-[#8db3ca]">
             workspace binds <code>{boundCount}</code>
           </p>
         </div>
@@ -295,12 +295,12 @@ function buildAutopilotLedgerPanel(args: BuildPanelConfigsArgs): PanelConfig {
             args.autopilotEvents.map((event, index) => (
               <div
                 key={`${event.ts}-${event.actionId}-${index}`}
-                className="border border-[var(--line)] rounded-lg bg-[rgba(45,46,39,0.86)] p-2"
+                className="border border-[var(--line)] rounded-lg bg-[#2a2b27] p-2"
               >
                 <p className="text-xs font-semibold text-ink">
                   <code>{event.intent}</code>{" -> "}<code>{event.actionId}</code>
                 </p>
-                <p className="text-[11px] text-muted font-mono">
+                <p className="text-[12px] text-muted font-mono">
                   confidence {event.confidence.toFixed(2)} | risk {event.risk.toFixed(2)} | result
                   <code>{event.result}</code>
                   {event.gate ? (
@@ -309,10 +309,10 @@ function buildAutopilotLedgerPanel(args: BuildPanelConfigsArgs): PanelConfig {
                     </>
                   ) : null}
                 </p>
-                <p className="text-[11px] text-muted font-mono">
+                <p className="text-[12px] text-muted font-mono">
                   perms {event.perms.length > 0 ? event.perms.join(", ") : "(none)"}
                 </p>
-                <p className="text-[11px] text-muted">{event.summary}</p>
+                <p className="text-[12px] text-muted">{event.summary}</p>
               </div>
             ))
           )}

@@ -17,7 +17,7 @@ export function ToastOverlay({ toasts, onDismiss }: ToastOverlayProps) {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="pointer-events-auto rounded-lg border border-[rgba(102,217,239,0.45)] bg-[rgba(12,23,31,0.94)] px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          className="pointer-events-auto rounded-lg border border-[#3c6f84] bg-[#0c171f] px-3 py-2 shadow-[0_8px_24px_#0e0e19]"
         >
           <div className="flex items-start justify-between gap-3">
             <div>

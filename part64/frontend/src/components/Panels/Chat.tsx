@@ -249,12 +249,12 @@ function collectNearbyEmbedSummaries(
 
 function messageTone(message: ChatMessage): string {
   if (message.role === "user") {
-    return "bg-[rgba(102,217,239,0.16)] border-[rgba(102,217,239,0.38)]";
+    return "bg-[#26384c] border-[#366277]";
   }
   if (message.role === "assistant") {
-    return "bg-[rgba(166,226,46,0.12)] border-[rgba(166,226,46,0.34)]";
+    return "bg-[#2a322e] border-[#495e2e]";
   }
-  return "bg-[rgba(249,38,114,0.08)] border-[rgba(249,38,114,0.28)]";
+  return "bg-[#2b1a33] border-[#581d41]";
 }
 
 export function ChatPanel({
@@ -673,16 +673,16 @@ export function ChatPanel({
     return (
       <div
         id="chat-panel"
-        className="space-y-3 rounded-xl border border-[rgba(102,217,239,0.36)] bg-[linear-gradient(165deg,rgba(10,16,24,0.94),rgba(14,12,21,0.9))] p-3"
+        className="space-y-3 rounded-xl border border-[#355e73] bg-[linear-gradient(165deg,#0a1018,#0e0c15)] p-3"
       >
-        <div className="rounded-md border border-[rgba(102,217,239,0.24)] bg-[rgba(10,19,28,0.62)] px-3 py-2">
+        <div className="rounded-md border border-[#2c475c] bg-[#101522] px-3 py-2">
           <p className="text-sm font-semibold text-ink">{activeMuseLabel}</p>
-          <p className="text-[11px] text-[#b7d8ee] mt-1">
+          <p className="text-[12px] text-[#b7d8ee] mt-1">
             Pinned nexus in this muse panel are always included in generation context.
           </p>
         </div>
 
-        <div className="rounded-md border border-[rgba(102,217,239,0.24)] bg-[rgba(11,20,29,0.64)] p-3">
+        <div className="rounded-md border border-[#2c475c] bg-[#101623] p-3">
           <p className="text-xs font-semibold text-[#d4ecff]">Nearby Nexus</p>
           <div className="mt-2 grid gap-1.5 max-h-[190px] overflow-auto pr-1">
             {nearbyNexusRows.length <= 0 ? (
@@ -698,9 +698,9 @@ export function ChatPanel({
                 return (
                   <div
                     key={nodeId}
-                    className="flex items-center justify-between gap-2 rounded-md border border-[rgba(102,217,239,0.18)] bg-[rgba(14,24,36,0.56)] px-2 py-1"
+                    className="flex items-center justify-between gap-2 rounded-md border border-[#273c50] bg-[#131828] px-2 py-1"
                   >
-                    <p className="text-[11px] text-[#d4e9f8] break-all">{label}</p>
+                    <p className="text-[12px] text-[#d4e9f8] break-all">{label}</p>
                     <button
                       type="button"
                       onClick={() => {
@@ -711,9 +711,9 @@ export function ChatPanel({
                           return [...prev, nodeId].slice(-24);
                         });
                       }}
-                      className={`rounded px-2 py-0.5 text-[10px] ${isPinned
-                        ? "border border-[rgba(249,38,114,0.45)] bg-[rgba(249,38,114,0.16)] text-[#ffd0e3]"
-                        : "border border-[rgba(102,217,239,0.45)] bg-[rgba(102,217,239,0.14)] text-[#d8f2ff]"}`}
+                      className={`rounded px-2 py-0.5 text-[12px] ${isPinned
+                        ? "border border-[#7e1f4c] bg-[#3d1b38] text-[#ffd0e3]"
+                        : "border border-[#3c6f84] bg-[#243449] text-[#d8f2ff]"}`}
                     >
                       {isPinned ? "unpin" : "pin"}
                     </button>
@@ -724,7 +724,7 @@ export function ChatPanel({
           </div>
         </div>
 
-        <div className="rounded-md border border-[rgba(166,226,46,0.3)] bg-[rgba(13,24,18,0.64)] p-3">
+        <div className="rounded-md border border-[#44562d] bg-[#11181c] p-3">
           <p className="text-xs font-semibold text-[#def5d2]">Pinned Nexus</p>
           {pinnedFileNodeIds.length <= 0 ? (
             <p className="text-xs text-muted mt-2">Nothing pinned yet.</p>
@@ -740,7 +740,7 @@ export function ChatPanel({
                     onClick={() => {
                       setPinnedFileNodeIds((prev) => prev.filter((id) => id !== nodeId));
                     }}
-                    className="rounded-md border border-[rgba(166,226,46,0.38)] bg-[rgba(32,47,21,0.74)] px-2 py-1 text-[11px] text-[#ddf6c9]"
+                    className="rounded-md border border-[#4f662e] bg-[#1e291b] px-2 py-1 text-[12px] text-[#ddf6c9]"
                     title="unpin nexus"
                   >
                     {label}
@@ -751,12 +751,12 @@ export function ChatPanel({
           )}
         </div>
 
-        <div className="rounded-lg border border-[var(--line)] bg-[rgba(16,20,20,0.74)] p-3">
+        <div className="rounded-lg border border-[var(--line)] bg-[#12151a] p-3">
           <p className="text-sm font-semibold text-ink">Muse Chat</p>
-          <p className="text-[11px] text-muted mt-1">Messages route to `/api/muse/message` with pinned nexus context.</p>
+          <p className="text-[12px] text-muted mt-1">Messages route to `/api/muse/message` with pinned nexus context.</p>
           <div
             ref={scrollRef}
-            className="mt-2 border border-[var(--line)] rounded-lg bg-[rgba(31,32,29,0.86)] p-2 min-h-[130px] max-h-[260px] overflow-auto grid gap-2"
+            className="mt-2 border border-[var(--line)] rounded-lg bg-[#1e1f1f] p-2 min-h-[130px] max-h-[260px] overflow-auto grid gap-2"
           >
             {messages.map((msg, index) => {
               const chips: string[] = [];
@@ -787,13 +787,13 @@ export function ChatPanel({
                   </span>
                   {msg.text}
                   {chips.length > 0 ? (
-                    <p className="mt-1 text-[10px] text-muted font-mono">{chips.join(" | ")}</p>
+                    <p className="mt-1 text-[12px] text-muted font-mono">{chips.join(" | ")}</p>
                   ) : null}
                 </article>
               );
             })}
             {isThinking ? (
-              <div className="border border-dashed border-[rgba(102,217,239,0.44)] rounded-lg p-2 text-sm bg-[rgba(102,217,239,0.12)] animate-pulse text-[#66d9ef]">
+              <div className="border border-dashed border-[#3b6e82] rounded-lg p-2 text-sm bg-[#233045] animate-pulse text-[#66d9ef]">
                 <Sparkles size={14} className="inline mr-1" />
                 {activeMuse?.en || "muse"} is synthesizing from simulation state...
               </div>
@@ -808,7 +808,7 @@ export function ChatPanel({
               onChange={(event) => setInput(event.target.value)}
               placeholder={isThinking ? "Thinking... / 思考中..." : "Ask this muse..."}
               disabled={isThinking}
-              className="w-full min-h-[74px] max-h-[180px] resize-y border border-[var(--line)] rounded-lg p-2 font-inherit bg-[rgba(39,40,34,0.9)] text-ink disabled:opacity-50"
+              className="w-full min-h-[74px] max-h-[180px] resize-y border border-[var(--line)] rounded-lg p-2 font-inherit bg-[#272822] text-ink disabled:opacity-50"
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
@@ -820,7 +820,7 @@ export function ChatPanel({
               type="button"
               onClick={handleSend}
               disabled={isThinking}
-              className="self-end border border-[var(--line)] rounded-lg px-3 py-2 bg-[rgba(102,217,239,0.2)] hover:bg-[rgba(102,217,239,0.28)] transition-colors disabled:opacity-50"
+              className="self-end border border-[var(--line)] rounded-lg px-3 py-2 bg-[#294054] hover:bg-[#2f4f64] transition-colors disabled:opacity-50"
             >
               <Send size={18} />
             </button>
@@ -859,7 +859,7 @@ export function ChatPanel({
   return (
     <div
       id="chat-panel"
-      className="space-y-3 rounded-xl border border-[rgba(102,217,239,0.36)] bg-[linear-gradient(165deg,rgba(12,18,26,0.94),rgba(18,14,22,0.9))] p-3"
+      className="space-y-3 rounded-xl border border-[#355e73] bg-[linear-gradient(165deg,#0c121a,#120e16)] p-3"
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
@@ -867,23 +867,23 @@ export function ChatPanel({
           <p className="text-xs text-muted mt-1">
             Muse channel is the single conversation lane for operator input, system needs, and state translation.
           </p>
-          <p className="text-[11px] text-[#b8d9ef] mt-1">
+          <p className="text-[12px] text-[#b8d9ef] mt-1">
             active muse <code>{activeMuseLabel}</code>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {fixedAgentPresenceId ? (
-            <div className="rounded-md border border-[rgba(102,217,239,0.3)] bg-[rgba(14,23,33,0.86)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-[0.12em] text-[#a8c6db]">Muse Workspace</p>
+            <div className="rounded-md border border-[#305367] bg-[#0f1722] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">Muse Workspace</p>
               <p className="text-xs text-[#d9edff] mt-1">{activeMuseLabel}</p>
             </div>
           ) : (
-            <label className="grid gap-1 text-[10px] uppercase tracking-[0.12em] text-[#a8c6db]">
+            <label className="grid gap-1 text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">
               Muse Presence
               <select
                 value={resolvedMusePresenceId}
                 onChange={(event) => onAgentPresenceChange?.(event.target.value)}
-                className="min-w-[220px] rounded-md border border-[rgba(102,217,239,0.34)] bg-[rgba(14,23,33,0.9)] px-2 py-1.5 text-xs text-[#e5f3ff]"
+                className="min-w-[220px] rounded-md border border-[#335a6f] bg-[#0e1721] px-2 py-1.5 text-xs text-[#e5f3ff]"
               >
                 {musePresenceOptions.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -898,7 +898,7 @@ export function ChatPanel({
             onClick={() => {
               void refreshRuntimeLedger(true);
             }}
-            className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(55,56,48,0.92)]"
+            className="border border-[var(--line)] rounded-md bg-[#1f201d] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#373830]"
           >
             <span className="inline-flex items-center gap-1.5">
               <RefreshCw size={14} className={runtimeLoading ? "animate-spin" : ""} />
@@ -908,10 +908,10 @@ export function ChatPanel({
         </div>
       </div>
 
-      <div className="rounded-lg border border-[rgba(102,217,239,0.26)] bg-[rgba(8,18,28,0.64)] p-3">
+      <div className="rounded-lg border border-[#2d4b60] bg-[#0e1422] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs font-semibold text-[#cfe9ff]">Muse Workspace Nexus Binds / 結び目</p>
-          <p className="text-[11px] text-[#9dc6dd]">Pinned nexus are used as active conversational context.</p>
+          <p className="text-[12px] text-[#9dc6dd]">Pinned nexus are used as active conversational context.</p>
         </div>
         <div className="mt-2 grid gap-2 md:grid-cols-[1fr_auto] md:items-start">
           <input
@@ -919,9 +919,9 @@ export function ChatPanel({
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="search files/resources to pin into this muse workspace"
-            className="w-full rounded-md border border-[rgba(102,217,239,0.28)] bg-[rgba(13,24,36,0.88)] px-3 py-2 text-xs text-[#e5f3ff]"
+            className="w-full rounded-md border border-[#2f4f64] bg-[#0e1825] px-3 py-2 text-xs text-[#e5f3ff]"
           />
-          <p className="text-[11px] text-[#9dc6dd]">
+          <p className="text-[12px] text-[#9dc6dd]">
             pinned <code>{pinnedFileNodeIds.length}</code>
           </p>
         </div>
@@ -938,7 +938,7 @@ export function ChatPanel({
                   onClick={() => {
                     setPinnedFileNodeIds((prev) => prev.filter((id) => id !== nodeId));
                   }}
-                  className="rounded-md border border-[rgba(166,226,46,0.38)] bg-[rgba(32,47,21,0.74)] px-2 py-1 text-[11px] text-[#ddf6c9]"
+                  className="rounded-md border border-[#4f662e] bg-[#1e291b] px-2 py-1 text-[12px] text-[#ddf6c9]"
                   title="unpin nexus"
                 >
                   {label}
@@ -961,9 +961,9 @@ export function ChatPanel({
               return (
                 <div
                   key={nodeId}
-                  className="flex items-center justify-between gap-2 rounded-md border border-[rgba(102,217,239,0.18)] bg-[rgba(14,24,36,0.52)] px-2 py-1"
+                  className="flex items-center justify-between gap-2 rounded-md border border-[#273c50] bg-[#131828] px-2 py-1"
                 >
-                  <p className="text-[11px] text-[#d4e9f8] break-all">{label}</p>
+                  <p className="text-[12px] text-[#d4e9f8] break-all">{label}</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -974,9 +974,9 @@ export function ChatPanel({
                         return [...prev, nodeId].slice(-24);
                       });
                     }}
-                    className={`rounded px-2 py-0.5 text-[10px] ${isPinned
-                      ? "border border-[rgba(249,38,114,0.45)] bg-[rgba(249,38,114,0.16)] text-[#ffd0e3]"
-                      : "border border-[rgba(102,217,239,0.45)] bg-[rgba(102,217,239,0.14)] text-[#d8f2ff]"}`}
+                    className={`rounded px-2 py-0.5 text-[12px] ${isPinned
+                      ? "border border-[#7e1f4c] bg-[#3d1b38] text-[#ffd0e3]"
+                      : "border border-[#3c6f84] bg-[#243449] text-[#d8f2ff]"}`}
                   >
                     {isPinned ? "unpin" : "pin"}
                   </button>
@@ -988,48 +988,48 @@ export function ChatPanel({
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-md border border-[rgba(102,217,239,0.3)] bg-[rgba(13,22,34,0.7)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-[#98c7e8]">continuity index</p>
+        <div className="rounded-md border border-[#305367] bg-[#101725] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-wide text-[#98c7e8]">continuity index</p>
           <p className="text-sm font-semibold text-[#d9f0ff]">{continuityPercent}</p>
-          <div className="mt-1 h-1.5 overflow-hidden rounded bg-[rgba(102,217,239,0.18)]">
+          <div className="mt-1 h-1.5 overflow-hidden rounded bg-[#273c50]">
             <div
-              className="h-full bg-[linear-gradient(90deg,rgba(102,217,239,0.92),rgba(166,226,46,0.86))]"
+              className="h-full bg-[linear-gradient(90deg,#66d9ef,#92c62e)]"
               style={{ width: continuityPercent }}
             />
           </div>
         </div>
-        <div className="rounded-md border border-[rgba(174,129,255,0.28)] bg-[rgba(28,18,38,0.64)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-[#c3aae9]">click pressure</p>
+        <div className="rounded-md border border-[#433668] bg-[#1b1428] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-wide text-[#c3aae9]">click pressure</p>
           <p className="text-sm font-semibold text-[#efe3ff]">{clickPercent}</p>
-          <div className="mt-1 h-1.5 overflow-hidden rounded bg-[rgba(174,129,255,0.2)]">
+          <div className="mt-1 h-1.5 overflow-hidden rounded bg-[#372e57]">
             <div
-              className="h-full bg-[linear-gradient(90deg,rgba(174,129,255,0.9),rgba(102,217,239,0.82))]"
+              className="h-full bg-[linear-gradient(90deg,#ae81ff,#58b6cc)]"
               style={{ width: clickPercent }}
             />
           </div>
         </div>
-        <div className="rounded-md border border-[rgba(253,151,31,0.32)] bg-[rgba(40,26,13,0.64)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-[#f3c596]">file pressure</p>
+        <div className="rounded-md border border-[#624229] bg-[#221a18] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-wide text-[#f3c596]">file pressure</p>
           <p className="text-sm font-semibold text-[#ffe7ce]">{filePercent}</p>
-          <div className="mt-1 h-1.5 overflow-hidden rounded bg-[rgba(253,151,31,0.2)]">
+          <div className="mt-1 h-1.5 overflow-hidden rounded bg-[#47332b]">
             <div
-              className="h-full bg-[linear-gradient(90deg,rgba(253,151,31,0.94),rgba(249,38,114,0.84))]"
+              className="h-full bg-[linear-gradient(90deg,#fd971f,#d52467)]"
               style={{ width: filePercent }}
             />
           </div>
         </div>
-        <div className="rounded-md border border-[rgba(166,226,46,0.3)] bg-[rgba(20,32,13,0.66)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-[#bfe8a7]">muse particles</p>
+        <div className="rounded-md border border-[#44562d] bg-[#161d18] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-wide text-[#bfe8a7]">muse particles</p>
           <p className="text-sm font-semibold text-[#e5ffdb]">{witnessParticles.length}</p>
-          <p className="text-[11px] text-[#d2efc0] mt-1">
+          <p className="text-[12px] text-[#d2efc0] mt-1">
             linked {isWitnessMuse ? witnessState?.linked_presences?.length ?? 0 : "n/a"}
           </p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-[rgba(126,166,192,0.32)] bg-[rgba(12,18,26,0.68)] p-3">
+      <div className="rounded-lg border border-[#3a465c] bg-[#101420] p-3">
         <p className="text-xs font-semibold text-[#d5ecff]">Lineage Ledger / 来歴</p>
-        <p className="text-[11px] text-[#9ec7dd] mt-1 break-words">linked presences: {linkedPresenceText}</p>
+        <p className="text-[12px] text-[#9ec7dd] mt-1 break-words">linked presences: {linkedPresenceText}</p>
         <div className="mt-2 grid gap-1.5">
           {lineageRows.length <= 0 ? (
             <p className="text-xs text-muted">
@@ -1041,27 +1041,27 @@ export function ChatPanel({
             lineageRows.slice(0, 8).map((entry, index) => (
               <article
                 key={`${entry.kind}-${entry.ref}-${index}`}
-                className="rounded-md border border-[rgba(102,217,239,0.2)] bg-[rgba(14,24,36,0.66)] px-2.5 py-2"
+                className="rounded-md border border-[#294054] bg-[#121827] px-2.5 py-2"
               >
-                <p className="text-[11px] font-mono text-[#cae8ff]">
+                <p className="text-[12px] font-mono text-[#cae8ff]">
                   <span className="text-[#66d9ef]">{entry.kind}</span>
                   {" | "}
                   <span className="break-all">{entry.ref}</span>
                 </p>
-                <p className="text-[11px] text-[#9ec7dd] mt-1">{entry.why_en}</p>
-                <p className="text-[11px] text-[#8cb6d0]">{entry.why_ja}</p>
+                <p className="text-[12px] text-[#9ec7dd] mt-1">{entry.why_en}</p>
+                <p className="text-[12px] text-[#8cb6d0]">{entry.why_ja}</p>
               </article>
             ))
           )}
         </div>
         {witnessState?.notes_en ? (
-          <p className="text-[11px] text-[#b8d9ef] mt-2">note: {witnessState.notes_en}</p>
+          <p className="text-[12px] text-[#b8d9ef] mt-2">note: {witnessState.notes_en}</p>
         ) : null}
       </div>
 
-      <div className="rounded-lg border border-[rgba(166,226,46,0.3)] bg-[rgba(11,22,16,0.68)] p-3">
+      <div className="rounded-lg border border-[#44562d] bg-[#0f1719] p-3">
         <p className="text-xs font-semibold text-[#dff4d5]">Particles Made Clear / 粒子明瞭化</p>
-        <p className="text-[11px] text-[#b4d6bb] mt-1">
+        <p className="text-[12px] text-[#b4d6bb] mt-1">
           Active muse particles are shown as explicit slices with deterministic order.
         </p>
         {witnessParticles.length <= 0 ? (
@@ -1074,7 +1074,7 @@ export function ChatPanel({
                 return (
                   <div
                     key={`${particle.id}-${index}`}
-                    className="h-3 rounded-sm border border-[rgba(248,248,242,0.16)]"
+                    className="h-3 rounded-sm border border-[#3d3d4d]"
                     style={{
                       backgroundColor: particleColor(particle),
                       opacity: 0.45 + (clamp01(Number(particle.size ?? 0.01) * 12) * 0.5),
@@ -1085,7 +1085,7 @@ export function ChatPanel({
                 );
               })}
             </div>
-            <p className="mt-2 text-[11px] font-mono text-[#d4f2cd] break-words">
+            <p className="mt-2 text-[12px] font-mono text-[#d4f2cd] break-words">
               top samples:{" "}
               {particleSamples
                 .map((row) => `(${row.x.toFixed(3)},${row.y.toFixed(3)} s=${Number(row.size ?? 0).toFixed(4)})`)
@@ -1095,57 +1095,57 @@ export function ChatPanel({
         )}
       </div>
 
-      <div className="rounded-lg border border-[rgba(249,38,114,0.28)] bg-[rgba(28,13,22,0.62)] p-3">
+      <div className="rounded-lg border border-[#581d41] bg-[#1b111f] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs font-semibold text-[#ffd7e8]">Checkpoint Cycle / チェックポイント</p>
           {lineageSnapshot?.generated_at ? (
-            <p className="text-[11px] text-[#f5bcd4]">updated {relativeTime(lineageSnapshot.generated_at)}</p>
+            <p className="text-[12px] text-[#f5bcd4]">updated {relativeTime(lineageSnapshot.generated_at)}</p>
           ) : null}
         </div>
-        <p className="text-[11px] text-[#f2c0d9] mt-1">
+        <p className="text-[12px] text-[#f2c0d9] mt-1">
           <GitBranch size={12} className="inline mr-1" />
           branch <code>{checkpoint?.branch || "(unknown)"}</code> | upstream <code>{checkpoint?.upstream || "(missing)"}</code> | ahead <code>{String(checkpoint?.ahead ?? 0)}</code> | behind <code>{String(checkpoint?.behind ?? 0)}</code>
         </p>
-        <p className="text-[11px] text-[#f2c0d9] mt-1">
+        <p className="text-[12px] text-[#f2c0d9] mt-1">
           tree dirty=<code>{String(treeState?.dirty ?? false)}</code> staged=<code>{String(treeState?.staged ?? 0)}</code> unstaged=<code>{String(treeState?.unstaged ?? 0)}</code> untracked=<code>{String(treeState?.untracked ?? 0)}</code>
         </p>
         {lineageSnapshot?.latest_commit ? (
-          <p className="text-[11px] text-[#f8d6e6] mt-1">latest <code>{lineageSnapshot.latest_commit}</code></p>
+          <p className="text-[12px] text-[#f8d6e6] mt-1">latest <code>{lineageSnapshot.latest_commit}</code></p>
         ) : null}
 
         {lineageSnapshot?.continuity_drift?.active ? (
-          <p className="text-[11px] text-[#ffc6db] mt-1">
+          <p className="text-[12px] text-[#ffc6db] mt-1">
             <ShieldAlert size={12} className="inline mr-1" />
             drift {lineageSnapshot.continuity_drift.code}: {lineageSnapshot.continuity_drift.message}
           </p>
         ) : (
-          <p className="text-[11px] text-[#d6f0cf] mt-1">continuity drift clear</p>
+          <p className="text-[12px] text-[#d6f0cf] mt-1">continuity drift clear</p>
         )}
 
-        <p className="text-[11px] text-[#e6bdd2] mt-1">
+        <p className="text-[12px] text-[#e6bdd2] mt-1">
           study blocked_gates=<code>{String(runtimeSignals?.blocked_gate_count ?? 0)}</code> active_drifts=<code>{String(runtimeSignals?.active_drift_count ?? 0)}</code> queue_pending=<code>{String(runtimeSignals?.queue_pending_count ?? 0)}</code>
         </p>
-        {runtimeError ? <p className="text-[11px] text-[#ffd9c2] mt-1">runtime fetch warning: {runtimeError}</p> : null}
+        {runtimeError ? <p className="text-[12px] text-[#ffd9c2] mt-1">runtime fetch warning: {runtimeError}</p> : null}
       </div>
 
-      <div className="rounded-lg border border-[rgba(126,166,192,0.3)] bg-[rgba(10,17,24,0.7)] p-3">
+      <div className="rounded-lg border border-[#384459] bg-[#0e131e] p-3">
         <p className="text-xs font-semibold text-[#cbe5f8]">Session Lens / 透過レンズ</p>
-        <p className="text-[11px] text-[#9ec7dd] mt-1">
+        <p className="text-[12px] text-[#9ec7dd] mt-1">
           lens mass <code>{chatLensState ? chatLensState.mass.toFixed(2) : "n/a"}</code> | priority <code>{chatLensState ? chatLensState.priority.toFixed(2) : "n/a"}</code> | dominant field <code>{dominantField}</code>
         </p>
         {activeChatSession ? (
-          <p className="text-[11px] text-[#b6d7eb] mt-1">
+          <p className="text-[12px] text-[#b6d7eb] mt-1">
             session <code>{activeChatSession.id}</code> | presence <code>{activeChatSession.presence}</code> | status <code>{activeChatSession.status}</code>
           </p>
         ) : (
-          <p className="text-[11px] text-muted mt-1">no active projection chat session</p>
+          <p className="text-[12px] text-muted mt-1">no active projection chat session</p>
         )}
-        <p className="text-[11px] text-[#afcfe2] mt-1">catalog refs <code>{catalog?.items?.length ?? 0}</code></p>
+        <p className="text-[12px] text-[#afcfe2] mt-1">catalog refs <code>{catalog?.items?.length ?? 0}</code></p>
       </div>
 
-      <div className="rounded-lg border border-[rgba(102,217,239,0.26)] bg-[rgba(10,22,30,0.62)] p-3">
+      <div className="rounded-lg border border-[#2d4b60] bg-[#101724] p-3">
         <p className="text-xs font-semibold text-[#d4ecff]">Nearby Embedded Context / 近傍埋め込み</p>
-        <p className="text-[11px] text-[#9dc6dd] mt-1">
+        <p className="text-[12px] text-[#9dc6dd] mt-1">
           Nearby embedding-bearing items are sent with muse state context for language synthesis.
         </p>
         {nearbyEmbedSummaries.length <= 0 ? (
@@ -1155,7 +1155,7 @@ export function ChatPanel({
             {nearbyEmbedSummaries.map((line) => (
               <p
                 key={line}
-                className="rounded-md border border-[rgba(102,217,239,0.2)] bg-[rgba(14,24,36,0.6)] px-2 py-1 text-[11px] font-mono text-[#c8e4f6] break-all"
+                className="rounded-md border border-[#294054] bg-[#121828] px-2 py-1 text-[12px] font-mono text-[#c8e4f6] break-all"
               >
                 {line}
               </p>
@@ -1164,28 +1164,28 @@ export function ChatPanel({
         )}
       </div>
 
-      <div className="rounded-lg border border-[var(--line)] bg-[rgba(16,20,20,0.74)] p-3">
+      <div className="rounded-lg border border-[var(--line)] bg-[#12151a] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold text-ink">Muse Conversation / ミューズ対話</p>
-          <div className="inline-flex rounded-md border border-[rgba(102,217,239,0.32)] overflow-hidden">
+          <div className="inline-flex rounded-md border border-[#32576b] overflow-hidden">
             <button
               type="button"
               onClick={() => setChatChannel("ledger")}
-              className={`px-3 py-1 text-xs transition-colors ${chatChannel === "ledger" ? "bg-[rgba(102,217,239,0.2)] text-[#d8f2ff]" : "bg-[rgba(31,32,29,0.86)] text-muted hover:bg-[rgba(55,56,48,0.92)]"}`}
+              className={`px-3 py-1 text-xs transition-colors ${chatChannel === "ledger" ? "bg-[#294054] text-[#d8f2ff]" : "bg-[#1e1f1f] text-muted hover:bg-[#373830]"}`}
             >
               ledger mode
             </button>
             <button
               type="button"
               onClick={() => setChatChannel("llm")}
-              className={`px-3 py-1 text-xs transition-colors ${chatChannel === "llm" ? "bg-[rgba(166,226,46,0.2)] text-[#e9ffd3]" : "bg-[rgba(31,32,29,0.86)] text-muted hover:bg-[rgba(55,56,48,0.92)]"}`}
+              className={`px-3 py-1 text-xs transition-colors ${chatChannel === "llm" ? "bg-[#36422e] text-[#e9ffd3]" : "bg-[#1e1f1f] text-muted hover:bg-[#373830]"}`}
             >
               llm mode
             </button>
           </div>
         </div>
 
-        <p className="text-[11px] text-muted mt-1">
+        <p className="text-[12px] text-muted mt-1">
           {chatChannel === "ledger"
             ? `ledger mode auto-routes plain text into /say ${resolvedMusePresenceId} for deterministic evidence replies.`
             : "llm mode uses /api/muse/message and carries live muse state + nearby embedding context."}
@@ -1193,7 +1193,7 @@ export function ChatPanel({
 
         <div
           ref={scrollRef}
-          className="mt-2 border border-[var(--line)] rounded-lg bg-[rgba(31,32,29,0.86)] p-2 min-h-[130px] max-h-[260px] overflow-auto grid gap-2"
+          className="mt-2 border border-[var(--line)] rounded-lg bg-[#1e1f1f] p-2 min-h-[130px] max-h-[260px] overflow-auto grid gap-2"
         >
           {messages.map((msg, index) => {
             const chips: string[] = [];
@@ -1224,13 +1224,13 @@ export function ChatPanel({
                 </span>
                 {msg.text}
                 {chips.length > 0 ? (
-                  <p className="mt-1 text-[10px] text-muted font-mono">{chips.join(" | ")}</p>
+                  <p className="mt-1 text-[12px] text-muted font-mono">{chips.join(" | ")}</p>
                 ) : null}
               </article>
             );
           })}
           {isThinking ? (
-            <div className="border border-dashed border-[rgba(102,217,239,0.44)] rounded-lg p-2 text-sm bg-[rgba(102,217,239,0.12)] animate-pulse text-[#66d9ef]">
+            <div className="border border-dashed border-[#3b6e82] rounded-lg p-2 text-sm bg-[#233045] animate-pulse text-[#66d9ef]">
               <Sparkles size={14} className="inline mr-1" />
               {activeMuse?.en || "muse"} is synthesizing from simulation state... / ミューズが状態から合成中...
             </div>
@@ -1238,9 +1238,9 @@ export function ChatPanel({
         </div>
 
         {pendingAsk ? (
-          <div className="mt-2 border border-[rgba(249,38,114,0.5)] rounded-lg bg-[rgba(249,38,114,0.1)] p-2">
+          <div className="mt-2 border border-[#892050] rounded-lg bg-[#301b34] p-2">
             <p className="text-xs font-semibold text-[#f92672]">Autopilot Request / 自動操縦の質問</p>
-            <p className="text-[11px] text-muted mt-1">
+            <p className="text-[12px] text-muted mt-1">
               gate: <code>{pendingAsk.gate || "unknown"}</code>
               {pendingAsk.urgency ? (
                 <>
@@ -1251,7 +1251,7 @@ export function ChatPanel({
             <p className="text-xs text-muted mt-1">{pendingAsk.reason}</p>
             <p className="text-sm text-ink mt-1">{pendingAsk.need}</p>
             {pendingAsk.context ? (
-              <p className="text-[11px] text-muted mt-1 font-mono">
+              <p className="text-[12px] text-muted mt-1 font-mono">
                 {Object.entries(pendingAsk.context)
                   .slice(0, 3)
                   .map(([key, value]) => `${key}=${formatContextValue(value)}`)
@@ -1265,7 +1265,7 @@ export function ChatPanel({
                     key={option}
                     type="button"
                     onClick={() => handleAskOption(option)}
-                    className="text-xs border border-[rgba(249,38,114,0.55)] rounded-md px-2 py-1 bg-[rgba(249,38,114,0.16)] hover:bg-[rgba(249,38,114,0.24)] transition-colors"
+                    className="text-xs border border-[#942053] rounded-md px-2 py-1 bg-[#3d1b38] hover:bg-[#4f1c3e] transition-colors"
                   >
                     {option}
                   </button>
@@ -1289,7 +1289,7 @@ export function ChatPanel({
                   : "Ask the muse for a state-derived language response..."
             }
             disabled={isThinking}
-            className="w-full min-h-[74px] max-h-[180px] resize-y border border-[var(--line)] rounded-lg p-2 font-inherit bg-[rgba(39,40,34,0.9)] text-ink disabled:opacity-50"
+            className="w-full min-h-[74px] max-h-[180px] resize-y border border-[var(--line)] rounded-lg p-2 font-inherit bg-[#272822] text-ink disabled:opacity-50"
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -1301,7 +1301,7 @@ export function ChatPanel({
             type="button"
             onClick={handleSend}
             disabled={isThinking}
-            className="self-end border border-[var(--line)] rounded-lg px-3 py-2 bg-[rgba(102,217,239,0.2)] hover:bg-[rgba(102,217,239,0.28)] transition-colors disabled:opacity-50"
+            className="self-end border border-[var(--line)] rounded-lg px-3 py-2 bg-[#294054] hover:bg-[#2f4f64] transition-colors disabled:opacity-50"
           >
             <Send size={18} />
           </button>
@@ -1335,10 +1335,10 @@ export function ChatPanel({
         </div>
 
         <p className="text-xs text-muted mt-1">{voiceInputMeta}</p>
-        <p className="text-[10px] text-muted/80 mt-1">
+        <p className="text-[12px] text-muted/80 mt-1">
           commands: <code>/ledger ...</code> <code>{`/say ${resolvedMusePresenceId} ...`}</code> <code>/study</code> <code>/drift</code> <code>/push-truth --dry-run</code>
         </p>
-        <p className="text-[10px] text-muted/80 mt-1">
+        <p className="text-[12px] text-muted/80 mt-1">
           <Activity size={11} className="inline mr-1" />
           Muse lane translates language into system signals, and turns live system state back into language.
         </p>

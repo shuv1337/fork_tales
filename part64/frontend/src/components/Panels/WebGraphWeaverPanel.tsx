@@ -1595,150 +1595,150 @@ export function WebGraphWeaverPanel() {
       </p>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5 mb-4">
-        <div className="mindfuck-card">
-          <p className="mindfuck-k">crawl state</p>
-          <p className="mindfuck-v capitalize">{status?.state || "stopped"}</p>
-          <p className="mindfuck-small">ws {connection}</p>
+        <div className="dashboard-card">
+          <p className="dashboard-k">crawl state</p>
+          <p className="dashboard-v capitalize">{status?.state || "stopped"}</p>
+          <p className="dashboard-small">ws {connection}</p>
         </div>
-        <div className="mindfuck-card">
-          <p className="mindfuck-k">crawl rate</p>
-          <p className="mindfuck-v">{status?.metrics?.crawl_rate_nodes_per_sec?.toFixed(2) || "0.00"}/s</p>
-          <p className="mindfuck-small">frontier {status?.metrics?.frontier_size ?? 0}</p>
+        <div className="dashboard-card">
+          <p className="dashboard-k">crawl rate</p>
+          <p className="dashboard-v">{status?.metrics?.crawl_rate_nodes_per_sec?.toFixed(2) || "0.00"}/s</p>
+          <p className="dashboard-small">frontier {status?.metrics?.frontier_size ?? 0}</p>
         </div>
-        <div className="mindfuck-card">
-          <p className="mindfuck-k">compliance</p>
-          <p className="mindfuck-v">{status?.metrics?.compliance_percent?.toFixed(1) || "0.0"}%</p>
-          <p className="mindfuck-small">robots blocked {status?.metrics?.robots_blocked ?? 0}</p>
+        <div className="dashboard-card">
+          <p className="dashboard-k">compliance</p>
+          <p className="dashboard-v">{status?.metrics?.compliance_percent?.toFixed(1) || "0.0"}%</p>
+          <p className="dashboard-small">robots blocked {status?.metrics?.robots_blocked ?? 0}</p>
         </div>
-        <div className="mindfuck-card">
-          <p className="mindfuck-k">graph</p>
-          <p className="mindfuck-v">{status?.graph_counts?.nodes_total ?? 0}</p>
-          <p className="mindfuck-small">edges {status?.graph_counts?.edges_total ?? 0}</p>
+        <div className="dashboard-card">
+          <p className="dashboard-k">graph</p>
+          <p className="dashboard-v">{status?.graph_counts?.nodes_total ?? 0}</p>
+          <p className="dashboard-small">edges {status?.graph_counts?.edges_total ?? 0}</p>
         </div>
-        <div className="mindfuck-card">
-          <p className="mindfuck-k">crawler load</p>
-          <p className="mindfuck-v">{status?.metrics?.active_fetchers ?? 0}</p>
-          <p className="mindfuck-small">avg {status?.metrics?.average_fetch_ms ?? 0}ms</p>
+        <div className="dashboard-card">
+          <p className="dashboard-k">crawler load</p>
+          <p className="dashboard-v">{status?.metrics?.active_fetchers ?? 0}</p>
+          <p className="dashboard-small">avg {status?.metrics?.average_fetch_ms ?? 0}ms</p>
         </div>
       </div>
 
       <div className="grid gap-3 xl:grid-cols-[1.7fr_1fr]">
         <div className="space-y-3">
-          <article className="mindfuck-panel">
+          <article className="dashboard-panel">
             <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-8">
               <label className="md:col-span-2 xl:col-span-3">
-                <span className="mindfuck-k">Seed URLs (one per line or comma)</span>
+                <span className="dashboard-k">Seed URLs (one per line or comma)</span>
                 <textarea
                   value={seedInput}
                   onChange={(event) => setSeedInput(event.target.value)}
-                  className="mindfuck-input min-h-[72px] mt-1"
+                  className="dashboard-input min-h-[72px] mt-1"
                 />
               </label>
 
               <label>
-                <span className="mindfuck-k">max depth</span>
+                <span className="dashboard-k">max depth</span>
                 <input
                   type="number"
                   min={0}
                   max={8}
                   value={maxDepth}
                   onChange={(event) => setMaxDepth(Number(event.target.value || 0))}
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </label>
 
               <label>
-                <span className="mindfuck-k">max nodes</span>
+                <span className="dashboard-k">max nodes</span>
                 <input
                   type="number"
                   min={100}
                   max={50000}
                   value={maxNodes}
                   onChange={(event) => setMaxNodes(Number(event.target.value || 100))}
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </label>
 
               <label>
-                <span className="mindfuck-k">parallel fetchers</span>
+                <span className="dashboard-k">parallel fetchers</span>
                 <input
                   type="number"
                   min={1}
                   max={24}
                   value={concurrency}
                   onChange={(event) => setConcurrency(Number(event.target.value || 1))}
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </label>
 
               <label>
-                <span className="mindfuck-k">max per host</span>
+                <span className="dashboard-k">max per host</span>
                 <input
                   type="number"
                   min={1}
                   max={12}
                   value={maxPerHost}
                   onChange={(event) => setMaxPerHost(Number(event.target.value || 1))}
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </label>
 
               <label>
-                <span className="mindfuck-k">entity walkers</span>
+                <span className="dashboard-k">entity walkers</span>
                 <input
                   type="number"
                   min={0}
                   max={24}
                   value={entityCount}
                   onChange={(event) => setEntityCount(Number(event.target.value || 0))}
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </label>
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" className="mindfuck-action-btn" onClick={() => postControl("start").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postControl("start").catch((err) => setFriendlyError(err))}>
                 Start Crawl
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postControl("pause").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postControl("pause").catch((err) => setFriendlyError(err))}>
                 Pause
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postControl("resume").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postControl("resume").catch((err) => setFriendlyError(err))}>
                 Resume
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postControl("stop").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postControl("stop").catch((err) => setFriendlyError(err))}>
                 Stop
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => bootstrap().catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => bootstrap().catch((err) => setFriendlyError(err))}>
                 Refresh
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postEntityControl("start").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postEntityControl("start").catch((err) => setFriendlyError(err))}>
                 Start Entities
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postEntityControl("pause").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postEntityControl("pause").catch((err) => setFriendlyError(err))}>
                 Pause Entities
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postEntityControl("resume").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postEntityControl("resume").catch((err) => setFriendlyError(err))}>
                 Resume Entities
               </button>
-              <button type="button" className="mindfuck-action-btn" onClick={() => postEntityControl("configure").catch((err) => setFriendlyError(err))}>
+              <button type="button" className="dashboard-action-btn" onClick={() => postEntityControl("configure").catch((err) => setFriendlyError(err))}>
                 Apply Entity Config
               </button>
             </div>
 
             <div className="mt-3 grid gap-2 md:grid-cols-[1fr_auto]">
               <div>
-                <span className="mindfuck-k">Opt-out domain</span>
+                <span className="dashboard-k">Opt-out domain</span>
                 <input
                   value={optOutInput}
                   onChange={(event) => setOptOutInput(event.target.value)}
                   placeholder="example.com"
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </div>
               <button
                 type="button"
-                className="mindfuck-action-btn self-end"
+                className="dashboard-action-btn self-end"
                 onClick={() => addOptOutDomain().catch((err) => setFriendlyError(err))}
               >
                 Add Opt-Out
@@ -1747,7 +1747,7 @@ export function WebGraphWeaverPanel() {
 
             <div className="mt-3 grid gap-2 md:grid-cols-[1fr_auto]">
               <div>
-                <span className="mindfuck-k">interaction delta</span>
+                <span className="dashboard-k">interaction delta</span>
                 <input
                   type="number"
                   min={0.05}
@@ -1755,12 +1755,12 @@ export function WebGraphWeaverPanel() {
                   step={0.05}
                   value={interactionDelta}
                   onChange={(event) => setInteractionDelta(Number(event.target.value || 0.05))}
-                  className="mindfuck-input mt-1"
+                  className="dashboard-input mt-1"
                 />
               </div>
               <button
                 type="button"
-                className="mindfuck-action-btn self-end"
+                className="dashboard-action-btn self-end"
                 onClick={() => selectedNode?.url && interactWithNode(selectedNode.url).catch((err) => setFriendlyError(err))}
                 disabled={!selectedNode?.url}
               >
@@ -1768,20 +1768,20 @@ export function WebGraphWeaverPanel() {
               </button>
             </div>
 
-            <p className="mindfuck-small mt-2">user-agent: {status?.user_agent || "(loading)"}</p>
-            <p className="mindfuck-small">endpoint: {activeWeaverBase}</p>
+            <p className="dashboard-small mt-2">user-agent: {status?.user_agent || "(loading)"}</p>
+            <p className="dashboard-small">endpoint: {activeWeaverBase}</p>
             {errorMessage && <p className="text-xs text-[#f92672] mt-2">{errorMessage}</p>}
           </article>
 
-          <article className="mindfuck-panel">
+          <article className="dashboard-panel">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-              <p className="mindfuck-subhead mb-0">Graph View</p>
+              <p className="dashboard-subhead mb-0">Graph View</p>
               <div className="flex items-center gap-2">
-                <span className="mindfuck-small">domain filter</span>
+                <span className="dashboard-small">domain filter</span>
                 <select
                   value={domainFilter}
                   onChange={(event) => setDomainFilter(event.target.value)}
-                  className="mindfuck-input !py-1 !px-2"
+                  className="dashboard-input !py-1 !px-2"
                 >
                   <option value="">(all domains)</option>
                   {domainOptions.map((domain) => (
@@ -1793,16 +1793,16 @@ export function WebGraphWeaverPanel() {
               </div>
             </div>
 
-            <div className="relative rounded-xl overflow-hidden border border-[rgba(102,217,239,0.38)] bg-[rgba(24,25,20,0.96)]">
+            <div className="relative rounded-xl overflow-hidden border border-[#366277] bg-[#181914]">
               <canvas ref={canvasRef} className="block w-full h-[420px]" />
-              <div className="absolute top-2 left-2 text-[10px] text-[#66d9ef] bg-[rgba(31,32,29,0.78)] px-2 py-1 rounded">
+              <div className="absolute top-2 left-2 text-[12px] text-[#66d9ef] bg-[#1d1e20] px-2 py-1 rounded">
                 wheel = zoom, drag = pan, click node = highlight path
               </div>
             </div>
 
-            <div className="mt-3 rounded-lg border border-[rgba(102,217,239,0.28)] p-3 bg-[rgba(17,22,31,0.55)]">
-              <p className="mindfuck-k">Selected node</p>
-              {!selectedNode && <p className="mindfuck-small">(click a URL node in the graph)</p>}
+            <div className="mt-3 rounded-lg border border-[#2f4f64] p-3 bg-[#151725]">
+              <p className="dashboard-k">Selected node</p>
+              {!selectedNode && <p className="dashboard-small">(click a URL node in the graph)</p>}
               {selectedNode && (
                 <div className="space-y-1 text-xs text-ink">
                   <p className="font-mono break-all">{selectedNode.url || selectedNode.label}</p>
@@ -1818,7 +1818,7 @@ export function WebGraphWeaverPanel() {
                   </p>
                   <p>- analysis provider: {selectedNode.analysis_provider || "(none yet)"}</p>
                   {selectedNode.analysis_summary && (
-                    <p className="text-[11px] text-[#dceaf8] leading-snug">
+                    <p className="text-[12px] text-[#dceaf8] leading-snug">
                       {shortText(selectedNode.analysis_summary, 240)}
                     </p>
                   )}
@@ -1829,22 +1829,22 @@ export function WebGraphWeaverPanel() {
         </div>
 
         <div className="space-y-3">
-          <article className="mindfuck-panel">
-            <h3 className="mindfuck-subhead">Entity Walkers</h3>
-            <p className="mindfuck-small">
+          <article className="dashboard-panel">
+            <h3 className="dashboard-subhead">Entity Walkers</h3>
+            <p className="dashboard-small">
               state: {entityState?.enabled ? (entityState?.paused ? "paused" : "active") : "disabled"}
               {" · "}
               count {entityRows.length}
             </p>
-            <p className="mindfuck-small">
+            <p className="dashboard-small">
               cooldown {Math.round(Number(entityState?.node_cooldown_ms || status?.config?.node_cooldown_ms || 0) / 1000)}s
               {" · "}
               max/host {entityState?.max_requests_per_host ?? status?.config?.max_requests_per_host ?? maxPerHost}
             </p>
             <div className="mt-2 space-y-1 max-h-[170px] overflow-auto pr-1">
-              {entityRows.length === 0 && <p className="mindfuck-small">(no entities)</p>}
+              {entityRows.length === 0 && <p className="dashboard-small">(no entities)</p>}
               {entityRows.slice(0, 16).map((entity) => (
-                <div key={entity.id} className="rounded border border-[rgba(102,217,239,0.25)] px-2 py-1.5 text-xs">
+                <div key={entity.id} className="rounded border border-[#2d495e] px-2 py-1.5 text-xs">
                   <p className="font-mono text-[#dceaf8]">
                     {entity.label} · {entity.state}
                   </p>
@@ -1857,8 +1857,8 @@ export function WebGraphWeaverPanel() {
             </div>
           </article>
 
-          <article className="mindfuck-panel">
-            <h3 className="mindfuck-subhead">Crawl Status</h3>
+          <article className="dashboard-panel">
+            <h3 className="dashboard-subhead">Crawl Status</h3>
             <ul className="space-y-1.5 text-xs text-ink">
               <li>- discovered: {status?.metrics?.discovered ?? 0}</li>
               <li>- fetched: {status?.metrics?.fetched ?? 0}</li>
@@ -1881,18 +1881,18 @@ export function WebGraphWeaverPanel() {
             </ul>
 
             <div className="mt-3">
-              <p className="mindfuck-k">active domains</p>
-              <p className="mindfuck-small">{(status?.active_domains ?? []).slice(0, 6).join(", ") || "(none)"}</p>
+              <p className="dashboard-k">active domains</p>
+              <p className="dashboard-small">{(status?.active_domains ?? []).slice(0, 6).join(", ") || "(none)"}</p>
             </div>
 
             <div className="mt-3">
-              <p className="mindfuck-k">opt-out list</p>
-              <p className="mindfuck-small">{(status?.opt_out_domains ?? []).join(", ") || "(none)"}</p>
+              <p className="dashboard-k">opt-out list</p>
+              <p className="dashboard-small">{(status?.opt_out_domains ?? []).join(", ") || "(none)"}</p>
             </div>
           </article>
 
-          <article className="mindfuck-panel">
-            <h3 className="mindfuck-subhead">Domain Distribution</h3>
+          <article className="dashboard-panel">
+            <h3 className="dashboard-subhead">Domain Distribution</h3>
             <div className="space-y-1 max-h-[150px] overflow-auto pr-1">
               {Object.entries(status?.domain_distribution || {})
                 .sort((a, b) => b[1] - a[1])
@@ -1907,7 +1907,7 @@ export function WebGraphWeaverPanel() {
                 ))}
             </div>
 
-            <h3 className="mindfuck-subhead mt-3">Depth Histogram</h3>
+            <h3 className="dashboard-subhead mt-3">Depth Histogram</h3>
             <div className="space-y-1">
               {Object.entries(status?.depth_histogram || {})
                 .sort((a, b) => Number(a[0]) - Number(b[0]))
@@ -1920,10 +1920,10 @@ export function WebGraphWeaverPanel() {
             </div>
           </article>
 
-          <article className="mindfuck-panel">
-            <h3 className="mindfuck-subhead">Event Stream</h3>
-            <div className="mindfuck-table-wrap max-h-[300px]">
-              <table className="mindfuck-table">
+          <article className="dashboard-panel">
+            <h3 className="dashboard-subhead">Event Stream</h3>
+            <div className="dashboard-table-wrap max-h-[300px]">
+              <table className="dashboard-table">
                 <thead>
                   <tr>
                     <th>ts</th>

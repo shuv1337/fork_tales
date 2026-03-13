@@ -695,23 +695,23 @@ export function GalaxyModelDock({ onClose }: Props) {
   }, [activeModel, apiCall, appendEvent, createGatewayPayload, field, mode, syncCatalog]);
 
   return (
-    <section className="w-[min(96vw,31rem)] max-h-[72vh] overflow-hidden rounded-xl border border-[rgba(129,203,245,0.5)] bg-[linear-gradient(152deg,rgba(6,16,28,0.94),rgba(8,22,36,0.92),rgba(6,18,30,0.96))] shadow-[0_26px_70px_rgba(0,9,22,0.54)] backdrop-blur-[4px]">
-      <header className="flex items-start justify-between gap-3 border-b border-[rgba(117,183,219,0.4)] px-3 py-2.5">
+    <section className="w-[min(96vw,31rem)] max-h-[72vh] overflow-hidden rounded-xl border border-[#4d7291] bg-[linear-gradient(152deg,#06101c,#081624,#06121e)] shadow-[0_26px_70px_#0b1021]">
+      <header className="flex items-start justify-between gap-3 border-b border-[#3e5873] px-3 py-2.5">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.13em] text-[#9fd4f5]">galaxy model dock</p>
+          <p className="text-[12px] uppercase tracking-[0.13em] text-[#9fd4f5]">galaxy model dock</p>
           <p className="text-sm font-semibold text-[#e3f4ff]">Multi-account OAuth + model control</p>
-          <p className="text-[10px] text-[#9abfd8]">Merged from proxy gateway interface for in-galaxy management.</p>
+          <p className="text-[12px] text-[#9abfd8]">Merged from proxy gateway interface for in-galaxy management.</p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="rounded border border-[rgba(154,198,226,0.48)] bg-[rgba(15,40,62,0.65)] px-2 py-1 text-[11px] font-semibold text-[#cfe8fb] hover:bg-[rgba(22,52,78,0.78)]"
+          className="rounded border border-[#576c84] bg-[#122338] px-2 py-1 text-[12px] font-semibold text-[#cfe8fb] hover:bg-[#162e46]"
         >
           close
         </button>
       </header>
 
-      <div className="max-h-[calc(72vh-4.6rem)] overflow-auto px-3 py-2.5 text-[11px] text-[#d6ebfb]">
+      <div className="max-h-[calc(72vh-4.6rem)] overflow-auto px-3 py-2.5 text-[12px] text-[#d6ebfb]">
         <div className="grid gap-2">
           <label className="grid gap-1">
             <span className="uppercase tracking-[0.09em] text-[#93bfdc]">gateway url</span>
@@ -719,7 +719,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               value={gatewayUrl}
               onChange={(event) => setGatewayUrl(event.target.value)}
               placeholder="http://127.0.0.1:18000"
-              className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+              className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
             />
           </label>
           <label className="grid gap-1">
@@ -729,7 +729,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               onChange={(event) => setProxyApiKey(event.target.value)}
               type="password"
               placeholder="Bearer token"
-              className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+              className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
             />
           </label>
 
@@ -740,19 +740,19 @@ export function GalaxyModelDock({ onClose }: Props) {
                 void syncCatalog();
               }}
               disabled={busy}
-              className="rounded border border-[rgba(133,224,255,0.5)] bg-[rgba(43,120,155,0.34)] px-2.5 py-1 text-[11px] font-semibold text-[#e2f7ff] disabled:opacity-60"
+              className="rounded border border-[#4f7d96] bg-[#1f3953] px-2.5 py-1 text-[12px] font-semibold text-[#e2f7ff] disabled:opacity-60"
             >
               {busy ? "syncing..." : "sync catalog"}
             </button>
-            <span className="text-[10px] text-[#a0c6df]">{statusMessage}</span>
+            <span className="text-[12px] text-[#a0c6df]">{statusMessage}</span>
           </div>
 
-          <div className="rounded border border-[rgba(111,173,209,0.35)] bg-[rgba(5,16,28,0.62)] p-2">
-            <p className="text-[10px] uppercase tracking-[0.09em] text-[#8cb7d3]">event stream</p>
+          <div className="rounded border border-[#374d67] bg-[#0c1322] p-2">
+            <p className="text-[12px] uppercase tracking-[0.09em] text-[#8cb7d3]">event stream</p>
             <div className="mt-1.5 max-h-24 overflow-auto space-y-1">
               {events.length > 0 ? (
                 events.slice(0, 8).map((entry) => (
-                  <p key={entry.id} className="text-[10px] leading-4 text-[#cfe8fb]">
+                  <p key={entry.id} className="text-[12px] leading-4 text-[#cfe8fb]">
                     <span className="text-[#8eb7d2]">{entry.ts.slice(11, 19)}</span>
                     {" · "}
                     <span
@@ -773,14 +773,14 @@ export function GalaxyModelDock({ onClose }: Props) {
                   </p>
                 ))
               ) : (
-                <p className="text-[10px] text-[#8fb5cf]">No events yet.</p>
+                <p className="text-[12px] text-[#8fb5cf]">No events yet.</p>
               )}
             </div>
           </div>
 
-          <div className="rounded border border-[rgba(118,188,228,0.35)] bg-[rgba(5,15,27,0.64)] p-2">
+          <div className="rounded border border-[#3a526d] bg-[#0c1221] p-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-[0.09em] text-[#9ed2f2]">
+              <p className="text-[12px] uppercase tracking-[0.09em] text-[#9ed2f2]">
                 openai codex account pool
               </p>
               <button
@@ -789,13 +789,13 @@ export function GalaxyModelDock({ onClose }: Props) {
                   void loadCodexAccounts();
                 }}
                 disabled={codexBusy}
-                className="rounded border border-[rgba(135,206,245,0.48)] bg-[rgba(24,71,102,0.36)] px-2 py-0.5 text-[10px] font-semibold text-[#def4ff] disabled:opacity-60"
+                className="rounded border border-[#4e708d] bg-[#192a42] px-2 py-0.5 text-[12px] font-semibold text-[#def4ff] disabled:opacity-60"
               >
                 {codexBusy ? "working..." : "reload accounts"}
               </button>
             </div>
 
-            <p className="mt-1 text-[10px] text-[#a8cbe1]">{codexStatus}</p>
+            <p className="mt-1 text-[12px] text-[#a8cbe1]">{codexStatus}</p>
 
             <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
               <input
@@ -803,7 +803,7 @@ export function GalaxyModelDock({ onClose }: Props) {
                 onChange={(event) => setCodexLoginKey(event.target.value)}
                 type="password"
                 placeholder="Paste OpenAI API key (sk-...)"
-                className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+                className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
               />
               <button
                 type="button"
@@ -811,7 +811,7 @@ export function GalaxyModelDock({ onClose }: Props) {
                   void loginCodexAccount();
                 }}
                 disabled={codexBusy}
-                className="rounded border border-[rgba(129,219,255,0.55)] bg-[rgba(39,112,144,0.34)] px-2.5 py-1 text-[11px] font-semibold text-[#e3f6ff] disabled:opacity-60"
+                className="rounded border border-[#5284a0] bg-[#1e374f] px-2.5 py-1 text-[12px] font-semibold text-[#e3f6ff] disabled:opacity-60"
               >
                 login + add
               </button>
@@ -825,14 +825,14 @@ export function GalaxyModelDock({ onClose }: Props) {
                   onChange={(event) =>
                     setCodexRotationMode(event.target.value === "sequential" ? "sequential" : "balanced")
                   }
-                  className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+                  className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
                 >
                   <option value="balanced">balanced</option>
                   <option value="sequential">sequential</option>
                 </select>
               </label>
 
-              <label className="flex items-center gap-2 rounded border border-[rgba(107,169,204,0.3)] bg-[rgba(6,18,30,0.6)] px-2 py-1.5 text-[11px] text-[#d9efff]">
+              <label className="flex items-center gap-2 rounded border border-[#32445d] bg-[#0e1524] px-2 py-1.5 text-[12px] text-[#d9efff]">
                 <input
                   type="checkbox"
                   checked={codexFairCycleEnabled}
@@ -848,29 +848,29 @@ export function GalaxyModelDock({ onClose }: Props) {
                 void applyCodexCycleConfig();
               }}
               disabled={codexBusy}
-              className="mt-2 rounded border border-[rgba(160,221,177,0.48)] bg-[rgba(38,102,66,0.28)] px-2.5 py-1 text-[11px] font-semibold text-[#dcffe7] disabled:opacity-60"
+              className="mt-2 rounded border border-[#5a776c] bg-[#1d2f33] px-2.5 py-1 text-[12px] font-semibold text-[#dcffe7] disabled:opacity-60"
             >
               apply cycle strategy
             </button>
 
-            <div className="mt-2 max-h-28 overflow-auto space-y-1.5 rounded border border-[rgba(105,165,200,0.3)] bg-[rgba(4,14,24,0.6)] p-1.5">
+            <div className="mt-2 max-h-28 overflow-auto space-y-1.5 rounded border border-[#31435c] bg-[#0c1220] p-1.5">
               {codexAccounts.length > 0 ? (
                 codexAccounts.map((account) => (
                   <article
                     key={account.id}
-                    className="flex items-start justify-between gap-2 rounded border border-[rgba(98,158,191,0.32)] bg-[rgba(7,20,32,0.78)] px-2 py-1"
+                    className="flex items-start justify-between gap-2 rounded border border-[#31445c] bg-[#0b1523] px-2 py-1"
                   >
                     <div>
-                      <p className="text-[11px] font-semibold text-[#def3ff]">{account.masked_key}</p>
-                      <p className="text-[10px] text-[#8fb6d0]">
+                      <p className="text-[12px] font-semibold text-[#def3ff]">{account.masked_key}</p>
+                      <p className="text-[12px] text-[#8fb6d0]">
                         {account.status} · requests {account.requests}
                         {account.key_cooldown_remaining
                           ? ` · cooldown ${account.key_cooldown_remaining}s`
                           : ""}
                       </p>
-                      <p className="text-[10px] text-[#87acc6]">last used {formatLastUsed(account.last_used_ts ?? null)}</p>
+                      <p className="text-[12px] text-[#87acc6]">last used {formatLastUsed(account.last_used_ts ?? null)}</p>
                       {account.env_key ? (
-                        <p className="text-[10px] text-[#7fa3bc]">{account.env_key}</p>
+                        <p className="text-[12px] text-[#7fa3bc]">{account.env_key}</p>
                       ) : null}
                     </div>
                     <button
@@ -879,21 +879,21 @@ export function GalaxyModelDock({ onClose }: Props) {
                         void removeCodexAccount(account.id);
                       }}
                       disabled={codexBusy}
-                      className="rounded border border-[rgba(242,162,148,0.5)] bg-[rgba(122,53,45,0.32)] px-2 py-0.5 text-[10px] font-semibold text-[#ffd9d1] disabled:opacity-60"
+                      className="rounded border border-[#865e61] bg-[#38222d] px-2 py-0.5 text-[12px] font-semibold text-[#ffd9d1] disabled:opacity-60"
                     >
                       remove
                     </button>
                   </article>
                 ))
               ) : (
-                <p className="text-[10px] text-[#8cb3cd]">No OpenAI Codex accounts loaded yet.</p>
+                <p className="text-[12px] text-[#8cb3cd]">No OpenAI Codex accounts loaded yet.</p>
               )}
             </div>
 
             {codexServerEvents.length > 0 ? (
-              <div className="mt-2 max-h-24 overflow-auto rounded border border-[rgba(109,173,210,0.28)] bg-[rgba(4,13,24,0.62)] p-1.5">
+              <div className="mt-2 max-h-24 overflow-auto rounded border border-[#31435b] bg-[#0c1120] p-1.5">
                 {codexServerEvents.slice(0, 10).map((event, index) => (
-                  <p key={`${event.id ?? "evt"}-${index}`} className="text-[10px] leading-4 text-[#cce8fb]">
+                  <p key={`${event.id ?? "evt"}-${index}`} className="text-[12px] leading-4 text-[#cce8fb]">
                     <span className="text-[#90bad5]">{String(event.ts ?? "").slice(11, 19) || "--:--:--"}</span>
                     {" · "}
                     <span className="text-[#dff4ff]">{event.action ?? "event"}</span>
@@ -907,20 +907,20 @@ export function GalaxyModelDock({ onClose }: Props) {
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-2">
-          <div className="rounded border border-[rgba(120,177,211,0.3)] bg-[rgba(4,13,22,0.62)] px-2 py-1.5">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#85b1cf]">providers</p>
+          <div className="rounded border border-[#36475f] bg-[#0c111f] px-2 py-1.5">
+            <p className="text-[12px] uppercase tracking-[0.08em] text-[#85b1cf]">providers</p>
             <p className="text-sm font-semibold text-[#dff2ff]">{providers.length}</p>
           </div>
-          <div className="rounded border border-[rgba(120,177,211,0.3)] bg-[rgba(4,13,22,0.62)] px-2 py-1.5">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#85b1cf]">models</p>
+          <div className="rounded border border-[#36475f] bg-[#0c111f] px-2 py-1.5">
+            <p className="text-[12px] uppercase tracking-[0.08em] text-[#85b1cf]">models</p>
             <p className="text-sm font-semibold text-[#dff2ff]">{models.length}</p>
           </div>
-          <div className="rounded border border-[rgba(120,177,211,0.3)] bg-[rgba(4,13,22,0.62)] px-2 py-1.5">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#85b1cf]">credentials</p>
+          <div className="rounded border border-[#36475f] bg-[#0c111f] px-2 py-1.5">
+            <p className="text-[12px] uppercase tracking-[0.08em] text-[#85b1cf]">credentials</p>
             <p className="text-sm font-semibold text-[#dff2ff]">{quotaStats?.summary?.total_credentials ?? 0}</p>
           </div>
-          <div className="rounded border border-[rgba(120,177,211,0.3)] bg-[rgba(4,13,22,0.62)] px-2 py-1.5">
-            <p className="text-[10px] uppercase tracking-[0.08em] text-[#85b1cf]">active creds</p>
+          <div className="rounded border border-[#36475f] bg-[#0c111f] px-2 py-1.5">
+            <p className="text-[12px] uppercase tracking-[0.08em] text-[#85b1cf]">active creds</p>
             <p className="text-sm font-semibold text-[#dff2ff]">{quotaStats?.summary?.active_credentials ?? 0}</p>
           </div>
         </div>
@@ -933,7 +933,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               onChange={(event) => setSelectedModel(event.target.value)}
               placeholder="provider/model"
               list="galaxy-model-catalog"
-              className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+              className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
             />
             <datalist id="galaxy-model-catalog">
               {models.map((entry) => (
@@ -948,7 +948,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               <select
                 value={mode}
                 onChange={(event) => setMode(normalizeMode(event.target.value))}
-                className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+                className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
               >
                 {(config?.modes ?? ["smart", "direct", "hardway"]).map((entry) => (
                   <option key={entry} value={entry}>
@@ -963,7 +963,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               <select
                 value={field}
                 onChange={(event) => setField(event.target.value)}
-                className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+                className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
               >
                 {(fieldOptions.length > 0 ? fieldOptions : ["general", "code", "train"]).map((entry) => (
                   <option key={entry} value={entry}>
@@ -978,7 +978,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               <select
                 value={hardware}
                 onChange={(event) => setHardware(event.target.value)}
-                className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+                className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
               >
                 {(config?.hardware_options ?? ["gpu", "npu", "cpu"]).map((entry) => (
                   <option key={entry} value={entry}>
@@ -995,7 +995,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               value={manualOverrideModel}
               onChange={(event) => setManualOverrideModel(event.target.value)}
               placeholder="provider/model"
-              className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+              className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
             />
           </label>
 
@@ -1005,7 +1005,7 @@ export function GalaxyModelDock({ onClose }: Props) {
               value={prompt}
               onChange={(event) => setPrompt(event.target.value)}
               rows={3}
-              className="rounded border border-[rgba(132,188,222,0.36)] bg-[rgba(8,23,35,0.82)] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[rgba(164,218,248,0.72)]"
+              className="rounded border border-[#40546d] bg-[#0b1724] px-2 py-1 text-[12px] text-[#e3f4ff] outline-none focus:border-[#7da4bf]"
             />
           </label>
 
@@ -1013,7 +1013,7 @@ export function GalaxyModelDock({ onClose }: Props) {
             <button
               type="submit"
               disabled={busy}
-              className="rounded border border-[rgba(129,219,255,0.55)] bg-[rgba(39,112,144,0.34)] px-2.5 py-1 text-[11px] font-semibold text-[#e3f6ff] disabled:opacity-60"
+              className="rounded border border-[#5284a0] bg-[#1e374f] px-2.5 py-1 text-[12px] font-semibold text-[#e3f6ff] disabled:opacity-60"
             >
               preview route
             </button>
@@ -1023,18 +1023,18 @@ export function GalaxyModelDock({ onClose }: Props) {
                 void runPrompt();
               }}
               disabled={busy}
-              className="rounded border border-[rgba(245,192,131,0.55)] bg-[rgba(153,94,45,0.28)] px-2.5 py-1 text-[11px] font-semibold text-[#ffe7d2] disabled:opacity-60"
+              className="rounded border border-[#92755c] bg-[#3d2d2d] px-2.5 py-1 text-[12px] font-semibold text-[#ffe7d2] disabled:opacity-60"
             >
               run prompt
             </button>
           </div>
-          <p className="text-[10px] text-[#8fb9d4]">active model: {activeModel}</p>
+          <p className="text-[12px] text-[#8fb9d4]">active model: {activeModel}</p>
         </form>
 
         {decision ? (
-          <div className="mt-3 rounded border border-[rgba(124,194,235,0.38)] bg-[rgba(4,15,25,0.62)] p-2">
-            <p className="text-[10px] uppercase tracking-[0.1em] text-[#8cb9d6]">route decision</p>
-            <div className="mt-1.5 grid gap-1 text-[11px] leading-5">
+          <div className="mt-3 rounded border border-[#3f5975] bg-[#0c1320] p-2">
+            <p className="text-[12px] uppercase tracking-[0.1em] text-[#8cb9d6]">route decision</p>
+            <div className="mt-1.5 grid gap-1 text-[12px] leading-5">
               <p><span className="text-[#83afcb]">requested:</span> <code>{decision.requested_model}</code></p>
               <p><span className="text-[#83afcb]">resolved:</span> <code>{decision.resolved_model_public}</code></p>
               <p><span className="text-[#83afcb]">internal:</span> <code>{decision.resolved_model}</code></p>
@@ -1045,7 +1045,7 @@ export function GalaxyModelDock({ onClose }: Props) {
                 {decision.candidate_models.map((entry) => (
                   <span
                     key={entry}
-                    className="rounded-full border border-[rgba(136,196,230,0.42)] bg-[rgba(14,42,63,0.66)] px-2 py-0.5 text-[10px] text-[#d8eeff]"
+                    className="rounded-full border border-[#48617b] bg-[#122439] px-2 py-0.5 text-[12px] text-[#d8eeff]"
                   >
                     {entry}
                   </span>
@@ -1056,18 +1056,18 @@ export function GalaxyModelDock({ onClose }: Props) {
         ) : null}
 
         {quotaRows.length > 0 ? (
-          <div className="mt-3 rounded border border-[rgba(124,194,235,0.38)] bg-[rgba(4,15,25,0.62)] p-2">
-            <p className="text-[10px] uppercase tracking-[0.1em] text-[#8cb9d6]">multi-account provider status</p>
+          <div className="mt-3 rounded border border-[#3f5975] bg-[#0c1320] p-2">
+            <p className="text-[12px] uppercase tracking-[0.1em] text-[#8cb9d6]">multi-account provider status</p>
             <div className="mt-2 grid gap-2">
               {quotaRows.map(([providerName, providerStats]) => {
                 const credentials = providerStats.credentials ?? [];
                 return (
                   <article
                     key={providerName}
-                    className="rounded border border-[rgba(107,171,208,0.28)] bg-[rgba(7,23,36,0.74)] p-2"
+                    className="rounded border border-[#30425b] bg-[#0b1726] p-2"
                   >
-                    <p className="text-[11px] font-semibold text-[#dff2ff]">{providerName}</p>
-                    <p className="text-[10px] text-[#8fb8d2]">
+                    <p className="text-[12px] font-semibold text-[#dff2ff]">{providerName}</p>
+                    <p className="text-[12px] text-[#8fb8d2]">
                       creds {providerStats.credential_count ?? 0} · active {providerStats.active_count ?? 0}
                       {" · "}
                       cooldown {providerStats.on_cooldown_count ?? 0}
@@ -1077,7 +1077,7 @@ export function GalaxyModelDock({ onClose }: Props) {
                       cost {toMoneyLabel(providerStats.approx_cost)}
                     </p>
                     {credentials.length > 0 ? (
-                      <div className="mt-1.5 grid gap-1 text-[10px] text-[#c8e4f8]">
+                      <div className="mt-1.5 grid gap-1 text-[12px] text-[#c8e4f8]">
                         {credentials.slice(0, 3).map((entry) => (
                           <p key={`${providerName}:${entry.identifier}`} className="break-all">
                             <span className="text-[#8fb8d2]">{entry.status ?? "unknown"}</span>
@@ -1098,9 +1098,9 @@ export function GalaxyModelDock({ onClose }: Props) {
           </div>
         ) : null}
 
-        <div className="mt-3 rounded border border-[rgba(124,194,235,0.34)] bg-[rgba(4,13,23,0.66)] p-2">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8cb9d6]">assistant output</p>
-          <pre className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap break-words text-[11px] leading-5 text-[#dff2ff]">
+        <div className="mt-3 rounded border border-[#3b536e] bg-[#0b111e] p-2">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8cb9d6]">assistant output</p>
+          <pre className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap break-words text-[12px] leading-5 text-[#dff2ff]">
             {responseText || "no completion yet"}
           </pre>
         </div>

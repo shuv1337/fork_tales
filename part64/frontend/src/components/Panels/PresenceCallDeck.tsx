@@ -471,7 +471,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
       <header className="border-b border-white/5 pb-4">
         <div className="flex justify-between items-start">
           <h2 className="text-2xl font-bold mb-1 text-ink tracking-tight">Presence Call Deck</h2>
-          <div className="px-2 py-0.5 rounded bg-white/5 text-[10px] font-mono text-muted border border-white/5">
+          <div className="px-2 py-0.5 rounded bg-white/5 text-[12px] font-mono text-muted border border-white/5">
             WEBRTC LANE
           </div>
         </div>
@@ -481,13 +481,13 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
       </header>
 
       <div className="space-y-4 flex-1">
-        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end bg-[rgba(0,0,0,0.2)] p-3 rounded-xl border border-white/5">
+        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end bg-[#141424] p-3 rounded-xl border border-white/5">
           <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
             Select Presence
             <select
               value={selectedPresenceId}
               onChange={(event) => setSelectedPresenceId(event.target.value)}
-              className="rounded-lg border border-[var(--line)] bg-[rgba(20,20,18,0.95)] px-3 py-2.5 text-sm text-ink focus:ring-1 focus:ring-[#66d9ef] focus:border-[#66d9ef] outline-none transition-all"
+              className="rounded-lg border border-[var(--line)] bg-[#141412] px-3 py-2.5 text-sm text-ink focus:ring-1 focus:ring-[#66d9ef] focus:border-[#66d9ef] outline-none transition-all"
             >
               {presences.map((presence) => (
                 <option key={presence.id} value={presence.id}>
@@ -501,7 +501,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
             <button
               type="button"
               onClick={stopCall}
-              className="btn-base flex items-center justify-center gap-2 px-5 py-2.5 border-[rgba(249,38,114,0.45)] bg-[rgba(249,38,114,0.1)] text-[#f92672] hover:bg-[rgba(249,38,114,0.2)] hover:border-[rgba(249,38,114,0.8)] transition-all rounded-lg font-medium"
+              className="btn-base flex items-center justify-center gap-2 px-5 py-2.5 border-[#7e1f4c] bg-[#301b34] text-[#f92672] hover:bg-[#461c3b] hover:border-[#cc2364] transition-all rounded-lg font-medium"
             >
               <PhoneOff size={16} />
               End Call
@@ -510,7 +510,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
             <button
               type="button"
               onClick={() => void startCall()}
-              className="btn-base flex items-center justify-center gap-2 px-5 py-2.5 border-[rgba(102,217,239,0.62)] bg-[rgba(102,217,239,0.1)] text-[#66d9ef] hover:bg-[rgba(102,217,239,0.2)] hover:border-[#66d9ef] transition-all rounded-lg font-medium shadow-[0_0_15px_-5px_rgba(102,217,239,0.3)]"
+              className="btn-base flex items-center justify-center gap-2 px-5 py-2.5 border-[#4990a5] bg-[#212d41] text-[#66d9ef] hover:bg-[#294054] hover:border-[#66d9ef] transition-all rounded-lg font-medium shadow-[0_0_15px_-5px_#305367]"
             >
               <Phone size={16} />
               Start Call
@@ -520,8 +520,8 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
 
         <section className={`rounded-xl border transition-all duration-300 ${
           callStatus === 'connected' 
-            ? 'border-[#a6e22e]/30 bg-[rgba(166,226,46,0.03)]' 
-            : 'border-[var(--line)] bg-[rgba(31,32,29,0.88)]'
+            ? 'border-[#a6e22e]/30 bg-[#1e202e]' 
+            : 'border-[var(--line)] bg-[#1e1f1f]'
         } p-4 space-y-3`}>
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted flex items-center gap-2">
@@ -544,7 +544,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
              </audio>
           </div>
           
-          <div className="flex items-center gap-2 text-[10px] text-muted opacity-70">
+          <div className="flex items-center gap-2 text-[12px] text-muted opacity-70">
             <div className="w-1.5 h-1.5 rounded-full bg-current" />
             <p>Stream: <code>mix.wav</code> + Presence TTS</p>
           </div>
@@ -556,7 +556,7 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
           ) : null}
         </section>
 
-        <section className="rounded-xl border border-[var(--line)] bg-[rgba(39,40,34,0.84)] p-1">
+        <section className="rounded-xl border border-[var(--line)] bg-[#242523] p-1">
           <div className="relative">
             <textarea
               value={question}
@@ -584,10 +584,10 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
           </div>
         </section>
 
-        <section className="rounded-xl border border-[var(--line)] bg-[rgba(31,32,29,0.8)] p-4 flex flex-col h-[320px]">
+        <section className="rounded-xl border border-[var(--line)] bg-[#1e1e20] p-4 flex flex-col h-[320px]">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted">Call Transcript</p>
-            <span className="text-[10px] text-muted opacity-60">Live feed</span>
+            <span className="text-[12px] text-muted opacity-60">Live feed</span>
           </div>
           
           <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin">
@@ -609,17 +609,17 @@ export function PresenceCallDeck({ catalog, simulation }: Props) {
                         ? "bg-[#66d9ef] text-[#272822] rounded-tr-none"
                         : entry.role === "presence"
                           ? "bg-[#272822] border border-[#a6e22e] text-[#a6e22e] rounded-tl-none"
-                          : "bg-[rgba(255,255,255,0.05)] text-muted italic border border-dashed border-white/10 w-full text-center"
+                          : "bg-[#252538] text-muted italic border border-dashed border-white/10 w-full text-center"
                     }`}
                   >
                     {entry.role !== "system" && (
-                      <p className="text-[9px] font-bold opacity-70 mb-0.5 uppercase tracking-wider">
+                      <p className="text-[12px] font-bold opacity-70 mb-0.5 uppercase tracking-wider">
                          {entry.role === "user" ? "You" : entry.presenceId}
                       </p>
                     )}
                     <p className="leading-relaxed">{entry.text}</p>
                   </div>
-                  <span className="text-[9px] text-muted opacity-40 mt-1 px-1">
+                  <span className="text-[12px] text-muted opacity-40 mt-1 px-1">
                     {entry.ts.split("T")[1].split(".")[0]}
                   </span>
                 </div>

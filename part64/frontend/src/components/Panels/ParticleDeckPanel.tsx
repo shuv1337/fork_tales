@@ -83,28 +83,28 @@ function antiClumpStatus(score: number, target: number): {
   if (delta >= 0.2) {
     return {
       label: "clumped",
-      accent: "rgba(255,135,122,0.86)",
-      background: "linear-gradient(90deg, rgba(76,23,19,0.62), rgba(88,33,26,0.56))",
+      accent: "#de776f",
+      background: "linear-gradient(90deg, #39181d, #3c1d22)",
     };
   }
   if (delta >= 0.08) {
     return {
       label: "forming clusters",
-      accent: "rgba(255,187,103,0.88)",
-      background: "linear-gradient(90deg, rgba(66,43,15,0.62), rgba(80,52,20,0.56))",
+      accent: "#e3a760",
+      background: "linear-gradient(90deg, #32241a, #38281f)",
     };
   }
   if (delta <= -0.05) {
     return {
       label: "dispersed",
-      accent: "rgba(128,236,255,0.88)",
-      background: "linear-gradient(90deg, rgba(13,43,57,0.62), rgba(13,60,72,0.56))",
+      accent: "#73d2e5",
+      background: "linear-gradient(90deg, #112434, #122d3c)",
     };
   }
   return {
     label: "on target",
-    accent: "rgba(129,233,171,0.9)",
-    background: "linear-gradient(90deg, rgba(15,50,30,0.62), rgba(19,70,39,0.56))",
+    accent: "#81e9ab",
+    background: "linear-gradient(90deg, #132824, #16322a)",
   };
 }
 
@@ -342,28 +342,28 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-2 md:grid-cols-6">
-        <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">active particles</p>
+        <div className="rounded-lg border border-[#3b526d] bg-[#0f1624] px-2 py-1.5">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8eb6cf]">active particles</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{Number(globalSummary?.active ?? fieldRows.length)}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">collisions</p>
+        <div className="rounded-lg border border-[#3b526d] bg-[#0f1624] px-2 py-1.5">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8eb6cf]">collisions</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{Number(globalSummary?.collisions ?? 0)}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">mean message</p>
+        <div className="rounded-lg border border-[#3b526d] bg-[#0f1624] px-2 py-1.5">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8eb6cf]">mean message</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{formatPercent(Number(globalSummary?.mean_message_probability ?? 0))}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">mean entropy</p>
+        <div className="rounded-lg border border-[#3b526d] bg-[#0f1624] px-2 py-1.5">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8eb6cf]">mean entropy</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{Number(globalSummary?.mean_package_entropy ?? 0).toFixed(3)}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">clump score</p>
+        <div className="rounded-lg border border-[#3b526d] bg-[#0f1624] px-2 py-1.5">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8eb6cf]">clump score</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{clumpScore.toFixed(3)}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(118,184,222,0.36)] bg-[rgba(9,20,30,0.62)] px-2 py-1.5">
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[#8eb6cf]">anti-clump drive</p>
+        <div className="rounded-lg border border-[#3b526d] bg-[#0f1624] px-2 py-1.5">
+          <p className="text-[12px] uppercase tracking-[0.1em] text-[#8eb6cf]">anti-clump drive</p>
           <p className="text-sm font-semibold text-[#e4f4ff]">{formatSigned(antiClumpDrive)}</p>
         </div>
       </div>
@@ -376,15 +376,15 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
         }}
       >
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[11px] uppercase tracking-[0.12em] text-[#d5ecfb]">Anti-clump controller</p>
-          <span className="rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em]" style={{ borderColor: clumpStatus.accent, color: clumpStatus.accent }}>
+          <p className="text-[12px] uppercase tracking-[0.12em] text-[#d5ecfb]">Anti-clump controller</p>
+          <span className="rounded-full border px-2 py-0.5 text-[12px] uppercase tracking-[0.08em]" style={{ borderColor: clumpStatus.accent, color: clumpStatus.accent }}>
             {clumpStatus.label}
           </span>
         </div>
-        <p className="mt-1 text-[10px] text-[#9ec7dd]">
+        <p className="mt-1 text-[12px] text-[#9ec7dd]">
           target {antiClumpTarget.toFixed(3)} | score {clumpScore.toFixed(3)} | drive {formatSigned(antiClumpDrive)} ({antiClumpDrive >= 0 ? "spread" : "relax"}) | snr {snrValue.toFixed(3)} [{snrBandMin.toFixed(2)}, {snrBandMax.toFixed(2)}]
         </p>
-        <div className="relative mt-2 h-2 rounded-full bg-[rgba(26,44,58,0.62)]">
+        <div className="relative mt-2 h-2 rounded-full bg-[#1a2535]">
           <div
             className="h-full rounded-full"
             style={{
@@ -396,11 +396,11 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
             className="absolute top-[-3px] h-[8px] w-[2px] rounded"
             style={{
               left: `calc(${antiClumpTarget * 100}% - 1px)`,
-              background: "rgba(231,248,255,0.92)",
+              background: "#e7f8ff",
             }}
           />
         </div>
-        <p className="mt-1 text-[10px] text-[#9ec7dd]">
+        <p className="mt-1 text-[12px] text-[#9ec7dd]">
           nn {Number(antiClumpMetrics?.nn_term ?? 0).toFixed(3)} | fano {Number(antiClumpMetrics?.fano_factor ?? 0).toFixed(3)} | off-field {Number(antiClumpMetrics?.motion_noise ?? 0).toFixed(4)} | sem {Number(antiClumpMetrics?.semantic_noise ?? 0).toFixed(3)}
         </p>
         <div className="mt-2 grid gap-2 md:grid-cols-2">
@@ -414,11 +414,11 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
             const bar = clamp01(row.value / 1.6);
             return (
               <div key={row.key}>
-                <div className="flex items-center justify-between text-[11px] text-[#cfe6f7]">
+                <div className="flex items-center justify-between text-[12px] text-[#cfe6f7]">
                   <span>{row.key}</span>
                   <span className="font-mono">{row.value.toFixed(3)}</span>
                 </div>
-                <div className="mt-1 h-1.5 rounded-full bg-[rgba(44,72,94,0.46)]">
+                <div className="mt-1 h-1.5 rounded-full bg-[#222f44]">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -434,13 +434,13 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
       </section>
 
       {lastFocusLabel ? (
-        <div className="rounded-lg border border-[rgba(139,209,244,0.4)] bg-[linear-gradient(90deg,rgba(10,25,36,0.82),rgba(8,30,39,0.74))] px-3 py-1.5 text-xs text-[#d8eeff]">
+        <div className="rounded-lg border border-[#47637d] bg-[linear-gradient(90deg,#0c1925,#0c1c28)] px-3 py-1.5 text-xs text-[#d8eeff]">
           focus locked {"->"} <span className="font-semibold text-[#f3fbff]">{lastFocusLabel}</span>
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.56)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Search Particle Emitter</p>
+      <section className="rounded-lg border border-[#344c68] bg-[#0f1623] p-3">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Search Particle Emitter</p>
         <div className="mt-2 grid gap-2 md:grid-cols-[1.2fr_0.8fr_auto]">
           <input
             type="text"
@@ -453,47 +453,47 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
               }
             }}
             placeholder="search query -> emits query particles + variants"
-            className="rounded-md border border-[rgba(124,190,228,0.32)] bg-[rgba(10,24,35,0.72)] px-2 py-1.5 text-xs text-[#e6f5ff] outline-none placeholder:text-[#87adc5]"
+            className="rounded-md border border-[#394e68] bg-[#0e1826] px-2 py-1.5 text-xs text-[#e6f5ff] outline-none placeholder:text-[#87adc5]"
           />
           <input
             type="text"
             value={queryTarget}
             onChange={(event) => setQueryTarget(event.target.value)}
             placeholder="target: nexus or presence_id"
-            className="rounded-md border border-[rgba(124,190,228,0.32)] bg-[rgba(10,24,35,0.72)] px-2 py-1.5 text-xs text-[#e6f5ff] outline-none placeholder:text-[#87adc5]"
+            className="rounded-md border border-[#394e68] bg-[#0e1826] px-2 py-1.5 text-xs text-[#e6f5ff] outline-none placeholder:text-[#87adc5]"
           />
           <button
             type="button"
             onClick={submitSearchQuery}
-            className="rounded-md border border-[rgba(138,226,255,0.56)] bg-[linear-gradient(90deg,rgba(24,88,120,0.86),rgba(22,112,136,0.9))] px-3 py-1.5 text-xs font-semibold text-[#eaf8ff]"
+            className="rounded-md border border-[#588aa3] bg-[linear-gradient(90deg,#184f6d,#167088)] px-3 py-1.5 text-xs font-semibold text-[#eaf8ff]"
           >
             emit
           </button>
         </div>
-        <p className="mt-2 text-[10px] text-[#9ec7dd]">
+        <p className="mt-2 text-[12px] text-[#9ec7dd]">
           transient edges: <code>{transientEdges.length}</code> | promoted edges: <code>{promotedEdges.length}</code>
         </p>
         {(transientEdges.length > 0 || promotedEdges.length > 0) ? (
           <div className="mt-2 grid gap-2 md:grid-cols-2">
-            <div className="rounded border border-[rgba(113,189,224,0.28)] bg-[rgba(7,18,28,0.58)] p-1.5">
-              <p className="text-[10px] uppercase tracking-[0.08em] text-[#a7cce3]">transient</p>
+            <div className="rounded border border-[#32475f] bg-[#0e1523] p-1.5">
+              <p className="text-[12px] uppercase tracking-[0.08em] text-[#a7cce3]">transient</p>
               <div className="mt-1 space-y-1 max-h-24 overflow-y-auto pr-1">
                 {transientEdges.length === 0 ? (
-                  <p className="text-[10px] text-[#87aec6]">none</p>
+                  <p className="text-[12px] text-[#87aec6]">none</p>
                 ) : transientEdges.slice(0, 6).map((row) => (
-                  <p key={row.id} className="text-[10px] text-[#cce5f5]">
+                  <p key={row.id} className="text-[12px] text-[#cce5f5]">
                     {row.target} · h{row.hits} · life {Math.round(row.life * 100)}%
                   </p>
                 ))}
               </div>
             </div>
-            <div className="rounded border border-[rgba(113,189,224,0.28)] bg-[rgba(7,18,28,0.58)] p-1.5">
-              <p className="text-[10px] uppercase tracking-[0.08em] text-[#a7cce3]">promoted</p>
+            <div className="rounded border border-[#32475f] bg-[#0e1523] p-1.5">
+              <p className="text-[12px] uppercase tracking-[0.08em] text-[#a7cce3]">promoted</p>
               <div className="mt-1 space-y-1 max-h-24 overflow-y-auto pr-1">
                 {promotedEdges.length === 0 ? (
-                  <p className="text-[10px] text-[#87aec6]">none</p>
+                  <p className="text-[12px] text-[#87aec6]">none</p>
                 ) : promotedEdges.slice(0, 6).map((row) => (
-                  <p key={row.id} className="text-[10px] text-[#ffe1b9]">
+                  <p key={row.id} className="text-[12px] text-[#ffe1b9]">
                     {row.target} · h{row.hits} · s {Math.round(row.strength * 100)}%
                   </p>
                 ))}
@@ -501,19 +501,19 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
             </div>
           </div>
         ) : null}
-        {queryHint ? <p className="mt-1 text-[10px] text-[#b7d8ee]">{queryHint}</p> : null}
+        {queryHint ? <p className="mt-1 text-[12px] text-[#b7d8ee]">{queryHint}</p> : null}
       </section>
 
-      <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.5)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Action distribution</p>
+      <section className="rounded-lg border border-[#344c68] bg-[#111625] p-3">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Action distribution</p>
         <div className="mt-2 grid gap-2 md:grid-cols-2">
           {actionDistribution.rows.map((row) => (
             <div key={row.key}>
-              <div className="flex items-center justify-between text-[11px] text-[#cfe6f7]">
+              <div className="flex items-center justify-between text-[12px] text-[#cfe6f7]">
                 <span>{row.key}</span>
                 <span className="font-mono">{formatPercent(row.probability)} ({row.value})</span>
               </div>
-              <div className="mt-1 h-1.5 rounded-full bg-[rgba(44,72,94,0.46)]">
+              <div className="mt-1 h-1.5 rounded-full bg-[#222f44]">
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -525,30 +525,30 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[10px] text-[#9ec7dd]">total actions: <code>{actionDistribution.total}</code></p>
+        <p className="mt-2 text-[12px] text-[#9ec7dd]">total actions: <code>{actionDistribution.total}</code></p>
       </section>
 
-      <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.5)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Top job trigger probabilities</p>
+      <section className="rounded-lg border border-[#344c68] bg-[#111625] p-3">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Top job trigger probabilities</p>
         <div className="mt-2 space-y-2">
           {topJobTriggers.rows.length === 0 ? (
             <p className="text-xs text-[#9fc4dd]">No job trigger distribution available yet.</p>
           ) : topJobTriggers.rows.map((row) => (
             <div key={row.name}>
-              <div className="flex items-center justify-between text-[11px] text-[#cfe6f7]">
+              <div className="flex items-center justify-between text-[12px] text-[#cfe6f7]">
                 <span>{row.name}</span>
                 <span className="font-mono">{formatPercent(row.probability)} ({row.count})</span>
               </div>
-              <div className="mt-1 h-1.5 rounded-full bg-[rgba(44,72,94,0.46)]">
-                <div className="h-full rounded-full bg-[linear-gradient(90deg,rgba(115,208,255,0.8),rgba(80,246,201,0.86))]" style={{ width: `${row.probability * 100}%` }} />
+              <div className="mt-1 h-1.5 rounded-full bg-[#222f44]">
+                <div className="h-full rounded-full bg-[linear-gradient(90deg,#61abd5,#48d7b3)]" style={{ width: `${row.probability * 100}%` }} />
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.5)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Presence stats (click to zoom)</p>
+      <section className="rounded-lg border border-[#344c68] bg-[#111625] p-3">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Presence stats (click to zoom)</p>
         <div className="mt-2 space-y-2 max-h-[22rem] overflow-y-auto pr-1">
           {presenceRows.length === 0 ? (
             <p className="text-xs text-[#9fc4dd]">No presence particle rows yet.</p>
@@ -570,24 +570,24 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
                 },
                 `presence ${presence.label}`,
               )}
-              className="w-full rounded-md border border-[rgba(124,190,228,0.28)] bg-[rgba(11,26,36,0.65)] px-2.5 py-2 text-left hover:border-[rgba(143,224,255,0.55)]"
+              className="w-full rounded-md border border-[#354760] bg-[#101a27] px-2.5 py-2 text-left hover:border-[#5a86a0]"
             >
               <div className="flex items-center justify-between text-xs text-[#e8f6ff]">
                 <span className="font-semibold">{presence.label}</span>
                 <span className="font-mono">{presence.count} particles</span>
               </div>
-              <p className="mt-1 text-[11px] text-[#a6cce1]">
+              <p className="mt-1 text-[12px] text-[#a6cce1]">
                 message {formatPercent(presence.meanMessageProbability)} | route {formatPercent(presence.meanRouteProbability)} | deflect {formatPercent(presence.meanDeflect)} | diffuse {formatPercent(presence.meanDiffuse)}
               </p>
               {presence.topJobs.length > 0 ? (
                 <div className="mt-1.5 space-y-1">
                   {presence.topJobs.map((job) => (
                     <div key={`${presence.presenceId}:${job.name}`}>
-                      <div className="flex items-center justify-between text-[10px] text-[#bcdff3]">
+                      <div className="flex items-center justify-between text-[12px] text-[#bcdff3]">
                         <span>{job.name}</span>
                         <span className="font-mono">{formatPercent(job.probability)}</span>
                       </div>
-                      <div className="mt-0.5 h-1 rounded-full bg-[rgba(44,72,94,0.46)]">
+                      <div className="mt-0.5 h-1 rounded-full bg-[#222f44]">
                         <div className="h-full rounded-full" style={{ width: `${job.probability * 100}%`, background: barColor(presence.hue) }} />
                       </div>
                     </div>
@@ -599,8 +599,8 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
         </div>
       </section>
 
-      <section className="rounded-lg border border-[rgba(108,184,228,0.32)] bg-[rgba(8,19,28,0.5)] p-3">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Particle highlights (click to zoom)</p>
+      <section className="rounded-lg border border-[#344c68] bg-[#111625] p-3">
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Particle highlights (click to zoom)</p>
         <div className="mt-2 grid gap-1.5 md:grid-cols-2">
           {highlightedParticles.length === 0 ? (
             <p className="text-xs text-[#9fc4dd]">No particle highlights available.</p>
@@ -622,10 +622,10 @@ export function ParticleDeckPanel({ catalog, simulation, onFocusAnchor, onEmitUs
                 },
                 `particle ${row.id}`,
               )}
-              className="rounded-md border border-[rgba(124,190,228,0.26)] bg-[rgba(11,26,36,0.58)] px-2 py-1.5 text-left hover:border-[rgba(143,224,255,0.52)]"
+              className="rounded-md border border-[#33445d] bg-[#111a28] px-2 py-1.5 text-left hover:border-[#56809a]"
             >
-              <p className="text-[11px] font-semibold text-[#e5f4ff]">{row.id}</p>
-              <p className="text-[10px] text-[#a8cee3]">
+              <p className="text-[12px] font-semibold text-[#e5f4ff]">{row.id}</p>
+              <p className="text-[12px] text-[#a8cee3]">
                 {row.presenceId} | m {formatPercent(row.messageProbability)} | r {formatPercent(row.routeProbability)}
               </p>
             </button>

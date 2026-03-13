@@ -42,7 +42,7 @@ export function OmniPanel({ catalog }: Props) {
         {catalog.cover_fields.map((cover) => (
           <article 
             key={cover.id}
-            className="border border-[var(--line)] rounded-xl p-3 bg-gradient-to-b from-[rgba(45,46,39,0.9)] to-[rgba(31,32,29,0.94)]"
+            className="border border-[var(--line)] rounded-xl p-3 bg-gradient-to-b from-[#2d2e27] to-[#1f201d]"
           >
             <div className="flex justify-between items-baseline mb-2">
               <strong className="text-sm font-semibold">{cover.display_name.en}</strong>
@@ -62,11 +62,11 @@ export function OmniPanel({ catalog }: Props) {
       </div>
 
       {memories.length > 0 && (
-        <div className="card !mt-6 bg-[rgba(166,226,46,0.12)] border-[rgba(166,226,46,0.36)]">
+        <div className="card !mt-6 bg-[#2a322e] border-[#4c622e]">
             <h4 className="text-sm font-bold mb-2 text-[#a6e22e]">Memory Fragments / 記憶の断片 (Echoes)</h4>
             <div className="space-y-2">
                 {memories.map((m, i) => (
-                    <div key={m.id || i} className="text-xs border-l-2 border-[rgba(166,226,46,0.5)] pl-2 py-1">
+                    <div key={m.id || i} className="text-xs border-l-2 border-[#607e2e] pl-2 py-1">
                         <span className="text-muted block font-mono">[{m.metadata?.timestamp || "???"}]</span>
                         {m.text}
                     </div>

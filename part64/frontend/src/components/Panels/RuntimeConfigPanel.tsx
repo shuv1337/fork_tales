@@ -1203,7 +1203,7 @@ export function RuntimeConfigPanel() {
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border border-[rgba(174,129,255,0.34)] bg-[rgba(39,40,34,0.9)] p-4">
+      <div className="rounded-xl border border-[#4c3d75] bg-[#272822] p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-ink flex items-center gap-2">
@@ -1220,7 +1220,7 @@ export function RuntimeConfigPanel() {
               onClick={() => {
                 void refreshConfig(true);
               }}
-              className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(55,56,48,0.92)]"
+              className="border border-[var(--line)] rounded-md bg-[#1f201d] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#373830]"
             >
               <span className="inline-flex items-center gap-1.5">
                 <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -1233,7 +1233,7 @@ export function RuntimeConfigPanel() {
                 void applyEdited();
               }}
               disabled={editedLeafIds.length === 0 || bulkMutating}
-              className="border border-[var(--line)] rounded-md bg-[rgba(44,67,39,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(63,94,56,0.92)] disabled:opacity-50"
+              className="border border-[var(--line)] rounded-md bg-[#2c4327] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#3f5e38] disabled:opacity-50"
             >
               Apply Edited ({editedLeafIds.length})
             </button>
@@ -1243,7 +1243,7 @@ export function RuntimeConfigPanel() {
                 void resetAll();
               }}
               disabled={bulkMutating}
-              className="border border-[var(--line)] rounded-md bg-[rgba(73,45,45,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(96,58,58,0.92)] disabled:opacity-50"
+              className="border border-[var(--line)] rounded-md bg-[#492d2d] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#603a3a] disabled:opacity-50"
             >
               Reset Runtime Defaults
             </button>
@@ -1251,34 +1251,34 @@ export function RuntimeConfigPanel() {
         </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-4">
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">modules</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">modules</p>
             <p className="text-sm font-semibold text-ink">{payload?.module_count ?? 0}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">constants</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">constants</p>
             <p className="text-sm font-semibold text-ink">{payload?.constant_count ?? 0}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">numeric leaves</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">numeric leaves</p>
             <p className="text-sm font-semibold text-ink">{payload?.numeric_leaf_count ?? 0}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">matched leaves</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">matched leaves</p>
             <p className="text-sm font-semibold text-ink">{matchedLeafCount}</p>
           </div>
         </div>
 
-        <div className="mt-3 rounded-md border border-[rgba(126,166,192,0.28)] bg-[rgba(16,22,27,0.74)] p-3">
+        <div className="mt-3 rounded-md border border-[#364156] bg-[#12171f] p-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold text-[#cfe7f8]">Simulation Bootstrap</p>
-              <p className="text-[11px] text-[#9ec7dd] mt-1">
+              <p className="text-[12px] text-[#9ec7dd] mt-1">
                 Queue a from-scratch simulation rebuild and inspect live phase heartbeats.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <label className="text-[11px] text-muted" htmlFor="bootstrap-perspective-select">
+              <label className="text-[12px] text-muted" htmlFor="bootstrap-perspective-select">
                 perspective
               </label>
               <select
@@ -1287,7 +1287,7 @@ export function RuntimeConfigPanel() {
                 onChange={(event) => {
                   setBootstrapPerspective(event.currentTarget.value);
                 }}
-                className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.94)] px-2 py-1 text-xs text-ink"
+                className="border border-[var(--line)] rounded-md bg-[#1f201d] px-2 py-1 text-xs text-ink"
               >
                 {BOOTSTRAP_PERSPECTIVE_OPTIONS.map((option) => (
                   <option key={option.id} value={option.id}>
@@ -1295,7 +1295,7 @@ export function RuntimeConfigPanel() {
                   </option>
                 ))}
               </select>
-              <label className="inline-flex items-center gap-1 text-[11px] text-muted">
+              <label className="inline-flex items-center gap-1 text-[12px] text-muted">
                 <input
                   type="checkbox"
                   checked={bootstrapSyncInbox}
@@ -1311,7 +1311,7 @@ export function RuntimeConfigPanel() {
                   void queueBootstrap();
                 }}
                 disabled={!bootstrapCanQueue}
-                className="border border-[rgba(126,196,156,0.5)] rounded-md bg-[rgba(35,70,50,0.9)] px-3 py-1.5 text-xs font-semibold text-[#def7ea] hover:bg-[rgba(49,96,69,0.92)] disabled:opacity-50"
+                className="border border-[#4c6f65] rounded-md bg-[#234632] px-3 py-1.5 text-xs font-semibold text-[#def7ea] hover:bg-[#316045] disabled:opacity-50"
               >
                 {bootstrapQueueing ? "queueing..." : bootstrapIsRunning ? "bootstrap running" : "queue bootstrap"}
               </button>
@@ -1320,7 +1320,7 @@ export function RuntimeConfigPanel() {
                 onClick={() => {
                   void refreshBootstrap(true);
                 }}
-                className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(55,56,48,0.92)]"
+                className="border border-[var(--line)] rounded-md bg-[#1f201d] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#373830]"
               >
                 <span className="inline-flex items-center gap-1.5">
                   <RefreshCw size={12} className={bootstrapLoading ? "animate-spin" : ""} />
@@ -1330,9 +1330,9 @@ export function RuntimeConfigPanel() {
             </div>
           </div>
 
-          <div className="mt-2 rounded-md border border-[rgba(126,166,192,0.24)] bg-[rgba(10,14,19,0.54)] p-2">
+          <div className="mt-2 rounded-md border border-[#323b51] bg-[#11131f] p-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[11px] text-[#cfe7f8] font-semibold">Catalog Stream Probe</p>
+              <p className="text-[12px] text-[#cfe7f8] font-semibold">Catalog Stream Probe</p>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
@@ -1340,7 +1340,7 @@ export function RuntimeConfigPanel() {
                     void startCatalogStreamProbe();
                   }}
                   disabled={catalogStreamIsRunning}
-                  className="border border-[rgba(126,196,156,0.5)] rounded-md bg-[rgba(35,70,50,0.9)] px-2.5 py-1 text-[11px] font-semibold text-[#def7ea] hover:bg-[rgba(49,96,69,0.92)] disabled:opacity-50"
+                  className="border border-[#4c6f65] rounded-md bg-[#234632] px-2.5 py-1 text-[12px] font-semibold text-[#def7ea] hover:bg-[#316045] disabled:opacity-50"
                 >
                   {catalogStreamIsRunning ? "streaming..." : "start stream"}
                 </button>
@@ -1350,13 +1350,13 @@ export function RuntimeConfigPanel() {
                     stopCatalogStreamProbe();
                   }}
                   disabled={!catalogStreamIsRunning}
-                  className="border border-[rgba(202,150,134,0.48)] rounded-md bg-[rgba(70,42,39,0.88)] px-2.5 py-1 text-[11px] font-semibold text-[#ffe0d7] hover:bg-[rgba(96,56,52,0.9)] disabled:opacity-50"
+                  className="border border-[#6e5558] rounded-md bg-[#402827] px-2.5 py-1 text-[12px] font-semibold text-[#ffe0d7] hover:bg-[#603834] disabled:opacity-50"
                 >
                   stop
                 </button>
               </div>
             </div>
-            <p className="text-[11px] text-muted mt-1">
+            <p className="text-[12px] text-muted mt-1">
               status <code className={catalogStreamStatusTone}>{catalogStreamStatus}</code>
               {catalogStreamProbe.stage ? (
                 <>
@@ -1385,64 +1385,64 @@ export function RuntimeConfigPanel() {
               ) : null}
             </p>
             {catalogStreamProbe.error ? (
-              <p className="text-[11px] text-[#ffcfbf] mt-1">
+              <p className="text-[12px] text-[#ffcfbf] mt-1">
                 error <code>{catalogStreamProbe.error}</code>
               </p>
             ) : null}
             {catalogStreamProbe.sections && Object.keys(catalogStreamProbe.sections).length > 0 ? (
-              <p className="text-[11px] text-[#9ec7dd] mt-1 break-all">
+              <p className="text-[12px] text-[#9ec7dd] mt-1 break-all">
                 sections <code>{Object.keys(catalogStreamProbe.sections).sort().join(", ")}</code>
               </p>
             ) : null}
             {catalogStreamLogRows.length > 0 ? (
               <div className="mt-2 max-h-24 overflow-auto space-y-1">
                 {catalogStreamLogRows.map((row, index) => (
-                  <p key={`catalog-stream-log-${index}-${row}`} className="text-[10px] text-[#a9cee5]">{row}</p>
+                  <p key={`catalog-stream-log-${index}-${row}`} className="text-[12px] text-[#a9cee5]">{row}</p>
                 ))}
               </div>
             ) : null}
           </div>
 
           <div className="mt-3 grid gap-2 sm:grid-cols-4">
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">job status</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">job status</p>
               <p className={`text-sm font-semibold ${bootstrapStatusTone}`}>{bootstrapJobStatus || "idle"}</p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 id <code>{bootstrapJobIdShort}</code>
               </p>
             </div>
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">phase</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">phase</p>
               <p className="text-sm font-semibold text-ink">{normalizePhaseLabel(bootstrapJobPhase)}</p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 heartbeat <code>{bootstrapHeartbeatCount === null ? "-" : String(Math.max(0, Math.floor(bootstrapHeartbeatCount)))}</code>
                 {" "}· elapsed <code>{formatDurationMs(bootstrapPhaseElapsedMs)}</code>
               </p>
             </div>
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">selection</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">selection</p>
               <p className="text-sm font-semibold text-ink">
                 {String(bootstrapSelection?.graph_surface || "n/a")}
               </p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 layers <code>{bootstrapActiveLayerCount === null ? "0" : String(Math.max(0, Math.round(bootstrapActiveLayerCount)))}</code>
                 /<code>{bootstrapLayerCount === null ? "0" : String(Math.max(0, Math.round(bootstrapLayerCount)))}</code>
               </p>
             </div>
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">compression</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">compression</p>
               <p className="text-sm font-semibold text-ink">
                 {bootstrapBeforeEdges === null ? "0" : String(Math.max(0, Math.round(bootstrapBeforeEdges)))}
                 {" -> "}
                 {bootstrapAfterEdges === null ? "0" : String(Math.max(0, Math.round(bootstrapAfterEdges)))}
               </p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 collapsed <code>{bootstrapCollapsedEdges === null ? "0" : String(Math.max(0, Math.round(bootstrapCollapsedEdges)))}</code>
               </p>
             </div>
           </div>
 
-          <p className="text-[11px] text-muted mt-2">
+          <p className="text-[12px] text-muted mt-2">
             phase timings: catalog <code>{formatDurationMs(bootstrapCatalogMs)}</code>
             {" "}| simulation <code>{formatDurationMs(bootstrapSimulationMs)}</code>
             {" "}| cache store <code>{formatDurationMs(bootstrapCacheStoreMs)}</code>
@@ -1474,41 +1474,41 @@ export function RuntimeConfigPanel() {
           </p>
 
           <div className="mt-2 grid gap-2 sm:grid-cols-3">
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.8)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">truth to view files</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1e20] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">truth to view files</p>
                 <p className="text-sm font-semibold text-ink">
                   {bootstrapTruthNodeCount === null ? "0" : String(Math.max(0, Math.round(bootstrapTruthNodeCount)))}
                   {" to "}
                   {bootstrapViewNodeCount === null ? "0" : String(Math.max(0, Math.round(bootstrapViewNodeCount)))}
                 </p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 missing in view <code>{bootstrapMissingTruthToViewCount === null ? "0" : String(Math.max(0, Math.round(bootstrapMissingTruthToViewCount)))}</code>
               </p>
             </div>
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.8)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">projection bundles</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1e20] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">projection bundles</p>
               <p className="text-sm font-semibold text-ink">
                 {bootstrapProjectionVisibleGroupCount === null ? "0" : String(Math.max(0, Math.round(bootstrapProjectionVisibleGroupCount)))}
                 {" visible / "}
                 {bootstrapProjectionGroupCount === null ? "0" : String(Math.max(0, Math.round(bootstrapProjectionGroupCount)))}
               </p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 hidden groups <code>{bootstrapProjectionHiddenGroupCount === null ? "0" : String(Math.max(0, Math.round(bootstrapProjectionHiddenGroupCount)))}</code>
                 {" "}| overflow nodes <code>{bootstrapOverflowNodeCount === null ? "0" : String(Math.max(0, Math.round(bootstrapOverflowNodeCount)))}</code>
               </p>
             </div>
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.8)] px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-muted">ingested coverage</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1e20] px-3 py-2">
+              <p className="text-[12px] uppercase tracking-wide text-muted">ingested coverage</p>
               <p className="text-sm font-semibold text-ink">
                 items <code>{bootstrapIngestedItemCount === null ? "0" : String(Math.max(0, Math.round(bootstrapIngestedItemCount)))}</code>
               </p>
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 not in truth graph <code>{bootstrapMissingIngestCount === null ? "0" : String(Math.max(0, Math.round(bootstrapMissingIngestCount)))}</code>
               </p>
             </div>
           </div>
 
-          <p className="text-[11px] text-muted mt-2">
+          <p className="text-[12px] text-muted mt-2">
             compaction mode <code>{bootstrapCompactionMode ? normalizePhaseLabel(bootstrapCompactionMode) : "n/a"}</code>
             {bootstrapGraphDiff?.view_graph_reconstructable_from_truth_graph ? (
               <>
@@ -1528,19 +1528,19 @@ export function RuntimeConfigPanel() {
           </p>
 
           {bootstrapGraphDiffNotes.length > 0 ? (
-            <div className="mt-2 rounded-md border border-[rgba(126,166,192,0.24)] bg-[rgba(10,14,19,0.54)] px-2 py-1.5">
+            <div className="mt-2 rounded-md border border-[#323b51] bg-[#11131f] px-2 py-1.5">
               {bootstrapGraphDiffNotes.slice(0, 4).map((note) => (
-                <p key={`bootstrap-note-${note}`} className="text-[11px] text-[#a9cee5]">{note}</p>
+                <p key={`bootstrap-note-${note}`} className="text-[12px] text-[#a9cee5]">{note}</p>
               ))}
             </div>
           ) : null}
 
-          <details className="mt-2 rounded-md border border-[rgba(126,166,192,0.24)] bg-[rgba(10,14,19,0.54)] px-2 py-1.5">
-            <summary className="cursor-pointer text-[11px] text-[#cfe7f8]">
+          <details className="mt-2 rounded-md border border-[#323b51] bg-[#11131f] px-2 py-1.5">
+            <summary className="cursor-pointer text-[12px] text-[#cfe7f8]">
               files ingested in truth graph but missing from view graph ({bootstrapMissingTruthToViewRows.length})
             </summary>
             {bootstrapMissingTruthToViewRows.length <= 0 ? (
-              <p className="mt-2 text-[11px] text-muted">No missing truth-graph file rows in current report.</p>
+              <p className="mt-2 text-[12px] text-muted">No missing truth-graph file rows in current report.</p>
             ) : (
               <div className="mt-2 max-h-44 overflow-auto space-y-1">
                 {bootstrapMissingTruthToViewRows.slice(0, 180).map((row) => {
@@ -1551,9 +1551,9 @@ export function RuntimeConfigPanel() {
                     : [];
                   const rowId = String(row?.id || row?.node_id || path || "row").trim() || "row";
                   return (
-                    <div key={`bootstrap-missing-row-${rowId}`} className="rounded border border-[rgba(126,166,192,0.2)] bg-[rgba(13,20,26,0.7)] px-2 py-1">
-                      <p className="text-[11px] text-[#d9ecff] break-all"><code>{path}</code></p>
-                      <p className="text-[10px] text-[#9ec7dd]">
+                    <div key={`bootstrap-missing-row-${rowId}`} className="rounded border border-[#2e364b] bg-[#101520] px-2 py-1">
+                      <p className="text-[12px] text-[#d9ecff] break-all"><code>{path}</code></p>
+                      <p className="text-[12px] text-[#9ec7dd]">
                         reason <code>{normalizePhaseLabel(reason)}</code>
                         {refs.length > 0 ? (
                           <>
@@ -1568,12 +1568,12 @@ export function RuntimeConfigPanel() {
             )}
           </details>
 
-          <details className="mt-2 rounded-md border border-[rgba(126,166,192,0.24)] bg-[rgba(10,14,19,0.54)] px-2 py-1.5">
-            <summary className="cursor-pointer text-[11px] text-[#cfe7f8]">
+          <details className="mt-2 rounded-md border border-[#323b51] bg-[#11131f] px-2 py-1.5">
+            <summary className="cursor-pointer text-[12px] text-[#cfe7f8]">
               ingested catalog items missing from truth graph ({bootstrapMissingIngestRows.length})
             </summary>
             {bootstrapMissingIngestRows.length <= 0 ? (
-              <p className="mt-2 text-[11px] text-muted">No ingest-vs-truth mismatches in current report.</p>
+              <p className="mt-2 text-[12px] text-muted">No ingest-vs-truth mismatches in current report.</p>
             ) : (
               <div className="mt-2 max-h-44 overflow-auto space-y-1">
                 {bootstrapMissingIngestRows.slice(0, 180).map((row) => {
@@ -1582,9 +1582,9 @@ export function RuntimeConfigPanel() {
                   const kind = String(row.kind || "").trim();
                   const rowId = `${path}|${kind || "unknown"}`;
                   return (
-                    <div key={`bootstrap-ingest-missing-row-${rowId}`} className="rounded border border-[rgba(126,166,192,0.2)] bg-[rgba(13,20,26,0.7)] px-2 py-1">
-                      <p className="text-[11px] text-[#d9ecff] break-all"><code>{path}</code></p>
-                      <p className="text-[10px] text-[#9ec7dd]">
+                    <div key={`bootstrap-ingest-missing-row-${rowId}`} className="rounded border border-[#2e364b] bg-[#101520] px-2 py-1">
+                      <p className="text-[12px] text-[#d9ecff] break-all"><code>{path}</code></p>
+                      <p className="text-[12px] text-[#9ec7dd]">
                         reason <code>{normalizePhaseLabel(reason)}</code>
                         {kind ? (
                           <>
@@ -1599,14 +1599,14 @@ export function RuntimeConfigPanel() {
             )}
           </details>
 
-          {bootstrapMessage ? <p className="text-[11px] text-[#b6f0c0] mt-2">{bootstrapMessage}</p> : null}
-          {bootstrapError ? <p className="text-[11px] text-[#ffcfbf] mt-2">{bootstrapError}</p> : null}
-          {bootstrapJob?.error ? <p className="text-[11px] text-[#ffcfbf] mt-2">{bootstrapJob.error}</p> : null}
-          {bootstrapReport?.error ? <p className="text-[11px] text-[#ffcfbf] mt-2">{bootstrapReport.error}</p> : null}
+          {bootstrapMessage ? <p className="text-[12px] text-[#b6f0c0] mt-2">{bootstrapMessage}</p> : null}
+          {bootstrapError ? <p className="text-[12px] text-[#ffcfbf] mt-2">{bootstrapError}</p> : null}
+          {bootstrapJob?.error ? <p className="text-[12px] text-[#ffcfbf] mt-2">{bootstrapJob.error}</p> : null}
+          {bootstrapReport?.error ? <p className="text-[12px] text-[#ffcfbf] mt-2">{bootstrapReport.error}</p> : null}
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <label className="text-[11px] text-muted" htmlFor="runtime-config-module-filter">
+          <label className="text-[12px] text-muted" htmlFor="runtime-config-module-filter">
             module
           </label>
           <select
@@ -1615,7 +1615,7 @@ export function RuntimeConfigPanel() {
             onChange={(event) => {
               setModuleFilter(event.currentTarget.value);
             }}
-            className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.94)] px-2 py-1 text-xs text-ink"
+            className="border border-[var(--line)] rounded-md bg-[#1f201d] px-2 py-1 text-xs text-ink"
           >
             <option value="all">all modules</option>
             {availableModules.map((moduleName) => (
@@ -1625,7 +1625,7 @@ export function RuntimeConfigPanel() {
             ))}
           </select>
 
-          <div className="inline-flex items-center gap-1 border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.94)] px-2 py-1">
+          <div className="inline-flex items-center gap-1 border border-[var(--line)] rounded-md bg-[#1f201d] px-2 py-1">
             <Search size={12} className="text-muted" />
             <input
               value={searchQuery}
@@ -1638,7 +1638,7 @@ export function RuntimeConfigPanel() {
           </div>
         </div>
 
-        <p className="text-[11px] text-muted mt-2">
+        <p className="text-[12px] text-muted mt-2">
           matches <code>{matchedConstantCount}</code> constants · <code>{matchedLeafCount}</code> leaves
           {payload?.generated_at ? (
             <>
@@ -1657,9 +1657,9 @@ export function RuntimeConfigPanel() {
           ) : null}
         </p>
 
-        {mutationMessage ? <p className="text-[11px] text-[#b6f0c0] mt-2">{mutationMessage}</p> : null}
-        {mutationError ? <p className="text-[11px] text-[#ffcfbf] mt-2">{mutationError}</p> : null}
-        {error ? <p className="text-[11px] text-[#ffcfbf] mt-2">{error}</p> : null}
+        {mutationMessage ? <p className="text-[12px] text-[#b6f0c0] mt-2">{mutationMessage}</p> : null}
+        {mutationError ? <p className="text-[12px] text-[#ffcfbf] mt-2">{mutationError}</p> : null}
+        {error ? <p className="text-[12px] text-[#ffcfbf] mt-2">{error}</p> : null}
       </div>
 
       <div className="space-y-2 max-h-[36rem] overflow-y-auto pr-1">
@@ -1669,13 +1669,13 @@ export function RuntimeConfigPanel() {
           moduleViews.map((moduleView) => (
             <section
               key={moduleView.moduleName}
-              className="rounded-lg border border-[var(--line)] bg-[rgba(31,32,29,0.86)] p-3"
+              className="rounded-lg border border-[var(--line)] bg-[#1e1f1f] p-3"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-ink">
                   <code>{moduleView.moduleName}</code>
                 </p>
-                <p className="text-[11px] text-muted">
+                <p className="text-[12px] text-muted">
                   constants <code>{moduleView.constantCount}</code> | leaves <code>{moduleView.numericLeafCount}</code>
                 </p>
               </div>
@@ -1687,14 +1687,14 @@ export function RuntimeConfigPanel() {
                   moduleView.entries.map((entry) => (
                     <details
                       key={`${moduleView.moduleName}:${entry.key}`}
-                      className="rounded-md border border-[rgba(126,166,192,0.26)] bg-[rgba(18,20,18,0.72)] px-3 py-2"
+                      className="rounded-md border border-[#343e53] bg-[#141519] px-3 py-2"
                     >
                       <summary className="cursor-pointer list-none">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="text-xs font-semibold text-[#d9ecff]">
                             <code>{entry.key}</code>
                           </p>
-                          <p className="text-[11px] text-[#9ec7dd]">
+                          <p className="text-[12px] text-[#9ec7dd]">
                             leaves <code>{entry.leafCount}</code> | {entry.preview}
                           </p>
                         </div>
@@ -1702,7 +1702,7 @@ export function RuntimeConfigPanel() {
 
                       <div className="mt-2 space-y-2">
                         {entry.leaves.length === 0 ? (
-                          <p className="text-[11px] text-muted">No numeric leaves found.</p>
+                          <p className="text-[12px] text-muted">No numeric leaves found.</p>
                         ) : (
                           entry.leaves.map((leaf) => {
                             const draftText = draftByLeafId[leaf.leafId] ?? formatNumber(leaf.value);
@@ -1719,13 +1719,13 @@ export function RuntimeConfigPanel() {
                             return (
                               <div
                                 key={leaf.leafId}
-                                className="rounded-md border border-[rgba(126,166,192,0.2)] bg-[rgba(12,16,20,0.66)] p-2"
+                                className="rounded-md border border-[#2e364b] bg-[#10131c] p-2"
                               >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <p className="text-[11px] text-[#d3e8ff] font-semibold">
+                                  <p className="text-[12px] text-[#d3e8ff] font-semibold">
                                     <code>{displayRef}</code>
                                   </p>
-                                  <p className="text-[11px] text-[#9ec7dd]">
+                                  <p className="text-[12px] text-[#9ec7dd]">
                                     current <code>{formatNumber(leaf.value)}</code>
                                   </p>
                                 </div>
@@ -1737,7 +1737,7 @@ export function RuntimeConfigPanel() {
                                       setLeafDraft(leaf.leafId, sliderValue - slider.step);
                                     }}
                                     disabled={!canMutate}
-                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[rgba(40,52,68,0.62)] disabled:opacity-50"
+                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[#222a3b] disabled:opacity-50"
                                   >
                                     -
                                   </button>
@@ -1758,7 +1758,7 @@ export function RuntimeConfigPanel() {
                                       setLeafDraft(leaf.leafId, sliderValue + slider.step);
                                     }}
                                     disabled={!canMutate}
-                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[rgba(40,52,68,0.62)] disabled:opacity-50"
+                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[#222a3b] disabled:opacity-50"
                                   >
                                     +
                                   </button>
@@ -1768,7 +1768,7 @@ export function RuntimeConfigPanel() {
                                       setLeafDraft(leaf.leafId, sliderValue * 0.5);
                                     }}
                                     disabled={!canMutate}
-                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[rgba(40,52,68,0.62)] disabled:opacity-50"
+                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[#222a3b] disabled:opacity-50"
                                   >
                                     x0.5
                                   </button>
@@ -1778,7 +1778,7 @@ export function RuntimeConfigPanel() {
                                       setLeafDraft(leaf.leafId, sliderValue * 2);
                                     }}
                                     disabled={!canMutate}
-                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[rgba(40,52,68,0.62)] disabled:opacity-50"
+                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[#222a3b] disabled:opacity-50"
                                   >
                                     x2
                                   </button>
@@ -1792,7 +1792,7 @@ export function RuntimeConfigPanel() {
                                       });
                                     }}
                                     disabled={!canMutate}
-                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[rgba(40,52,68,0.62)] disabled:opacity-50"
+                                    className="border border-[var(--line)] rounded px-2 py-1 text-xs text-ink hover:bg-[#222a3b] disabled:opacity-50"
                                   >
                                     clear
                                   </button>
@@ -1807,7 +1807,7 @@ export function RuntimeConfigPanel() {
                                         [leaf.leafId]: event.currentTarget.value,
                                       }));
                                     }}
-                                    className="border border-[var(--line)] rounded-md bg-[rgba(26,29,31,0.94)] px-2 py-1 text-xs text-ink"
+                                    className="border border-[var(--line)] rounded-md bg-[#1a1d1f] px-2 py-1 text-xs text-ink"
                                   />
                                   <button
                                     type="button"
@@ -1818,7 +1818,7 @@ export function RuntimeConfigPanel() {
                                       void applyLeaf(leaf, parsedDraft);
                                     }}
                                     disabled={!dirty || parsedDraft === null || !canMutate}
-                                    className="border border-[rgba(126,196,156,0.5)] rounded-md bg-[rgba(35,70,50,0.9)] px-3 py-1 text-xs font-semibold text-[#def7ea] hover:bg-[rgba(49,96,69,0.92)] disabled:opacity-50"
+                                    className="border border-[#4c6f65] rounded-md bg-[#234632] px-3 py-1 text-xs font-semibold text-[#def7ea] hover:bg-[#316045] disabled:opacity-50"
                                   >
                                     {activeMutationLeafId === leaf.leafId ? "applying..." : "apply"}
                                   </button>
@@ -1828,7 +1828,7 @@ export function RuntimeConfigPanel() {
                                       void resetLeaf(leaf);
                                     }}
                                     disabled={!canMutate}
-                                    className="border border-[rgba(202,150,134,0.48)] rounded-md bg-[rgba(70,42,39,0.88)] px-3 py-1 text-xs font-semibold text-[#ffe0d7] hover:bg-[rgba(96,56,52,0.9)] disabled:opacity-50"
+                                    className="border border-[#6e5558] rounded-md bg-[#402827] px-3 py-1 text-xs font-semibold text-[#ffe0d7] hover:bg-[#603834] disabled:opacity-50"
                                   >
                                     {activeMutationLeafId === leaf.leafId ? "resetting..." : "reset"}
                                   </button>
@@ -1838,9 +1838,9 @@ export function RuntimeConfigPanel() {
                           })
                         )}
 
-                        <details className="rounded-md border border-[rgba(126,166,192,0.2)] bg-[rgba(11,14,18,0.62)] px-2 py-1">
-                          <summary className="cursor-pointer text-[11px] text-muted">raw constant json</summary>
-                          <pre className="mt-1 text-[11px] text-[#c7e6ff] whitespace-pre-wrap break-all">
+                        <details className="rounded-md border border-[#2e364b] bg-[#10121c] px-2 py-1">
+                          <summary className="cursor-pointer text-[12px] text-muted">raw constant json</summary>
+                          <pre className="mt-1 text-[12px] text-[#c7e6ff] whitespace-pre-wrap break-all">
                             {JSON.stringify(entry.value, null, 2)}
                           </pre>
                         </details>

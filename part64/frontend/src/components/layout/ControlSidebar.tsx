@@ -128,11 +128,11 @@ export function ControlSidebar(props: ControlSidebarProps) {
   return (
     <aside
       data-core-wheel="block"
-      className="fixed inset-x-2 bottom-20 z-[74] max-h-[46vh] overflow-y-auto rounded-xl border border-[rgba(137,198,235,0.36)] bg-[linear-gradient(180deg,rgba(7,17,27,0.92),rgba(6,15,24,0.96))] p-3 shadow-[0_12px_30px_rgba(2,8,14,0.34)] pointer-events-auto lg:inset-x-auto lg:bottom-4 lg:right-2 lg:top-24 lg:w-[23rem] lg:max-h-[calc(100vh-8rem)]"
+      className="fixed inset-x-2 bottom-20 z-[74] max-h-[46vh] overflow-y-auto rounded-xl border border-[#415772] bg-[linear-gradient(180deg,#07111b,#060f18)] p-3 shadow-[0_12px_30px_#111323] pointer-events-auto lg:inset-x-auto lg:bottom-4 lg:right-2 lg:top-24 lg:w-[23rem] lg:max-h-[calc(100vh-8rem)]"
     >
       <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-[#a3d3ef]">Simulation Controls</p>
-        <p className="text-[10px] text-[#beddf0]">ui opacity <code>{Math.round(interfaceOpacity * 100)}%</code></p>
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#a3d3ef]">Simulation Controls</p>
+        <p className="text-[12px] text-[#beddf0]">ui opacity <code>{Math.round(interfaceOpacity * 100)}%</code></p>
       </div>
 
       <CoreControlPanel
@@ -189,10 +189,10 @@ export function ControlSidebar(props: ControlSidebarProps) {
         />
       </div>
 
-      <div className="mt-3 rounded-lg border border-[rgba(106,203,242,0.3)] bg-[rgba(8,19,29,0.38)] px-3 py-2">
+      <div className="mt-3 rounded-lg border border-[#324f68] bg-[#131727] px-3 py-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[11px] uppercase tracking-[0.12em] text-[#9ec7dd]">Muse Forge</p>
-          <p className="text-[10px] text-[#b8d9ef]">
+          <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Muse Forge</p>
+          <p className="text-[12px] text-[#b8d9ef]">
             runtime: <code>{museRuntimeSnapshot?.muse_count ?? 0}</code> muses | seq <code>{museRuntimeSnapshot?.event_seq ?? 0}</code>
           </p>
         </div>
@@ -208,18 +208,18 @@ export function ControlSidebar(props: ControlSidebarProps) {
               }
             }}
             placeholder="create muse label (e.g. Archive Witness)"
-            className="min-w-[220px] flex-1 rounded-md border border-[rgba(106,203,242,0.34)] bg-[rgba(10,23,34,0.86)] px-3 py-1.5 text-xs text-[#e6f5ff]"
+            className="min-w-[220px] flex-1 rounded-md border border-[#355670] bg-[#0c1723] px-3 py-1.5 text-xs text-[#e6f5ff]"
           />
           <button
             type="button"
             disabled={agentForgeBusy || !agentForgePreviewId}
             onClick={onCreateMuse}
-            className="rounded-md border border-[rgba(166,226,46,0.45)] bg-[rgba(166,226,46,0.16)] px-3 py-1.5 text-xs font-semibold text-[#e9ffd3] disabled:opacity-45"
+            className="rounded-md border border-[#59742e] bg-[#303a2e] px-3 py-1.5 text-xs font-semibold text-[#e9ffd3] disabled:opacity-45"
           >
             {agentForgeBusy ? "creating..." : "Create Muse"}
           </button>
         </div>
-        <p className="mt-1 text-[10px] text-[#9fc4dd]">
+        <p className="mt-1 text-[12px] text-[#9fc4dd]">
           next id: <code>{agentForgePreviewId || "(type label)"}</code>
         </p>
       </div>

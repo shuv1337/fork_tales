@@ -1128,9 +1128,9 @@ function drawHologramAudioBaseCanvas(
   context.putImageData(spectrogramImage, 0, 0);
 
   const waveTop = topHeight;
-  context.fillStyle = "rgba(6, 16, 28, 0.96)";
+  context.fillStyle = "#06101c";
   context.fillRect(0, waveTop, width, waveHeight);
-  context.strokeStyle = "rgba(120, 188, 220, 0.42)";
+  context.strokeStyle = "#415e77";
   context.lineWidth = Math.max(1, width / 1100);
   context.beginPath();
   context.moveTo(0, waveTop + (waveHeight / 2));
@@ -1139,7 +1139,7 @@ function drawHologramAudioBaseCanvas(
 
   const waveBins = visualization.waveformBins;
   const waveBinCount = Math.max(1, waveBins.length);
-  context.strokeStyle = "rgba(176, 236, 255, 0.92)";
+  context.strokeStyle = "#b0ecff";
   context.lineWidth = Math.max(1.2, width / 820);
   context.beginPath();
   for (let x = 0; x < width; x += 1) {
@@ -1167,9 +1167,9 @@ function drawHologramAudioPlayhead(
   const ratio = clamp01(ratioInput);
   const x = ratio * width;
   context.clearRect(0, 0, width, height);
-  context.strokeStyle = "rgba(255, 242, 204, 0.94)";
+  context.strokeStyle = "#fff2cc";
   context.lineWidth = Math.max(1.2, width / 1100);
-  context.shadowColor = "rgba(255, 227, 160, 0.76)";
+  context.shadowColor = "#c8b284";
   context.shadowBlur = Math.max(4, width / 250);
   context.beginPath();
   context.moveTo(x, 0);
@@ -1178,7 +1178,7 @@ function drawHologramAudioPlayhead(
   context.shadowBlur = 0;
 
   const markerRadius = Math.max(3.5, width / 220);
-  context.fillStyle = "rgba(255, 236, 188, 0.94)";
+  context.fillStyle = "#ffecbc";
   context.beginPath();
   context.arc(x, markerRadius + 2, markerRadius, 0, Math.PI * 2);
   context.fill();
@@ -6123,7 +6123,7 @@ export function SimulationCanvas({
 
   const containerClassName = backgroundMode
     ? `relative h-full w-full overflow-hidden ${className}`.trim()
-    : `relative mt-3 border border-[rgba(36,31,26,0.16)] rounded-xl overflow-hidden bg-gradient-to-b from-[#0f1a1f] to-[#131b2a] ${className}`.trim();
+    : `relative mt-3 border border-[#1b1a2a] rounded-xl overflow-hidden bg-gradient-to-b from-[#0f1a1f] to-[#131b2a] ${className}`.trim();
   const canvasHeight: number | string = backgroundMode ? "100%" : height;
   const canvasPointerEvents = interactive ? "auto" : "none";
   const worldscreenCenterRatio = worldscreenPinnedCenterRatio ?? glassCenterRatio;
@@ -6515,20 +6515,20 @@ export function SimulationCanvas({
           {graphNodeTitleOverlays.map((row) => (
             <div
               key={`graph-node-title-${row.id}`}
-              className={`absolute pointer-events-auto max-w-[15rem] -translate-x-1/2 -translate-y-full rounded border px-1.5 py-0.5 text-[10px] leading-4 whitespace-nowrap overflow-hidden text-ellipsis shadow-[0_8px_22px_rgba(0,0,0,0.32)] ${
+              className={`absolute pointer-events-auto max-w-[15rem] -translate-x-1/2 -translate-y-full rounded border px-1.5 py-0.5 text-[12px] leading-4 whitespace-nowrap overflow-hidden text-ellipsis shadow-[0_8px_22px_#11111f] ${
                 row.isTrueGraph && row.label.toLowerCase().startsWith("[bundle]")
-                  ? "border-[rgba(255,142,220,0.9)] bg-[rgba(61,12,51,0.9)] text-[#ffe3ff]"
+                  ? "border-[#ff8edc] bg-[#3d0c33] text-[#ffe3ff]"
                   : row.isTrueGraph
-                    ? "border-[rgba(230,129,255,0.82)] bg-[rgba(42,9,63,0.86)] text-[#f6d7ff]"
+                    ? "border-[#c16ed9] bg-[#270b3c] text-[#f6d7ff]"
                   : row.label.toLowerCase().startsWith("[bundle]")
-                  ? "border-[rgba(255,196,108,0.58)] bg-[rgba(58,36,10,0.72)] text-[#ffe7bf]"
+                  ? "border-[#9e7c51] bg-[#312114] text-[#ffe7bf]"
                   : row.kind === "file"
-                  ? "border-[rgba(152,216,255,0.44)] bg-[rgba(11,30,48,0.68)] text-[#dff3ff]"
+                  ? "border-[#516d89] bg-[#0f1c2f] text-[#dff3ff]"
                   : row.kind === "crawler"
-                    ? "border-[rgba(186,210,164,0.38)] bg-[rgba(23,36,30,0.65)] text-[#d7f0dc]"
+                    ? "border-[#565f5a] bg-[#182023] text-[#d7f0dc]"
                     : row.kind === "nexus"
-                      ? "border-[rgba(189,206,255,0.44)] bg-[rgba(19,28,52,0.68)] text-[#e5ecff]"
-                      : "border-[rgba(178,190,232,0.44)] bg-[rgba(18,23,40,0.68)] text-[#e2e8ff]"
+                      ? "border-[#616989] bg-[#151b32] text-[#e5ecff]"
+                      : "border-[#5c627f] bg-[#141729] text-[#e2e8ff]"
               }`}
               onPointerDown={(event) => {
                 if (event.button !== 0) {
@@ -6550,8 +6550,8 @@ export function SimulationCanvas({
       ) : null}
       {!compactHud ? (
         <div className="absolute top-2 right-2 z-10 w-[min(96%,31rem)] pointer-events-auto">
-          <div className="rounded-md border border-[rgba(137,178,220,0.32)] bg-[rgba(9,22,36,0.72)] px-2 py-2 backdrop-blur-[2px]">
-            <p className="text-[9px] uppercase tracking-[0.13em] text-[#a8d3f7]">view lanes</p>
+          <div className="rounded-md border border-[#3d4a65] bg-[#0d1726] px-2 py-2">
+            <p className="text-[12px] uppercase tracking-[0.13em] text-[#a8d3f7]">view lanes</p>
             {!overlayViewLocked ? (
               <div className="mt-1 flex flex-wrap gap-1">
                 {OVERLAY_VIEW_OPTIONS.map((option) => (
@@ -6559,10 +6559,10 @@ export function SimulationCanvas({
                     key={option.id}
                     type="button"
                     onClick={() => setOverlayView(option.id)}
-                    className={`rounded-md border px-2 py-1 text-[10px] font-semibold transition-colors ${
+                    className={`rounded-md border px-2 py-1 text-[12px] font-semibold transition-colors ${
                       overlayView === option.id
-                        ? "border-[rgba(146,229,255,0.82)] bg-[rgba(66,170,214,0.34)] text-[#e8f8ff]"
-                        : "border-[rgba(128,167,204,0.42)] bg-[rgba(15,34,54,0.62)] text-[#c4d7f0] hover:bg-[rgba(33,64,96,0.74)]"
+                        ? "border-[#7cc0d9] bg-[#274a67] text-[#e8f8ff]"
+                        : "border-[#445570] bg-[#131e32] text-[#c4d7f0] hover:bg-[#1f3653]"
                     }`}
                   >
                     {option.label}
@@ -6570,28 +6570,28 @@ export function SimulationCanvas({
                 ))}
               </div>
             ) : (
-              <p className="mt-1 text-[10px] text-[#d3ebff]">lane locked: {activeOverlayView.label}</p>
+              <p className="mt-1 text-[12px] text-[#d3ebff]">lane locked: {activeOverlayView.label}</p>
             )}
-            <p className="mt-1 text-[10px] text-[#bcd8ef]">{activeOverlayView.description}</p>
-            <p className="mt-1 text-[10px] text-[#9fc7e3]">
+            <p className="mt-1 text-[12px] text-[#bcd8ef]">{activeOverlayView.description}</p>
+            <p className="mt-1 text-[12px] text-[#9fc7e3]">
               swarm mode braids nearby packets by owner + direction.
             </p>
             {interactive ? (
-              <p className="mt-1 text-[10px] text-[#c4d7f0]">single tap centers nexus in glass lane · double tap opens hologram / 単タップで中心化・ダブルで起動</p>
+              <p className="mt-1 text-[12px] text-[#c4d7f0]">single tap centers nexus in glass lane · double tap opens hologram / 単タップで中心化・ダブルで起動</p>
             ) : null}
-            <div className="mt-2 rounded border border-[rgba(122,198,228,0.32)] bg-[rgba(10,27,42,0.56)] px-2 py-1.5">
-              <p className="text-[9px] uppercase tracking-[0.11em] text-[#9fd5f2]">mp3 nexus tools</p>
-              <p className="mt-1 text-[10px] text-[#c8e4f5]">
+            <div className="mt-2 rounded border border-[#385168] bg-[#111a2b] px-2 py-1.5">
+              <p className="text-[12px] uppercase tracking-[0.11em] text-[#9fd5f2]">mp3 nexus tools</p>
+              <p className="mt-1 text-[12px] text-[#c8e4f5]">
                 mp3 matches: {musicNexusNodeCount} · visible matches: {musicNexusHotspotsRef.current.length}
               </p>
               <div className="mt-1.5 flex flex-wrap gap-1">
                 <button
                   type="button"
                   onClick={() => setMusicNexusSpotlight((previous) => !previous)}
-                  className={`rounded border px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                  className={`rounded border px-2 py-0.5 text-[12px] font-semibold transition-colors ${
                     musicNexusSpotlight
-                      ? "border-[rgba(128,236,255,0.82)] bg-[rgba(62,172,192,0.38)] text-[#ecfbff]"
-                      : "border-[rgba(122,177,209,0.42)] bg-[rgba(12,33,52,0.62)] text-[#bed8ee] hover:bg-[rgba(26,58,85,0.74)]"
+                      ? "border-[#6dc6d9] bg-[#275165] text-[#ecfbff]"
+                      : "border-[#425972] bg-[#111e31] text-[#bed8ee] hover:bg-[#1a314a]"
                   }`}
                 >
                   {musicNexusSpotlight ? "mp3 spotlight on" : "mp3 spotlight off"}
@@ -6599,28 +6599,28 @@ export function SimulationCanvas({
                 <button
                   type="button"
                   onClick={focusNextMusicNexus}
-                  className="rounded border border-[rgba(128,236,255,0.64)] bg-[rgba(25,94,116,0.38)] px-2 py-0.5 text-[10px] font-semibold text-[#dff7ff] hover:bg-[rgba(38,126,150,0.44)]"
+                  className="rounded border border-[#5ba0b3] bg-[#193348] px-2 py-0.5 text-[12px] font-semibold text-[#dff7ff] hover:bg-[#1f465b]"
                 >
                   jump to next mp3 nexus
                 </button>
               </div>
               {musicNexusJumpLabel ? (
-                <p className="mt-1 text-[10px] text-[#a9d9ee]">focus: {musicNexusJumpLabel}</p>
+                <p className="mt-1 text-[12px] text-[#a9d9ee]">focus: {musicNexusJumpLabel}</p>
               ) : null}
             </div>
           </div>
-          <div className="mt-2 rounded-md border border-[rgba(126,214,247,0.34)] bg-[rgba(7,19,33,0.76)] px-2 py-2 shadow-[0_14px_30px_rgba(0,9,20,0.34)]">
+          <div className="mt-2 rounded-md border border-[#3c5972] bg-[#0b1424] px-2 py-2 shadow-[0_14px_30px_#111425]">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[9px] uppercase tracking-[0.13em] text-[#a9d8f2]">compute insight</p>
+              <p className="text-[12px] uppercase tracking-[0.13em] text-[#a9d8f2]">compute insight</p>
               <button
                 type="button"
                 onClick={() => setComputePanelCollapsed((prev) => !prev)}
-                className="rounded border border-[rgba(136,193,226,0.4)] bg-[rgba(17,42,64,0.58)] px-2 py-0.5 text-[10px] font-semibold text-[#d7edff]"
+                className="rounded border border-[#465c76] bg-[#142338] px-2 py-0.5 text-[12px] font-semibold text-[#d7edff]"
               >
                 {computePanelCollapsed ? "expand" : "collapse"}
               </button>
             </div>
-            <p className="mt-1 text-[10px] text-[#bed9ee]">
+            <p className="mt-1 text-[12px] text-[#bed9ee]">
               jobs 180s: {computeJobInsights.total180s} · window: {computeJobInsights.rows.length} · gpu idle est: {Math.round(computeJobInsights.gpuAvailability * 100)}%
             </p>
             {!computePanelCollapsed ? (
@@ -6631,17 +6631,17 @@ export function SimulationCanvas({
                       key={option.id}
                       type="button"
                       onClick={() => setComputeJobFilter(option.id)}
-                      className={`rounded border px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                      className={`rounded border px-2 py-0.5 text-[12px] font-semibold transition-colors ${
                         computeJobFilter === option.id
-                          ? "border-[rgba(144,227,255,0.78)] bg-[rgba(54,142,188,0.38)] text-[#e8f9ff]"
-                          : "border-[rgba(120,170,206,0.38)] bg-[rgba(14,33,52,0.62)] text-[#bed8ee] hover:bg-[rgba(27,58,85,0.74)]"
+                          ? "border-[#76b6d1] bg-[#244663] text-[#e8f9ff]"
+                          : "border-[#3d506a] bg-[#121e31] text-[#bed8ee] hover:bg-[#1a314a]"
                       }`}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
-                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-[#c9e3f6]">
+                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[12px] text-[#c9e3f6]">
                   <p>llm: {computeJobInsights.summary.llm}</p>
                   <p>embed: {computeJobInsights.summary.embedding}</p>
                   <p>ok: {computeJobInsights.summary.ok}</p>
@@ -6656,22 +6656,22 @@ export function SimulationCanvas({
                     .map(([backend, count]) => (
                       <span
                         key={backend}
-                        className="rounded border border-[rgba(116,172,205,0.34)] bg-[rgba(9,28,45,0.64)] px-1.5 py-0.5 text-[10px] text-[#b8d7ec]"
+                        className="rounded border border-[#384b64] bg-[#0f1b2d] px-1.5 py-0.5 text-[12px] text-[#b8d7ec]"
                       >
                         {backend}:{count}
                       </span>
                     ))}
                 </div>
-                <div className="mt-2 max-h-44 overflow-auto rounded border border-[rgba(114,177,214,0.3)] bg-[rgba(4,13,24,0.64)] p-1.5">
+                <div className="mt-2 max-h-44 overflow-auto rounded border border-[#344760] bg-[#0b111f] p-1.5">
                   {computeJobInsights.filtered.length <= 0 ? (
-                    <p className="text-[10px] text-[#99c0dc]">no compute jobs for selected filter</p>
+                    <p className="text-[12px] text-[#99c0dc]">no compute jobs for selected filter</p>
                   ) : (
                     computeJobInsights.filtered.slice(0, 10).map((row) => (
                       <article
                         key={row.id}
-                        className="mb-1.5 rounded border border-[rgba(94,149,183,0.26)] bg-[rgba(10,27,42,0.7)] px-1.5 py-1 last:mb-0"
+                        className="mb-1.5 rounded border border-[#2b3951] bg-[#0e1a2b] px-1.5 py-1 last:mb-0"
                       >
-                        <p className="text-[10px] text-[#d8efff]">
+                        <p className="text-[12px] text-[#d8efff]">
                           <span className="font-semibold">{row.kind}</span>
                           <span className="text-[#9fc4df]"> · </span>
                           <span>{row.op || "op"}</span>
@@ -6680,13 +6680,13 @@ export function SimulationCanvas({
                           <span className="text-[#9fc4df]"> · </span>
                           <span>{row.resource || "resource"}</span>
                         </p>
-                        <p className="text-[10px] text-[#a9cde7]">
+                        <p className="text-[12px] text-[#a9cde7]">
                           {computeJobAgeLabel(row.tsMs)} ago · {row.status}
                           {row.latencyMs !== null ? ` · ${Math.round(row.latencyMs)}ms` : ""}
                           {row.model ? ` · ${row.model}` : ""}
                         </p>
                         {row.error ? (
-                          <p className="text-[10px] text-[#ffcdae] line-clamp-2">{row.error}</p>
+                          <p className="text-[12px] text-[#ffcdae] line-clamp-2">{row.error}</p>
                         ) : null}
                       </article>
                     ))
@@ -6698,9 +6698,9 @@ export function SimulationCanvas({
         </div>
       ) : null}
       {!compactHud ? (
-        <div className="absolute top-2 left-2 pointer-events-none rounded-md border border-[rgba(130,176,220,0.32)] bg-[rgba(8,20,33,0.62)] px-2 py-1">
-          <p className="text-[9px] uppercase tracking-[0.11em] text-[#a8d3f7]">node legend</p>
-          <p className="text-[10px]">
+        <div className="absolute top-2 left-2 pointer-events-none rounded-md border border-[#3b4a65] bg-[#0e1625] px-2 py-1">
+          <p className="text-[12px] uppercase tracking-[0.11em] text-[#a8d3f7]">node legend</p>
+          <p className="text-[12px]">
             <span className="text-[#ffd76a]">TEXT</span>
             <span className="text-[#c8dcf3]"> · </span>
             <span className="text-[#ff87d4]">IMAGE</span>
@@ -6711,15 +6711,15 @@ export function SimulationCanvas({
             <span className="text-[#c8dcf3]"> · </span>
             <span className="text-[#9fb3c8]">BLOB</span>
           </p>
-          <p className="text-[10px]">
+          <p className="text-[12px]">
             <span className="text-[#8ccfff]">LINK</span>
             <span className="text-[#c8dcf3]"> · </span>
             <span className="text-[#9ce9bb]">WEBSITE</span>
             <span className="text-[#c8dcf3]"> · </span>
             <span className="text-[#ff9f77]">VIDEO</span>
           </p>
-          <p className="text-[10px] text-[#a7f2ff]">MUSIC NEXUS: cyan ring + [music] label</p>
-          <p className="text-[10px] text-[#cfdcff]">NEXUS META: tag / field / presence nodes</p>
+          <p className="text-[12px] text-[#a7f2ff]">MUSIC NEXUS: cyan ring + [music] label</p>
+          <p className="text-[12px] text-[#cfdcff]">NEXUS META: tag / field / presence nodes</p>
         </div>
       ) : null}
       {!compactHud ? (
@@ -6729,7 +6729,7 @@ export function SimulationCanvas({
       ) : null}
       {interactive ? (
         <div
-          className={`absolute left-2 z-20 pointer-events-none rounded-md border border-[rgba(122,182,220,0.34)] bg-[rgba(6,16,28,0.72)] px-2 py-1.5 text-[10px] text-[#cde8ff] ${
+          className={`absolute left-2 z-20 pointer-events-none rounded-md border border-[#3a4f69] bg-[#0b1221] px-2 py-1.5 text-[12px] text-[#cde8ff] ${
             compactHud ? "bottom-10 max-w-[19rem]" : "bottom-12 max-w-[24rem]"
           }`}
         >
@@ -6791,7 +6791,7 @@ export function SimulationCanvas({
           ) : (
             <p className="text-[#a7c7df]">truth/view contracts not present in current simulation snapshot.</p>
           )}
-          <div className="my-1 border-t border-[rgba(117,158,190,0.3)]" />
+          <div className="my-1 border-t border-[#354159]" />
           <p className="uppercase tracking-[0.1em] text-[#9fd2f3]">particle key</p>
           {overlayParticleModeActive ? (
             <>
@@ -6831,7 +6831,7 @@ export function SimulationCanvas({
           <button
             type="button"
             onClick={() => setModelDockOpen((prev) => !prev)}
-            className="rounded-md border border-[rgba(132,200,239,0.5)] bg-[rgba(15,38,58,0.72)] px-2.5 py-1 text-[11px] font-semibold text-[#d7efff] shadow-[0_10px_24px_rgba(0,9,20,0.45)] hover:bg-[rgba(26,58,83,0.85)]"
+            className="rounded-md border border-[#4f718e] bg-[#122236] px-2.5 py-1 text-[12px] font-semibold text-[#d7efff] shadow-[0_10px_24px_#0e1222] hover:bg-[#1a354d]"
           >
             {modelDockOpen ? "hide model dock" : "model dock"}
           </button>
@@ -6855,7 +6855,7 @@ export function SimulationCanvas({
                   refY="4"
                   orient="auto-start-reverse"
                 >
-                  <path d="M0,0 L8,4 L0,8 z" fill="rgba(158,226,255,0.9)" />
+                  <path d="M0,0 L8,4 L0,8 z" fill="#9ee2ff" />
                 </marker>
               </defs>
               <line
@@ -6863,7 +6863,7 @@ export function SimulationCanvas({
                 y1={`${(worldscreenConnector.startY * 100).toFixed(2)}%`}
                 x2={`${(worldscreenConnector.endX * 100).toFixed(2)}%`}
                 y2={`${(worldscreenConnector.endY * 100).toFixed(2)}%`}
-                stroke="rgba(158,226,255,0.76)"
+                stroke="#7eb2cc"
                 strokeWidth="2"
                 strokeDasharray="5 4"
                 markerEnd="url(#worldscreen-connector-arrow)"
@@ -6872,8 +6872,8 @@ export function SimulationCanvas({
                 cx={`${(worldscreenConnector.startX * 100).toFixed(2)}%`}
                 cy={`${(worldscreenConnector.startY * 100).toFixed(2)}%`}
                 r="4"
-                fill="rgba(120,205,255,0.9)"
-                stroke="rgba(224,246,255,0.84)"
+                fill="#78cdff"
+                stroke="#c0d2dd"
                 strokeWidth="1"
               />
             </svg>
@@ -6881,7 +6881,7 @@ export function SimulationCanvas({
           <section
             data-core-pointer="block"
             data-core-wheel="block"
-            className="pointer-events-auto absolute rounded-2xl border border-[rgba(126,218,255,0.58)] bg-[linear-gradient(164deg,rgba(6,16,30,0.88),rgba(10,30,48,0.82),rgba(7,18,34,0.9))] backdrop-blur-[5px] shadow-[0_30px_90px_rgba(0,18,42,0.56)] overflow-hidden"
+            className="pointer-events-auto absolute rounded-2xl border border-[#5489a7] bg-[linear-gradient(164deg,#08111f,#0c1d2f,#071222)] shadow-[0_30px_90px_#0b152b] overflow-hidden"
             style={
               worldscreenPlacement
                 ? {
@@ -6897,35 +6897,35 @@ export function SimulationCanvas({
                 : undefined
             }
           >
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(132,212,255,0.08)_48%,transparent_100%)] bg-[length:100%_3px] opacity-40" />
-            <div className="pointer-events-none absolute -inset-8 bg-[radial-gradient(circle_at_75%_8%,rgba(74,220,255,0.26),transparent_42%),radial-gradient(circle_at_22%_88%,rgba(255,156,94,0.2),transparent_46%)]" />
-            <header className="relative h-14 px-4 flex items-center justify-between border-b border-[rgba(132,196,244,0.35)] bg-[rgba(7,19,33,0.76)]">
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_0%,#22283e_48%,transparent_100%)] bg-[length:100%_3px] opacity-40" />
+            <div className="pointer-events-none absolute -inset-8 bg-[radial-gradient(circle_at_75%_8%,#264c64,transparent_42%),radial-gradient(circle_at_22%_88%,#473437,transparent_46%)]" />
+            <header className="relative h-14 px-4 flex items-center justify-between border-b border-[#3f5573] bg-[#0b1424]">
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-[#a9dbff]">hologram worldscreen / 投影スクリーン</p>
+                <p className="text-[12px] uppercase tracking-[0.14em] text-[#a9dbff]">hologram worldscreen / 投影スクリーン</p>
                 <p className="text-sm text-[#ecf7ff] font-semibold truncate">
                   {worldscreen.label}
-                  <span className="text-[11px] text-[#b9dcf7]"> ({worldscreen.nodeKind})</span>
+                  <span className="text-[12px] text-[#b9dcf7]"> ({worldscreen.nodeKind})</span>
                 </p>
-                <p className="text-[10px] text-[#9bc3df]">{worldscreen.subtitle}</p>
+                <p className="text-[12px] text-[#9bc3df]">{worldscreen.subtitle}</p>
               </div>
               <div className="flex items-center gap-2 pl-3">
-                <div className="flex items-center gap-1 rounded-md border border-[rgba(127,190,226,0.34)] bg-[rgba(10,28,45,0.48)] px-1 py-1">
+                <div className="flex items-center gap-1 rounded-md border border-[#3c516b] bg-[#121a2d] px-1 py-1">
                   {HOLOGRAM_MODE_OPTIONS.map((option) => (
                     <button
                       key={option.id}
                       type="button"
                       onClick={() => setWorldscreenMode(option.id)}
-                      className={`rounded px-2 py-1 text-[10px] font-semibold transition-colors ${
+                      className={`rounded px-2 py-1 text-[12px] font-semibold transition-colors ${
                         worldscreenMode === option.id
-                          ? "bg-[rgba(82,162,206,0.4)] text-[#ecf8ff]"
-                          : "text-[#b3d4ea] hover:bg-[rgba(47,98,136,0.32)]"
+                          ? "bg-[#30506e] text-[#ecf8ff]"
+                          : "text-[#b3d4ea] hover:bg-[#20314a]"
                       }`}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
-                <span className="text-[10px] px-2 py-1 rounded-md border border-[rgba(142,223,255,0.44)] text-[#d8f3ff] bg-[rgba(33,95,132,0.24)]">
+                <span className="text-[12px] px-2 py-1 rounded-md border border-[#4d7089] text-[#d8f3ff] bg-[#1b2a42]">
                   {resourceKindLabel(worldscreen.resourceKind)}
                 </span>
                 {String(worldscreen.url ?? "").trim().length > 0 ? (
@@ -6933,7 +6933,7 @@ export function SimulationCanvas({
                     href={worldscreen.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs px-2.5 py-1 rounded-md border border-[rgba(145,190,240,0.42)] text-[#d4ebff] hover:bg-[rgba(72,119,170,0.2)]"
+                    className="text-xs px-2.5 py-1 rounded-md border border-[#4b5e7f] text-[#d4ebff] hover:bg-[#232c46]"
                   >
                     new tab
                   </a>
@@ -6951,7 +6951,7 @@ export function SimulationCanvas({
                     setWorldscreenPinnedCenterRatio(null);
                     setWorldscreenMode("overview");
                   }}
-                  className="text-xs px-2.5 py-1 rounded-md border border-[rgba(245,200,171,0.45)] text-[#ffe6d2] hover:bg-[rgba(187,120,78,0.2)]"
+                  className="text-xs px-2.5 py-1 rounded-md border border-[#7c6866] text-[#ffe6d2] hover:bg-[#3a2c34]"
                 >
                   close
                 </button>
@@ -6959,13 +6959,13 @@ export function SimulationCanvas({
             </header>
             <div className="relative h-[calc(100%-3.5rem)] p-2 sm:p-3">
               {worldscreenMode === "overview" ? (
-                <div className="h-full rounded-xl border border-[rgba(143,214,255,0.38)] bg-[linear-gradient(180deg,rgba(5,16,30,0.92),rgba(5,15,26,0.88))] overflow-hidden p-3 text-[#d9eeff]">
+                <div className="h-full rounded-xl border border-[#46617d] bg-[linear-gradient(180deg,#05101e,#07101c)] overflow-hidden p-3 text-[#d9eeff]">
                   <div className="grid h-full gap-3 lg:grid-cols-[minmax(16rem,0.9fr)_minmax(0,1.1fr)]">
                     <aside className="overflow-auto pr-1">
-                      <p className="text-[11px] uppercase tracking-[0.12em] text-[#9fd0ef]">
+                      <p className="text-[12px] uppercase tracking-[0.12em] text-[#9fd0ef]">
                         Remote resource metadata from crawler encounter
                       </p>
-                      <div className="mt-2 grid gap-1.5 text-[11px] leading-5">
+                      <div className="mt-2 grid gap-1.5 text-[12px] leading-5">
                         {worldscreenMetadataDetails.map((row) => (
                           <div key={`${row.key}:${row.value}`} className="grid grid-cols-[auto,1fr] gap-2">
                             <span className="text-[#87afcc] uppercase tracking-[0.08em]">{row.key}</span>
@@ -6990,7 +6990,7 @@ export function SimulationCanvas({
                                       href={link}
                                       target="_blank"
                                       rel="noreferrer"
-                                      className="rounded border border-[rgba(113,181,220,0.35)] bg-[rgba(15,45,68,0.5)] px-1.5 py-0.5 text-[10px] text-[#d2edff]"
+                                      className="rounded border border-[#38506a] bg-[#142339] px-1.5 py-0.5 text-[12px] text-[#d2edff]"
                                     >
                                       open link
                                     </a>
@@ -7001,20 +7001,20 @@ export function SimulationCanvas({
                           </div>
                         ))}
                       </div>
-                      <div className="mt-3 rounded border border-[rgba(112,174,207,0.32)] bg-[rgba(8,22,35,0.62)] p-2">
-                        <p className="text-[10px] uppercase tracking-[0.1em] text-[#95c4e1]">conversation quick stats</p>
-                        <p className="text-[11px] text-[#c9e7fb]">comments {imageCommentStats.total} · participants {imageCommentStats.participants}</p>
-                        <p className="text-[11px] text-[#c9e7fb]">threads {imageCommentStats.rootCommentCount} · depth {imageCommentStats.deepestDepth}</p>
+                      <div className="mt-3 rounded border border-[#354961] bg-[#0e1727] p-2">
+                        <p className="text-[12px] uppercase tracking-[0.1em] text-[#95c4e1]">conversation quick stats</p>
+                        <p className="text-[12px] text-[#c9e7fb]">comments {imageCommentStats.total} · participants {imageCommentStats.participants}</p>
+                        <p className="text-[12px] text-[#c9e7fb]">threads {imageCommentStats.rootCommentCount} · depth {imageCommentStats.deepestDepth}</p>
                       </div>
                       {worldscreen.projectionMemberManifest && worldscreen.projectionMemberManifest.length > 0 ? (
-                        <div className="mt-3 rounded border border-[rgba(224,176,108,0.34)] bg-[rgba(46,30,10,0.45)] p-2">
-                          <p className="text-[10px] uppercase tracking-[0.1em] text-[#ffd8a9]">bundle manifest</p>
-                          <p className="text-[10px] text-[#f2d9bb]">
+                        <div className="mt-3 rounded border border-[#5d4d43] bg-[#231b1d] p-2">
+                          <p className="text-[12px] uppercase tracking-[0.1em] text-[#ffd8a9]">bundle manifest</p>
+                          <p className="text-[12px] text-[#f2d9bb]">
                             group <code>{worldscreen.projectionGroupId || "(unknown)"}</code> · files {worldscreen.projectionMemberManifest.length}
                           </p>
-                          <div className="mt-1.5 max-h-40 overflow-auto rounded border border-[rgba(225,172,112,0.28)] bg-[rgba(24,15,5,0.56)] p-1.5">
+                          <div className="mt-1.5 max-h-40 overflow-auto rounded border border-[#514240] bg-[#181317] p-1.5">
                             {worldscreen.projectionMemberManifest.map((path, index) => (
-                              <p key={`${worldscreen.projectionGroupId || "bundle"}:${path}`} className="text-[10px] leading-5 text-[#ffe8cd] break-all">
+                              <p key={`${worldscreen.projectionGroupId || "bundle"}:${path}`} className="text-[12px] leading-5 text-[#ffe8cd] break-all">
                                 {index + 1}. {path}
                               </p>
                             ))}
@@ -7023,20 +7023,20 @@ export function SimulationCanvas({
                       ) : null}
                     </aside>
 
-                    <section className="overflow-auto rounded-lg border border-[rgba(124,205,247,0.3)] bg-[rgba(6,17,29,0.56)] p-2">
+                    <section className="overflow-auto rounded-lg border border-[#374f6a] bg-[#0e1424] p-2">
                       {worldscreen.view === "video" ? (
                         <video
                           controls
                           autoPlay
                           src={worldscreen.url}
-                          className="w-full max-h-[56vh] rounded-md bg-[rgba(4,9,16,0.86)]"
+                          className="w-full max-h-[56vh] rounded-md bg-[#070b14]"
                         >
                           <track kind="captions" />
                         </video>
                       ) : null}
 
                       {worldscreen.view === "editor" ? (
-                        <div className="min-h-[20rem] overflow-hidden rounded-md border border-[rgba(143,214,255,0.22)]">
+                        <div className="min-h-[20rem] overflow-hidden rounded-md border border-[#33435b]">
                           {editorPreview.status === "loading" ? (
                             <div className="h-full min-h-[20rem] grid place-items-center text-sm text-[#b8e0ff]">loading file preview...</div>
                           ) : null}
@@ -7044,7 +7044,7 @@ export function SimulationCanvas({
                             <div className="h-full min-h-[20rem] grid place-items-center text-sm text-[#ffd6bb]">{editorPreview.error}</div>
                           ) : null}
                           {editorPreview.status === "ready" ? (
-                            <pre className="h-full max-h-[56vh] overflow-auto px-3 py-2 text-[11px] leading-5 font-mono text-[#d9eeff]">
+                            <pre className="h-full max-h-[56vh] overflow-auto px-3 py-2 text-[12px] leading-5 font-mono text-[#d9eeff]">
                               {editorPreview.content.split(/\r?\n/).slice(0, 220).map((line, index) => (
                                 <div key={`${index}-${line.length}`} className="flex items-start gap-3">
                                   <span className="w-8 shrink-0 text-right text-[#6797ba]">{index + 1}</span>
@@ -7060,11 +7060,11 @@ export function SimulationCanvas({
                       ) : null}
 
                       {worldscreen.view === "markdown" ? (
-                        <article className="min-h-[20rem] max-h-[56vh] overflow-auto rounded-md border border-[rgba(140,210,246,0.34)] bg-[rgba(4,12,22,0.86)] px-3 py-2">
-                          <p className="mb-2 text-[10px] uppercase tracking-[0.1em] text-[#9ed1ef]">
+                        <article className="min-h-[20rem] max-h-[56vh] overflow-auto rounded-md border border-[#405872] bg-[#070d19] px-3 py-2">
+                          <p className="mb-2 text-[12px] uppercase tracking-[0.1em] text-[#9ed1ef]">
                             crawler markdown projection
                           </p>
-                          <pre className="whitespace-pre-wrap break-words text-[11px] leading-5 text-[#d7ebff]">
+                          <pre className="whitespace-pre-wrap break-words text-[12px] leading-5 text-[#d7ebff]">
                             {worldscreenCrawlerMarkdown}
                           </pre>
                         </article>
@@ -7074,7 +7074,7 @@ export function SimulationCanvas({
                         <iframe
                           title={`worldscreen-${worldscreen.label}`}
                           src={worldscreen.url}
-                          className="w-full h-[56vh] rounded-md border border-[rgba(143,214,255,0.3)] bg-[#06101e]"
+                          className="w-full h-[56vh] rounded-md border border-[#3d526c] bg-[#06101e]"
                           referrerPolicy="no-referrer"
                         />
                       ) : null}
@@ -7082,7 +7082,7 @@ export function SimulationCanvas({
                       {worldscreen.view === "metadata" ? (
                         <>
                           {worldscreen.resourceKind === "audio" ? (
-                            <div className="rounded-md border border-[rgba(136,205,238,0.34)] bg-[rgba(5,15,28,0.84)] p-2">
+                            <div className="rounded-md border border-[#3f566f] bg-[#08101e] p-2">
                               <audio
                                 ref={worldscreenAudioElementRef}
                                 controls
@@ -7092,13 +7092,13 @@ export function SimulationCanvas({
                               >
                                 <track kind="captions" />
                               </audio>
-                              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] text-[#bcdcf1]">
+                              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[12px] text-[#bcdcf1]">
                                 <p className="uppercase tracking-[0.09em] text-[#a9d7f2]">mp3 waveform + spectrogram</p>
                                 <p className="font-mono text-[#dff2ff]">{worldscreenAudioClockText}</p>
                               </div>
                               <div
                                 data-core-pointer="block"
-                                className="mt-2 relative h-56 w-full cursor-ew-resize overflow-hidden rounded border border-[rgba(126,190,226,0.34)] bg-[rgba(5,12,20,0.92)]"
+                                className="mt-2 relative h-56 w-full cursor-ew-resize overflow-hidden rounded border border-[#3c516b] bg-[#050c14]"
                                 onPointerDown={(event) => {
                                   event.preventDefault();
                                   event.stopPropagation();
@@ -7144,14 +7144,14 @@ export function SimulationCanvas({
                                   className="pointer-events-none absolute inset-0 h-full w-full"
                                 />
                               </div>
-                              <p className="mt-1 text-[10px] text-[#9ec4dc]">
+                              <p className="mt-1 text-[12px] text-[#9ec4dc]">
                                 click or drag the visual to seek. the vertical line follows playback in real-time.
                               </p>
                               {worldscreenAudioVizStatus === "loading" ? (
-                                <p className="mt-1 text-[10px] text-[#a9d8ee]">building waveform and spectrogram...</p>
+                                <p className="mt-1 text-[12px] text-[#a9d8ee]">building waveform and spectrogram...</p>
                               ) : null}
                               {worldscreenAudioVizStatus === "error" ? (
-                                <p className="mt-1 text-[10px] text-[#ffd8be]">{worldscreenAudioVizError}</p>
+                                <p className="mt-1 text-[12px] text-[#ffd8be]">{worldscreenAudioVizError}</p>
                               ) : null}
                             </div>
                           ) : worldscreen.resourceKind === "video" ? (
@@ -7159,7 +7159,7 @@ export function SimulationCanvas({
                               controls
                               preload="metadata"
                               src={worldscreen.remoteFrameUrl || worldscreen.url}
-                              className="w-full max-h-[52vh] rounded-md bg-[rgba(4,9,16,0.86)]"
+                              className="w-full max-h-[52vh] rounded-md bg-[#070b14]"
                             >
                               <track kind="captions" />
                             </video>
@@ -7167,11 +7167,11 @@ export function SimulationCanvas({
                             <img
                               src={worldscreen.remoteFrameUrl || worldscreen.url}
                               alt={`crawler frame for ${worldscreen.label}`}
-                              className="w-full max-h-[52vh] rounded-md object-contain bg-[rgba(4,9,16,0.86)]"
+                              className="w-full max-h-[52vh] rounded-md object-contain bg-[#070b14]"
                               loading="lazy"
                             />
                           ) : (
-                            <p className="text-[11px] text-[#9fc3df]">
+                            <p className="text-[12px] text-[#9fc3df]">
                               No crawler frame is cached for this remote resource yet.
                             </p>
                           )}
@@ -7182,7 +7182,7 @@ export function SimulationCanvas({
                                 href={worldscreen.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="rounded border border-[rgba(113,181,220,0.35)] bg-[rgba(15,45,68,0.5)] px-2 py-0.5 text-[11px] text-[#d2edff]"
+                                className="rounded border border-[#38506a] bg-[#142339] px-2 py-0.5 text-[12px] text-[#d2edff]"
                               >
                                 open website
                               </a>
@@ -7191,7 +7191,7 @@ export function SimulationCanvas({
                                   href={worldscreen.sourceUrl}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="rounded border border-[rgba(113,181,220,0.35)] bg-[rgba(15,45,68,0.5)] px-2 py-0.5 text-[11px] text-[#d2edff]"
+                                  className="rounded border border-[#38506a] bg-[#142339] px-2 py-0.5 text-[12px] text-[#d2edff]"
                                 >
                                   open source link
                                 </a>
@@ -7206,31 +7206,31 @@ export function SimulationCanvas({
               ) : null}
 
               {worldscreenMode === "conversation" ? (
-                <div className="h-full rounded-xl border border-[rgba(143,214,255,0.38)] bg-[linear-gradient(180deg,rgba(5,16,30,0.92),rgba(5,15,26,0.88))] overflow-hidden p-3 text-[#d9eeff]">
-                  <p className="text-[11px] uppercase tracking-[0.12em] text-[#9fd0ef]">true graph conversation</p>
-                  <p className="mt-1 text-[10px] text-[#9ec4dd] break-all">
+                <div className="h-full rounded-xl border border-[#46617d] bg-[linear-gradient(180deg,#05101e,#07101c)] overflow-hidden p-3 text-[#d9eeff]">
+                  <p className="text-[12px] uppercase tracking-[0.12em] text-[#9fd0ef]">true graph conversation</p>
+                  <p className="mt-1 text-[12px] text-[#9ec4dd] break-all">
                     compact nexus ref: {activeImageCommentRef || "(unknown)"}
                   </p>
 
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     <div className="grid gap-1">
-                      <span className="text-[10px] uppercase tracking-[0.08em] text-[#89b1cc]">presence account</span>
+                      <span className="text-[12px] uppercase tracking-[0.08em] text-[#89b1cc]">presence account</span>
                       <input
                         value={presenceAccountId}
                         onChange={(event) => setPresenceAccountId(event.target.value)}
                         list="presence-account-options"
                         placeholder="witness_thread"
-                        className="rounded border border-[rgba(140,196,231,0.38)] bg-[rgba(11,24,38,0.82)] px-2 py-1 text-[12px] text-[#def1ff] outline-none focus:border-[rgba(165,220,255,0.68)]"
+                        className="rounded border border-[#455a74] bg-[#0d1827] px-2 py-1 text-[12px] text-[#def1ff] outline-none focus:border-[#789dbc]"
                       />
                     </div>
                     {worldscreen.resourceKind === "image" ? (
                       <div className="grid gap-1">
-                        <span className="text-[10px] uppercase tracking-[0.08em] text-[#89b1cc]">analysis prompt</span>
+                        <span className="text-[12px] uppercase tracking-[0.08em] text-[#89b1cc]">analysis prompt</span>
                         <input
                           value={imageCommentPrompt}
                           onChange={(event) => setImageCommentPrompt(event.target.value)}
                           placeholder="Describe the image evidence and one next action."
-                          className="rounded border border-[rgba(140,196,231,0.38)] bg-[rgba(11,24,38,0.82)] px-2 py-1 text-[12px] text-[#def1ff] outline-none focus:border-[rgba(165,220,255,0.68)]"
+                          className="rounded border border-[#455a74] bg-[#0d1827] px-2 py-1 text-[12px] text-[#def1ff] outline-none focus:border-[#789dbc]"
                         />
                       </div>
                     ) : null}
@@ -7244,28 +7244,28 @@ export function SimulationCanvas({
                   </datalist>
 
                   {imageCommentParentId ? (
-                    <p className="mt-2 text-[10px] text-[#a9d0ea]">
+                    <p className="mt-2 text-[12px] text-[#a9d0ea]">
                       replying to {resolvePresenceName(commentEntryById.get(imageCommentParentId)?.presence_id ?? "")}
                       <button
                         type="button"
                         onClick={() => setImageCommentParentId("")}
-                        className="ml-2 rounded border border-[rgba(140,194,226,0.38)] bg-[rgba(17,44,66,0.44)] px-1.5 py-0.5 text-[10px] text-[#d8edff]"
+                        className="ml-2 rounded border border-[#455972] bg-[#162136] px-1.5 py-0.5 text-[12px] text-[#d8edff]"
                       >
                         clear
                       </button>
                     </p>
                   ) : (
-                    <p className="mt-2 text-[10px] text-[#8fb6d1]">posting a new root comment</p>
+                    <p className="mt-2 text-[12px] text-[#8fb6d1]">posting a new root comment</p>
                   )}
 
                   <div className="mt-2 grid gap-1">
-                    <span className="text-[10px] uppercase tracking-[0.08em] text-[#89b1cc]">comment draft</span>
+                    <span className="text-[12px] uppercase tracking-[0.08em] text-[#89b1cc]">comment draft</span>
                     <textarea
                       value={imageCommentDraft}
                       onChange={(event) => setImageCommentDraft(event.target.value)}
                       rows={3}
                       placeholder="Commentary appears here; edit before posting if needed."
-                      className="rounded border border-[rgba(140,196,231,0.38)] bg-[rgba(11,24,38,0.82)] px-2 py-1 text-[12px] leading-5 text-[#def1ff] outline-none focus:border-[rgba(165,220,255,0.68)]"
+                      className="rounded border border-[#455a74] bg-[#0d1827] px-2 py-1 text-[12px] leading-5 text-[#def1ff] outline-none focus:border-[#789dbc]"
                     />
                   </div>
 
@@ -7277,7 +7277,7 @@ export function SimulationCanvas({
                           void submitGeneratedImageCommentary();
                         }}
                         disabled={imageCommentBusy}
-                        className="rounded border border-[rgba(131,223,255,0.52)] bg-[rgba(40,113,148,0.34)] px-2.5 py-1 text-[11px] font-semibold text-[#e2f6ff] disabled:opacity-60"
+                        className="rounded border border-[#50809a] bg-[#1e3750] px-2.5 py-1 text-[12px] font-semibold text-[#e2f6ff] disabled:opacity-60"
                       >
                         {imageCommentBusy ? "analyzing..." : "analyze with qwen3-vl"}
                       </button>
@@ -7288,7 +7288,7 @@ export function SimulationCanvas({
                         void submitManualImageComment();
                       }}
                       disabled={imageCommentBusy || imageCommentDraft.trim().length === 0}
-                      className="rounded border border-[rgba(154,206,247,0.48)] bg-[rgba(49,96,137,0.28)] px-2.5 py-1 text-[11px] font-semibold text-[#dff2ff] disabled:opacity-60"
+                      className="rounded border border-[#57708e] bg-[#202d47] px-2.5 py-1 text-[12px] font-semibold text-[#dff2ff] disabled:opacity-60"
                     >
                       post comment
                     </button>
@@ -7298,31 +7298,31 @@ export function SimulationCanvas({
                         refreshNexusComments(activeImageCommentRef);
                       }}
                       disabled={imageCommentBusy || !activeImageCommentRef}
-                      className="rounded border border-[rgba(154,206,247,0.34)] bg-[rgba(20,60,94,0.24)] px-2.5 py-1 text-[11px] font-semibold text-[#cfe7fb] disabled:opacity-60"
+                      className="rounded border border-[#455772] bg-[#182239] px-2.5 py-1 text-[12px] font-semibold text-[#cfe7fb] disabled:opacity-60"
                     >
                       refresh comments
                     </button>
                   </div>
 
                   {imageCommentError ? (
-                    <p className="mt-2 text-[11px] text-[#ffd7be]">{imageCommentError}</p>
+                    <p className="mt-2 text-[12px] text-[#ffd7be]">{imageCommentError}</p>
                   ) : null}
 
-                  <div className="mt-2 rounded border border-[rgba(120,182,220,0.3)] bg-[rgba(4,12,21,0.62)] p-2 max-h-[calc(100%-17.2rem)] overflow-auto">
+                  <div className="mt-2 rounded border border-[#364862] bg-[#0c111e] p-2 max-h-[calc(100%-17.2rem)] overflow-auto">
                     {imageCommentsLoading ? (
-                      <p className="text-[11px] text-[#9bc2dd]">loading nexus comments...</p>
+                      <p className="text-[12px] text-[#9bc2dd]">loading nexus comments...</p>
                     ) : null}
                     {!imageCommentsLoading && flattenedImageComments.length === 0 ? (
-                      <p className="text-[11px] text-[#9bc2dd]">no comments yet for this nexus.</p>
+                      <p className="text-[12px] text-[#9bc2dd]">no comments yet for this nexus.</p>
                     ) : null}
                     {!imageCommentsLoading
                       ? flattenedImageComments.map(({ entry, depth }) => (
                           <article
                             key={entry.id}
-                            className="pb-2 mb-2 border-b border-[rgba(108,164,199,0.24)] last:border-none last:pb-0 last:mb-0"
+                            className="pb-2 mb-2 border-b border-[#2d3b52] last:border-none last:pb-0 last:mb-0"
                             style={{ marginLeft: `${Math.min(depth * 18, 72)}px` }}
                           >
-                            <p className="text-[10px] uppercase tracking-[0.08em] text-[#88b3d0]">
+                            <p className="text-[12px] uppercase tracking-[0.08em] text-[#88b3d0]">
                               {resolvePresenceName(entry.presence_id)}
                               <span className="ml-1 text-[#6f95b1]">{timestampLabel(entry.created_at || entry.time)}</span>
                             </p>
@@ -7330,7 +7330,7 @@ export function SimulationCanvas({
                             <button
                               type="button"
                               onClick={() => setImageCommentParentId(entry.id)}
-                              className="mt-1 rounded border border-[rgba(128,186,220,0.34)] bg-[rgba(13,39,58,0.54)] px-1.5 py-0.5 text-[10px] text-[#d3ebff]"
+                              className="mt-1 rounded border border-[#3c5069] bg-[#122134] px-1.5 py-0.5 text-[12px] text-[#d3ebff]"
                             >
                               reply in-thread
                             </button>
@@ -7342,26 +7342,26 @@ export function SimulationCanvas({
               ) : null}
 
               {worldscreenMode === "stats" ? (
-                <div className="h-full rounded-xl border border-[rgba(143,214,255,0.38)] bg-[linear-gradient(180deg,rgba(5,16,30,0.92),rgba(5,15,26,0.88))] overflow-auto p-3 text-[#d9eeff]">
-                  <p className="text-[11px] uppercase tracking-[0.12em] text-[#9fd0ef]">nexus stats</p>
+                <div className="h-full rounded-xl border border-[#46617d] bg-[linear-gradient(180deg,#05101e,#07101c)] overflow-auto p-3 text-[#d9eeff]">
+                  <p className="text-[12px] uppercase tracking-[0.12em] text-[#9fd0ef]">nexus stats</p>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                    <div className="rounded border border-[rgba(112,174,207,0.32)] bg-[rgba(8,22,35,0.62)] p-2">
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-[#95c4e1]">resource</p>
+                    <div className="rounded border border-[#354961] bg-[#0e1727] p-2">
+                      <p className="text-[12px] uppercase tracking-[0.1em] text-[#95c4e1]">resource</p>
                       <p className="text-[12px] text-[#e4f5ff]">{resourceKindLabel(worldscreen.resourceKind)} / {worldscreen.nodeKind}</p>
-                      <p className="mt-1 text-[11px] text-[#b8d8ec] break-all">node: {worldscreen.nodeId || "(unknown)"}</p>
-                      <p className="text-[11px] text-[#b8d8ec] break-all">ref: {activeImageCommentRef || "(unknown)"}</p>
+                      <p className="mt-1 text-[12px] text-[#b8d8ec] break-all">node: {worldscreen.nodeId || "(unknown)"}</p>
+                      <p className="text-[12px] text-[#b8d8ec] break-all">ref: {activeImageCommentRef || "(unknown)"}</p>
                     </div>
 
-                    <div className="rounded border border-[rgba(112,174,207,0.32)] bg-[rgba(8,22,35,0.62)] p-2">
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-[#95c4e1]">conversation</p>
+                    <div className="rounded border border-[#354961] bg-[#0e1727] p-2">
+                      <p className="text-[12px] uppercase tracking-[0.1em] text-[#95c4e1]">conversation</p>
                       <p className="text-[12px] text-[#e4f5ff]">comments: {imageCommentStats.total}</p>
-                      <p className="text-[11px] text-[#b8d8ec]">participants: {imageCommentStats.participants}</p>
-                      <p className="text-[11px] text-[#b8d8ec]">threads: {imageCommentStats.rootCommentCount}</p>
-                      <p className="text-[11px] text-[#b8d8ec]">max depth: {imageCommentStats.deepestDepth}</p>
+                      <p className="text-[12px] text-[#b8d8ec]">participants: {imageCommentStats.participants}</p>
+                      <p className="text-[12px] text-[#b8d8ec]">threads: {imageCommentStats.rootCommentCount}</p>
+                      <p className="text-[12px] text-[#b8d8ec]">max depth: {imageCommentStats.deepestDepth}</p>
                     </div>
                   </div>
 
-                  <div className="mt-3 rounded border border-[rgba(112,174,207,0.3)] bg-[rgba(8,22,35,0.52)] p-2 text-[11px] text-[#cde7fb]">
+                  <div className="mt-3 rounded border border-[#33465e] bg-[#101728] p-2 text-[12px] text-[#cde7fb]">
                     <p>discovered: {worldscreen.discoveredAt || "n/a"}</p>
                     <p>fetched: {worldscreen.fetchedAt || "n/a"}</p>
                     <p>encountered: {worldscreen.encounteredAt || "n/a"}</p>

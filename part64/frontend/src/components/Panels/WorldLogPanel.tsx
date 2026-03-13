@@ -133,7 +133,7 @@ export function WorldLogPanel({ catalog }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border border-[rgba(102,217,239,0.3)] bg-[rgba(39,40,34,0.88)] p-3">
+      <div className="rounded-xl border border-[#305367] bg-[#252623] p-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <p className="text-sm font-semibold text-ink">World Log Stream</p>
@@ -147,7 +147,7 @@ export function WorldLogPanel({ catalog }: Props) {
               onClick={() => {
                 void fetchWorldLog(true);
               }}
-              className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(55,56,48,0.92)]"
+              className="border border-[var(--line)] rounded-md bg-[#1f201d] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#373830]"
             >
               <span className="inline-flex items-center gap-1.5">
                 <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -159,7 +159,7 @@ export function WorldLogPanel({ catalog }: Props) {
               onClick={() => {
                 void triggerInboxSync();
               }}
-              className="border border-[rgba(166,226,46,0.48)] rounded-md bg-[rgba(56,66,22,0.36)] px-3 py-1.5 text-xs font-semibold text-[#c7f06f] hover:bg-[rgba(56,66,22,0.54)]"
+              className="border border-[#5d792e] rounded-md bg-[#242825] px-3 py-1.5 text-xs font-semibold text-[#c7f06f] hover:bg-[#2a2f21]"
             >
               ingest .ημ now
             </button>
@@ -167,34 +167,34 @@ export function WorldLogPanel({ catalog }: Props) {
         </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">events</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">events</p>
             <p className="text-sm font-semibold text-ink">{payload?.count ?? 0}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">pending inbox</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">pending inbox</p>
             <p className="text-sm font-semibold text-ink">{payload?.pending_inbox ?? 0}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">relation links</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">relation links</p>
             <p className="text-sm font-semibold text-ink">{payload?.relation_count ?? 0}</p>
           </div>
         </div>
 
         {topSources.length > 0 ? (
-          <p className="mt-2 text-[11px] text-muted">
+          <p className="mt-2 text-[12px] text-muted">
             <Activity size={12} className="inline mr-1" />
             sources {topSources.map(([key, value]) => `${key}:${value}`).join(" | ")}
           </p>
         ) : null}
         {topKinds.length > 0 ? (
-          <p className="text-[11px] text-muted">
+          <p className="text-[12px] text-muted">
             <Workflow size={12} className="inline mr-1" />
             kinds {topKinds.map(([key, value]) => `${key}:${value}`).join(" | ")}
           </p>
         ) : null}
-        {syncStatus ? <p className="text-[11px] text-[#c8e6ff] mt-1">{syncStatus}</p> : null}
-        {error ? <p className="text-[11px] text-[#ffcfbf] mt-1">{error}</p> : null}
+        {syncStatus ? <p className="text-[12px] text-[#c8e6ff] mt-1">{syncStatus}</p> : null}
+        {error ? <p className="text-[12px] text-[#ffcfbf] mt-1">{error}</p> : null}
       </div>
 
       <div className="max-h-[32rem] overflow-y-auto pr-1 space-y-2">
@@ -208,10 +208,10 @@ export function WorldLogPanel({ catalog }: Props) {
             return (
               <article
                 key={event.id}
-                className="rounded-lg border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2"
+                className="rounded-lg border border-[var(--line)] bg-[#1e1f1f] px-3 py-2"
               >
                 <p className="text-sm font-semibold text-ink">{compactText(event.title, 140)}</p>
-                <p className="text-[11px] text-muted font-mono mt-0.5">
+                <p className="text-[12px] text-muted font-mono mt-0.5">
                   <span className={eventTone(event.kind)}>{event.kind}</span>
                   {" | "}
                   {event.source}
@@ -224,7 +224,7 @@ export function WorldLogPanel({ catalog }: Props) {
                   </p>
                 ) : null}
                 {previewImageUrl ? (
-                  <div className="mt-2 overflow-hidden rounded-md border border-[rgba(102,217,239,0.26)] bg-[rgba(18,20,18,0.74)]">
+                  <div className="mt-2 overflow-hidden rounded-md border border-[#2d4b60] bg-[#141519]">
                     <img
                       src={previewImageUrl}
                       alt={`${event.title} tile`}
@@ -235,12 +235,12 @@ export function WorldLogPanel({ catalog }: Props) {
                   </div>
                 ) : null}
                 {refs.length > 0 ? (
-                  <p className="text-[11px] text-[#9fd0ef] mt-1 break-all">
+                  <p className="text-[12px] text-[#9fd0ef] mt-1 break-all">
                     refs: {refs.slice(0, 3).join(" | ")}
                   </p>
                 ) : null}
                 {relations.length > 0 ? (
-                  <p className="text-[11px] text-[#b9d5e8] mt-1">
+                  <p className="text-[12px] text-[#b9d5e8] mt-1">
                     related: {relations.slice(0, 3).map((row) => `${row.event_id.slice(0, 8)}(${row.score.toFixed(2)})`).join(" · ")}
                   </p>
                 ) : null}

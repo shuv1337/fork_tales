@@ -314,7 +314,7 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-[rgba(102,217,239,0.32)] bg-[rgba(39,40,34,0.88)] p-4">
+      <div className="rounded-xl border border-[#32576b] bg-[#252623] p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold flex items-center gap-2">
@@ -331,7 +331,7 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
               onClick={() => {
                 void refreshStudySnapshot();
               }}
-              className="border border-[var(--line)] rounded-md bg-[rgba(31,32,29,0.9)] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[rgba(55,56,48,0.92)]"
+              className="border border-[var(--line)] rounded-md bg-[#1f201d] px-3 py-1.5 text-xs font-semibold text-ink hover:bg-[#373830]"
             >
               <span className="inline-flex items-center gap-1.5">
                 <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -343,14 +343,14 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
               onClick={() => {
                 void exportStudySnapshot();
               }}
-              className="border border-[rgba(102,217,239,0.6)] rounded-md bg-[rgba(26,52,61,0.45)] px-3 py-1.5 text-xs font-semibold text-[#66d9ef] hover:bg-[rgba(26,52,61,0.6)]"
+              className="border border-[#478ca1] rounded-md bg-[#1a2534] px-3 py-1.5 text-xs font-semibold text-[#66d9ef] hover:bg-[#1a2937]"
             >
               Export Evidence
             </button>
           </div>
         </div>
 
-        <div className="mt-3 rounded-lg border border-[var(--line)] bg-[rgba(31,32,29,0.9)] p-3">
+        <div className="mt-3 rounded-lg border border-[var(--line)] bg-[#1f201d] p-3">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-xs uppercase tracking-wide text-muted">stability index</p>
             <p className="text-sm font-mono">
@@ -359,84 +359,84 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
               </span>
             </p>
           </div>
-          <div className="mt-2 h-2 rounded-full overflow-hidden bg-[rgba(22,23,20,0.95)]">
+          <div className="mt-2 h-2 rounded-full overflow-hidden bg-[#161714]">
             <div
               className="h-full transition-[width] duration-400"
               style={{
                 width: `${stabilityPct}%`,
                 background:
-                  "linear-gradient(90deg, rgba(249,38,114,0.88), rgba(253,151,31,0.85), rgba(166,226,46,0.9))",
+                  "linear-gradient(90deg, #de2469, #da8421, #a6e22e)",
               }}
             />
           </div>
-          <p className="text-[11px] text-muted mt-2">
+          <p className="text-[12px] text-muted mt-2">
             source <code>{sourceMode || "unknown"}</code> | last evidence refresh <code>{relativeTime(lastFetchedAt)}</code>
           </p>
           {study?.runtime ? (
-            <p className="text-[11px] text-muted mt-1">
+            <p className="text-[12px] text-muted mt-1">
               receipts <code>{shortPath(study.runtime.receipts_path)}</code> | within vault <code>{String(study.runtime.receipts_path_within_vault)}</code>
             </p>
           ) : null}
         </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">blocked gates</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">blocked gates</p>
             <p className="text-sm font-semibold text-ink">{blockedGateCount}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">active drifts</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">active drifts</p>
             <p className="text-sm font-semibold text-ink">{activeDriftCount}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">queue pending</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">queue pending</p>
             <p className="text-sm font-semibold text-ink">{queuePendingCount}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">council pending</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">council pending</p>
             <p className="text-sm font-semibold text-ink">{councilPendingCount}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">resource hot</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">resource hot</p>
             <p className="text-sm font-semibold text-ink">{resourceHotCount}</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">cpu utilization</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">cpu utilization</p>
             <p className="text-sm font-semibold text-ink">{Math.round(resourceCpuUtilization)}%</p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2 sm:col-span-2 lg:col-span-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">npu lane</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2 sm:col-span-2 lg:col-span-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">npu lane</p>
             <p className="text-sm font-semibold text-ink">
               <span className={resourceStatusClass(npuStatus)}>{npuStatus}</span>
               <span className="text-muted"> - </span>
               {Math.round(npuUtilization)}% utilization
             </p>
-            <p className="text-[11px] text-muted mt-1">
+            <p className="text-[12px] text-muted mt-1">
               queue <code>{npuQueueDepth}</code> | temp <code>{npuTemperatureLabel}</code> | device <code>{npuDeviceLabel}</code>
             </p>
           </div>
         </div>
 
         <div className="mt-3 grid gap-2 md:grid-cols-2">
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">truth gate</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">truth gate</p>
             <p className="text-sm font-semibold flex items-center gap-1.5">
               {truthBlocked ? <ShieldAlert size={14} className="text-[#f92672]" /> : <CheckCircle2 size={14} className="text-[#a6e22e]" />}
               {truthBlocked ? "blocked" : "clear"}
             </p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">drift severities</p>
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">drift severities</p>
             <p className="text-sm font-mono text-ink">
               high {driftSeverities.high} | medium {driftSeverities.medium} | low {driftSeverities.low}
             </p>
           </div>
-          <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.84)] px-3 py-2 md:col-span-2">
-            <p className="text-[10px] uppercase tracking-wide text-muted">resource routing</p>
-            <p className="text-[11px] text-muted mt-1">
+          <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2 md:col-span-2">
+            <p className="text-[12px] uppercase tracking-wide text-muted">resource routing</p>
+            <p className="text-[12px] text-muted mt-1">
               embeddings <code>{resourceAutoEmbeddings}</code>
             </p>
-            <p className="text-[11px] text-muted mt-1">
+            <p className="text-[12px] text-muted mt-1">
               text <code>{resourceAutoText}</code> | log error ratio <code>{resourceLogErrorRatio.toFixed(3)}</code>
             </p>
           </div>
@@ -451,7 +451,7 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <div className="rounded-xl border border-[var(--line)] bg-[rgba(39,40,34,0.84)] p-3">
+        <div className="rounded-xl border border-[var(--line)] bg-[#242523] p-3">
           <p className="text-xs uppercase tracking-wide text-muted">Council Decisions</p>
           <div className="mt-2 space-y-2 max-h-[21rem] overflow-auto pr-1">
             {recentDecisions.length === 0 ? (
@@ -464,30 +464,30 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
                 return (
                   <article
                     key={decision.id}
-                    className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.86)] px-3 py-2"
+                    className="rounded-md border border-[var(--line)] bg-[#1e1f1f] px-3 py-2"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] font-mono text-muted truncate">{decision.id}</p>
+                      <p className="text-[12px] font-mono text-muted truncate">{decision.id}</p>
                       <p className={`text-xs font-semibold ${decisionStatusClass(decision.status)}`}>
                         {decision.status}
                       </p>
                     </div>
-                    <p className="text-[11px] text-muted mt-1 truncate">
+                    <p className="text-[12px] text-muted mt-1 truncate">
                       source: <code>{sourcePath || "(unknown)"}</code>
                     </p>
-                    <p className="text-[11px] text-muted">
+                    <p className="text-[12px] text-muted">
                       votes: yes {tally?.yes ?? 0} / no {tally?.no ?? 0} / abstain {tally?.abstain ?? 0} / req {tally?.required_yes ?? 0}
                     </p>
-                    <p className="text-[11px] text-muted">
+                    <p className="text-[12px] text-muted">
                       action: <code>{decision.action?.result ?? "pending"}</code>
                       {decision.action?.services && decision.action.services.length > 0
                         ? ` (${decision.action.services.join(",")})`
                         : ""}
                     </p>
                     {gateReasons.length > 0 ? (
-                      <p className="text-[11px] text-[#fd971f] truncate">gate: {gateReasons.join(", ")}</p>
+                      <p className="text-[12px] text-[#fd971f] truncate">gate: {gateReasons.join(", ")}</p>
                     ) : null}
-                    <p className="text-[11px] text-muted">{relativeTime(decision.created_at)}</p>
+                    <p className="text-[12px] text-muted">{relativeTime(decision.created_at)}</p>
                   </article>
                 );
               })
@@ -495,20 +495,20 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
           </div>
         </div>
 
-        <div className="rounded-xl border border-[var(--line)] bg-[rgba(39,40,34,0.84)] p-3">
+        <div className="rounded-xl border border-[var(--line)] bg-[#242523] p-3">
           <p className="text-xs uppercase tracking-wide text-muted">Queue and Gate Evidence</p>
           <div className="mt-2 space-y-2">
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.86)] p-2">
-              <p className="text-[11px] text-muted font-semibold">Warnings</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] p-2">
+              <p className="text-[12px] text-muted font-semibold">Warnings</p>
               {warnings.length === 0 ? (
-                <p className="text-[11px] text-[#a6e22e] mt-1 inline-flex items-center gap-1">
+                <p className="text-[12px] text-[#a6e22e] mt-1 inline-flex items-center gap-1">
                   <CheckCircle2 size={12} />
                   none
                 </p>
               ) : (
                 <div className="mt-1 space-y-1 max-h-[8rem] overflow-auto pr-1">
                   {warnings.slice(0, 8).map((warning, index) => (
-                    <p key={`${warning.code}-${index}`} className="text-[11px] text-[#fd971f]">
+                    <p key={`${warning.code}-${index}`} className="text-[12px] text-[#fd971f]">
                       <AlertTriangle size={11} className="inline-block mr-1" />
                       {warning.code}: {warning.message}
                     </p>
@@ -517,34 +517,34 @@ export function StabilityObservatoryPanel({ catalog, simulation }: Props) {
               )}
             </div>
 
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.86)] p-2">
-              <p className="text-[11px] text-muted font-semibold">Pending tasks</p>
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] p-2">
+              <p className="text-[12px] text-muted font-semibold">Pending tasks</p>
               {pendingTasks.length === 0 ? (
-                <p className="text-[11px] text-[#a6e22e] mt-1">queue clear</p>
+                <p className="text-[12px] text-[#a6e22e] mt-1">queue clear</p>
               ) : (
                 <div className="mt-1 space-y-1 max-h-[10rem] overflow-auto pr-1">
                   {pendingTasks.map((task) => (
-                    <p key={task.id} className="text-[11px] text-ink truncate">
+                    <p key={task.id} className="text-[12px] text-ink truncate">
                       <code>{task.kind}</code> :: {task.id}
                     </p>
                   ))}
                 </div>
               )}
-              <p className="text-[11px] text-muted mt-1">
+              <p className="text-[12px] text-muted mt-1">
                 dedupe keys <code>{queueData?.dedupe_keys ?? 0}</code> | events <code>{queueData?.event_count ?? 0}</code>
               </p>
             </div>
 
-            <div className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.86)] p-2">
-              <p className="text-[11px] text-muted font-semibold">Interpretation</p>
-              <p className="text-[11px] text-muted mt-1">
+            <div className="rounded-md border border-[var(--line)] bg-[#1e1f1f] p-2">
+              <p className="text-[12px] text-muted font-semibold">Interpretation</p>
+              <p className="text-[12px] text-muted mt-1">
                 Stability drops when gate blocks accumulate, queue pressure rises, resource lanes run hot, and council decisions wait without closure.
               </p>
-              <p className="text-[11px] text-muted mt-1 inline-flex items-center gap-1">
+              <p className="text-[12px] text-muted mt-1 inline-flex items-center gap-1">
                 <ShieldAlert size={11} />
                 Use <code>/study</code> in chat for a compact evidence digest.
               </p>
-              <p className="text-[11px] text-muted mt-1 inline-flex items-center gap-1">
+              <p className="text-[12px] text-muted mt-1 inline-flex items-center gap-1">
                 <RefreshCw size={11} />
                 Auto-refresh every 6.5s; manual refresh keeps snapshots explicit.
               </p>

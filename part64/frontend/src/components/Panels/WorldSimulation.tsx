@@ -53,7 +53,7 @@ export function WorldSimulationPanel({
                 type="button"
                 onClick={() => onInteract(person.id, "speak")}
                 disabled={interactingPersonId === person.id}
-                className="text-[10px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
+                className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
               >
                 Speak / 話す
               </button>
@@ -61,7 +61,7 @@ export function WorldSimulationPanel({
                 type="button"
                 onClick={() => onInteract(person.id, "pray")}
                 disabled={interactingPersonId === person.id}
-                className="text-[10px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
+                className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
               >
                 Pray / 祈る
               </button>
@@ -69,7 +69,7 @@ export function WorldSimulationPanel({
                 type="button"
                 onClick={() => onInteract(person.id, "sing")}
                 disabled={interactingPersonId === person.id}
-                className="text-[10px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
+                className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
               >
                 Sing / 歌う
               </button>

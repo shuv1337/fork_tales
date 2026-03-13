@@ -9,7 +9,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ isConnected, partRoot }: AppHeaderProps) {
   return (
-    <header className="mb-4 border-b border-[rgba(166,205,235,0.28)] pb-3 flex flex-col gap-2 bg-[rgba(8,14,22,0.18)] rounded-xl px-3 shadow-[0_6px_16px_rgba(2,8,14,0.16)] pointer-events-auto">
+    <header className="mb-4 border-b border-[#414c62] pb-3 flex flex-col gap-2 bg-[#161729] rounded-xl px-3 shadow-[0_6px_16px_#161728] pointer-events-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold tracking-tight text-ink flex items-center gap-3">
           <span className="opacity-50">ημ</span>

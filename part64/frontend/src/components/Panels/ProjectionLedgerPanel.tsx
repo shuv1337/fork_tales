@@ -46,8 +46,8 @@ function SignalBar({
 }) {
   return (
     <div>
-      <p className="text-[11px] text-muted font-mono">{label}</p>
-      <div className="mt-1 h-1.5 rounded-full bg-[rgba(18,20,16,0.85)]">
+      <p className="text-[12px] text-muted font-mono">{label}</p>
+      <div className="mt-1 h-1.5 rounded-full bg-[#131414]">
         <div
           className={`h-1.5 rounded-full bg-gradient-to-r ${tone}`}
           style={{ width: pct(value) }}
@@ -184,43 +184,43 @@ export function ProjectionLedgerPanel({ projection }: ProjectionLedgerPanelProps
   return (
     <div className="space-y-3">
       <div className="grid gap-2 sm:grid-cols-2 2xl:grid-cols-4">
-        <div className="rounded-lg border border-[rgba(102,217,239,0.34)] bg-[rgba(14,22,34,0.58)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#9dd1e4]">Perspective</p>
+        <div className="rounded-lg border border-[#335a6f] bg-[#131727] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-[0.16em] text-[#9dd1e4]">Perspective</p>
           <p className="text-sm font-semibold text-[#e7f6ff]">{projection.perspective}</p>
-          <p className="text-[11px] text-[#a5c8d8]">default {projection.default_perspective}</p>
+          <p className="text-[12px] text-[#a5c8d8]">default {projection.default_perspective}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(102,217,239,0.28)] bg-[rgba(25,31,42,0.58)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#9dd1e4]">Coherence</p>
+        <div className="rounded-lg border border-[#2f4f64] bg-[#191c2b] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-[0.16em] text-[#9dd1e4]">Coherence</p>
           <p className="text-sm font-semibold text-[#e7f6ff]">tension {pct(projection.coherence.tension)}</p>
-          <p className="text-[11px] text-[#a5c8d8]">
+          <p className="text-[12px] text-[#a5c8d8]">
             drift {pct(projection.coherence.drift)} | entropy {pct(projection.coherence.entropy)}
           </p>
         </div>
-        <div className="rounded-lg border border-[rgba(166,226,46,0.3)] bg-[rgba(30,34,22,0.62)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#bfdb73]">Coverage</p>
+        <div className="rounded-lg border border-[#44562d] bg-[#1c1e1f] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-[0.16em] text-[#bfdb73]">Coverage</p>
           <p className="text-sm font-semibold text-[#ebffd0]">
             {routedBoxCount} / {states.length} boxes routed
           </p>
-          <p className="text-[11px] text-[#cde3a0]">presences linked {uniquePresenceCount}</p>
+          <p className="text-[12px] text-[#cde3a0]">presences linked {uniquePresenceCount}</p>
         </div>
-        <div className="rounded-lg border border-[rgba(253,151,31,0.32)] bg-[rgba(38,26,19,0.62)] px-3 py-2">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-[#f2b77b]">Queue Pressure</p>
+        <div className="rounded-lg border border-[#624229] bg-[#211a1d] px-3 py-2">
+          <p className="text-[12px] uppercase tracking-[0.16em] text-[#f2b77b]">Queue Pressure</p>
           <p className="text-sm font-semibold text-[#ffe6cd]">pending {projection.queue.pending_count}</p>
-          <p className="text-[11px] text-[#ffd8b5]">events {projection.queue.event_count}</p>
+          <p className="text-[12px] text-[#ffd8b5]">events {projection.queue.event_count}</p>
         </div>
       </div>
 
       <div className="grid gap-2 xl:grid-cols-12">
-        <section className="rounded-lg border border-[rgba(168,189,216,0.28)] bg-[rgba(18,20,24,0.58)] p-3 xl:col-span-4">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#a8c3d8]">Lane Router</p>
-          <p className="text-[11px] text-muted mt-1">Presences pick lane pressure, then boxes reorder.</p>
+        <section className="rounded-lg border border-[#41475d] bg-[#151621] p-3 xl:col-span-4">
+          <p className="text-[12px] uppercase tracking-[0.14em] text-[#a8c3d8]">Lane Router</p>
+          <p className="text-[12px] text-muted mt-1">Presences pick lane pressure, then boxes reorder.</p>
           <div className="mt-2 space-y-2">
             {laneCards.map((lane) => (
-              <div key={lane.lane} className="rounded-md border border-[rgba(126,139,167,0.34)] bg-[rgba(35,36,41,0.72)] p-2">
+              <div key={lane.lane} className="rounded-md border border-[#3c4057] bg-[#20212a] p-2">
                 <p className="text-xs font-semibold text-ink">
                   <code>{lane.lane}</code> lane
                 </p>
-                <p className="text-[11px] text-muted font-mono">
+                <p className="text-[12px] text-muted font-mono">
                   boxes {lane.rows.length} | avg priority {lane.avgPriority.toFixed(2)}
                 </p>
                 <div className="mt-1 flex flex-wrap gap-1">
@@ -228,7 +228,7 @@ export function ProjectionLedgerPanel({ projection }: ProjectionLedgerPanelProps
                     <button
                       type="button"
                       key={`${lane.lane}-${state.element_id}`}
-                      className="rounded border border-[rgba(136,162,198,0.34)] bg-[rgba(20,24,32,0.8)] px-1.5 py-0.5 text-[10px] text-[#dcecff]"
+                      className="rounded border border-[#3f4861] bg-[#151822] px-1.5 py-0.5 text-[12px] text-[#dcecff]"
                       onClick={() => setFocusedElementId(state.element_id)}
                     >
                       {elementsById.get(state.element_id)?.title ?? state.element_id}
@@ -240,29 +240,29 @@ export function ProjectionLedgerPanel({ projection }: ProjectionLedgerPanelProps
           </div>
         </section>
 
-        <section className="rounded-lg border border-[rgba(168,189,216,0.28)] bg-[rgba(19,20,23,0.6)] p-3 xl:col-span-8">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#a8c3d8]">Field Leadership</p>
-          <p className="text-[11px] text-muted mt-1">Each field nominates the strongest boxes.</p>
+        <section className="rounded-lg border border-[#41475d] bg-[#151620] p-3 xl:col-span-8">
+          <p className="text-[12px] uppercase tracking-[0.14em] text-[#a8c3d8]">Field Leadership</p>
+          <p className="text-[12px] text-muted mt-1">Each field nominates the strongest boxes.</p>
           <div className="mt-2 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
             {fieldLeaders.map((field) => (
-              <div key={field.field} className="rounded-md border border-[rgba(126,139,167,0.34)] bg-[rgba(33,35,40,0.72)] p-2">
+              <div key={field.field} className="rounded-md border border-[#3c4057] bg-[#1f2029] p-2">
                 <p className="text-xs font-semibold text-ink">
                   <code>{field.field}</code> {field.name}
                 </p>
-                <p className="text-[11px] text-muted">{field.interpretation}</p>
+                <p className="text-[12px] text-muted">{field.interpretation}</p>
                 <div className="mt-2 space-y-1.5">
                   {field.leaders.length === 0 ? (
-                    <p className="text-[11px] text-muted">No bound boxes</p>
+                    <p className="text-[12px] text-muted">No bound boxes</p>
                   ) : (
                     field.leaders.map((leader) => (
                       <button
                         type="button"
                         key={`${field.field}-${leader.id}`}
-                        className="w-full rounded border border-[rgba(124,148,180,0.34)] bg-[rgba(18,21,27,0.78)] px-2 py-1 text-left"
+                        className="w-full rounded border border-[#3b435b] bg-[#13161f] px-2 py-1 text-left"
                         onClick={() => setFocusedElementId(leader.id)}
                       >
-                        <p className="text-[11px] font-semibold text-[#e6f2ff]">{leader.title}</p>
-                        <p className="text-[10px] text-[#a7c4e0] font-mono">
+                        <p className="text-[12px] font-semibold text-[#e6f2ff]">{leader.title}</p>
+                        <p className="text-[12px] text-[#a7c4e0] font-mono">
                           binding {leader.binding.toFixed(2)} | weight {leader.weight.toFixed(2)}
                         </p>
                       </button>
@@ -276,22 +276,22 @@ export function ProjectionLedgerPanel({ projection }: ProjectionLedgerPanelProps
       </div>
 
       <div className="grid gap-2 xl:grid-cols-12">
-        <section className="rounded-lg border border-[rgba(102,217,239,0.28)] bg-[rgba(13,21,30,0.64)] p-3 xl:col-span-4">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9dcadf]">Box Inspector</p>
+        <section className="rounded-lg border border-[#2f4f64] bg-[#111623] p-3 xl:col-span-4">
+          <p className="text-[12px] uppercase tracking-[0.14em] text-[#9dcadf]">Box Inspector</p>
           {focusedState ? (
             <div className="mt-2 space-y-2">
               <div>
                 <p className="text-sm font-semibold text-[#e8f5ff]">
                   {focusedElement?.title ?? focusedState.element_id}
                 </p>
-                <p className="text-[11px] text-[#9fc0d6] font-mono">
+                <p className="text-[12px] text-[#9fc0d6] font-mono">
                   id <code>{focusedState.element_id}</code>
                 </p>
-                <p className="text-[11px] text-[#9fc0d6] font-mono">
+                <p className="text-[12px] text-[#9fc0d6] font-mono">
                   presence <code>{focusedElement?.presence || "(none)"}</code> | lane
                   <code>{focusedElement?.lane || "unassigned"}</code>
                 </p>
-                <p className="text-[11px] text-[#9fc0d6] font-mono">
+                <p className="text-[12px] text-[#9fc0d6] font-mono">
                   layout <code>{rectLabel(focusedRect)}</code>
                 </p>
               </div>
@@ -303,16 +303,16 @@ export function ProjectionLedgerPanel({ projection }: ProjectionLedgerPanelProps
               />
               <SignalBar label="area" value={focusedState.area} tone="from-[#fd971f] to-[#cb6216]" />
               <SignalBar label="pulse" value={focusedState.pulse} tone="from-[#f92672] to-[#8b1742]" />
-              <p className="text-[11px] text-[#c4d8e6]">{focusedState.explain.reason_en}</p>
+              <p className="text-[12px] text-[#c4d8e6]">{focusedState.explain.reason_en}</p>
             </div>
           ) : (
             <p className="mt-2 text-xs text-muted">No box selected.</p>
           )}
         </section>
 
-        <section className="rounded-lg border border-[rgba(102,217,239,0.28)] bg-[rgba(15,19,26,0.64)] p-3 xl:col-span-8">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-[#9dcadf]">Every Box Control Cards</p>
-          <p className="text-[11px] text-muted mt-1">One card per box. Presence pressure, field pressure, and placement are visible here.</p>
+        <section className="rounded-lg border border-[#2f4f64] bg-[#121521] p-3 xl:col-span-8">
+          <p className="text-[12px] uppercase tracking-[0.14em] text-[#9dcadf]">Every Box Control Cards</p>
+          <p className="text-[12px] text-muted mt-1">One card per box. Presence pressure, field pressure, and placement are visible here.</p>
           <div className="mt-2 grid gap-2 md:grid-cols-2 2xl:grid-cols-3">
             {states.map((state) => {
               const element = elementsById.get(state.element_id);
@@ -325,18 +325,18 @@ export function ProjectionLedgerPanel({ projection }: ProjectionLedgerPanelProps
                   onClick={() => setFocusedElementId(state.element_id)}
                   className={`rounded-lg border p-2 text-left transition-colors ${
                     isFocused
-                      ? "border-[rgba(102,217,239,0.72)] bg-[rgba(13,36,52,0.72)]"
-                      : "border-[rgba(123,138,168,0.34)] bg-[rgba(26,27,32,0.76)] hover:border-[rgba(138,169,208,0.56)]"
+                      ? "border-[#50a3b8] bg-[#102132]"
+                      : "border-[#3a4057] bg-[#1a1a23] hover:border-[#586a88]"
                   }`}
                 >
                   <p className="text-xs font-semibold text-[#e8f4ff]">{element?.title ?? state.element_id}</p>
-                  <p className="text-[10px] text-[#adc6da] font-mono">
+                  <p className="text-[12px] text-[#adc6da] font-mono">
                     lane <code>{element?.lane || "unassigned"}</code> | slot <code>{rectLabel(rect)}</code>
                   </p>
-                  <p className="text-[10px] text-[#adc6da] font-mono">
+                  <p className="text-[12px] text-[#adc6da] font-mono">
                     m {state.mass.toFixed(2)} | p {state.priority.toFixed(2)} | a {state.area.toFixed(2)}
                   </p>
-                  <p className="text-[10px] text-[#adc6da] font-mono">
+                  <p className="text-[12px] text-[#adc6da] font-mono">
                     field {state.explain.field_signal.toFixed(2)} | presence {state.explain.presence_signal.toFixed(2)}
                   </p>
                 </button>

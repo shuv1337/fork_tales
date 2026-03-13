@@ -40,7 +40,7 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
   return (
     <div className="mt-3 space-y-4">
       {witnessState && (
-        <article className="border border-[rgba(102,217,239,0.34)] rounded-2xl p-4 bg-gradient-to-br from-[rgba(45,46,39,0.94)] via-[rgba(39,40,34,0.92)] to-[rgba(31,32,29,0.94)] shadow-sm">
+        <article className="border border-[#335a6f] rounded-2xl p-4 bg-gradient-to-br from-[#2d2e27] via-[#272822] to-[#1f201d] shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:justify-between lg:items-start">
             <div>
               <h3 className="text-xl font-semibold text-ink mb-1">{witnessState.en} / {witnessState.ja}</h3>
@@ -48,29 +48,29 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
               <p className="text-xs text-muted mt-1">{witnessState.notes_ja}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 w-full lg:w-auto">
-              <div className="rounded-lg border border-[var(--line)] bg-[rgba(39,40,34,0.88)] px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted">continuity</p>
+              <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
+                <p className="text-[12px] uppercase tracking-wide text-muted">continuity</p>
                 <p className="font-mono font-semibold text-ink">{witnessContinuityPct}%</p>
               </div>
-              <div className="rounded-lg border border-[var(--line)] bg-[rgba(39,40,34,0.88)] px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted">click pressure</p>
+              <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
+                <p className="text-[12px] uppercase tracking-wide text-muted">click pressure</p>
                 <p className="font-mono font-semibold text-ink">{Math.round((witnessState.click_pressure ?? 0) * 100)}%</p>
               </div>
-              <div className="rounded-lg border border-[var(--line)] bg-[rgba(39,40,34,0.88)] px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted">file pressure</p>
+              <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
+                <p className="text-[12px] uppercase tracking-wide text-muted">file pressure</p>
                 <p className="font-mono font-semibold text-ink">{Math.round((witnessState.file_pressure ?? 0) * 100)}%</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-3 rounded-xl border border-[var(--line)] bg-[rgba(39,40,34,0.84)] p-3">
-            <p className="text-[11px] uppercase tracking-wide text-muted">Continuity Line / 連続線</p>
-            <div className="relative mt-2 h-3 rounded-full overflow-hidden bg-[rgba(31,32,29,0.95)]">
+          <div className="mt-3 rounded-xl border border-[var(--line)] bg-[#242523] p-3">
+            <p className="text-[12px] uppercase tracking-wide text-muted">Continuity Line / 連続線</p>
+            <div className="relative mt-2 h-3 rounded-full overflow-hidden bg-[#1f201d]">
               <div
                 className="absolute inset-y-0 left-0 rounded-full"
                 style={{
                   width: `${witnessContinuityPct}%`,
-                  background: "linear-gradient(90deg, rgba(102,217,239,0.8), rgba(166,226,46,0.72), rgba(174,129,255,0.72))",
+                  background: "linear-gradient(90deg, #56b2c8, #7eaa2e, #8464c4)",
                 }}
               />
               <div
@@ -84,19 +84,19 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
           </div>
 
           <div className="mt-3 grid gap-3 md:grid-cols-2">
-            <div className="rounded-xl border border-[var(--line)] bg-[rgba(39,40,34,0.84)] p-3">
-              <p className="text-[11px] uppercase tracking-wide text-muted mb-2">Lineage / 来歴</p>
+            <div className="rounded-xl border border-[var(--line)] bg-[#242523] p-3">
+              <p className="text-[12px] uppercase tracking-wide text-muted mb-2">Lineage / 来歴</p>
               <div className="space-y-2">
                 {(witnessState.lineage ?? []).map((entry, index) => (
-                  <div key={`${entry.kind}-${entry.ref}-${index}`} className="rounded-md border border-[var(--line)] bg-[rgba(31,32,29,0.82)] px-2 py-1.5">
-                    <p className="text-[11px] text-[#66d9ef] font-mono">{entry.kind}{" -> "}{entry.ref}</p>
-                    <p className="text-[11px] text-muted">{entry.why_ja}</p>
+                  <div key={`${entry.kind}-${entry.ref}-${index}`} className="rounded-md border border-[var(--line)] bg-[#1e1e20] px-2 py-1.5">
+                    <p className="text-[12px] text-[#66d9ef] font-mono">{entry.kind}{" -> "}{entry.ref}</p>
+                    <p className="text-[12px] text-muted">{entry.why_ja}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="rounded-xl border border-[var(--line)] bg-[rgba(39,40,34,0.84)] p-3">
-              <p className="text-[11px] uppercase tracking-wide text-muted mb-2">How To Read / 読み方</p>
+            <div className="rounded-xl border border-[var(--line)] bg-[#242523] p-3">
+              <p className="text-[12px] uppercase tracking-wide text-muted mb-2">How To Read / 読み方</p>
               <ol className="space-y-1.5 text-xs text-ink list-decimal pl-4">
                 <li>Tap the field map to bind a target into witness continuity.</li>
                 <li>Check lineage rows to see what changed and where it landed.</li>
@@ -108,7 +108,7 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
       )}
 
       {growthGuard && (
-        <article className="border border-[rgba(166,226,46,0.34)] rounded-2xl p-4 bg-gradient-to-br from-[rgba(41,48,32,0.94)] via-[rgba(37,43,31,0.92)] to-[rgba(31,36,29,0.94)] shadow-sm">
+        <article className="border border-[#495e2e] rounded-2xl p-4 bg-gradient-to-br from-[#293020] via-[#252b1f] to-[#1f241d] shadow-sm">
           <div className="flex flex-col gap-2 md:flex-row md:justify-between md:items-start">
             <div>
               <h3 className="text-lg font-semibold text-ink">Growth Guard / 増殖監視</h3>
@@ -117,16 +117,16 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 w-full md:w-auto">
-              <div className="rounded-lg border border-[var(--line)] bg-[rgba(39,40,34,0.88)] px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted">collapsed files</p>
+              <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
+                <p className="text-[12px] uppercase tracking-wide text-muted">collapsed files</p>
                 <p className="font-mono font-semibold text-ink">{Number(growthAction?.collapsed_file_nodes ?? 0)}</p>
               </div>
-              <div className="rounded-lg border border-[var(--line)] bg-[rgba(39,40,34,0.88)] px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted">collapsed edges</p>
+              <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
+                <p className="text-[12px] uppercase tracking-wide text-muted">collapsed edges</p>
                 <p className="font-mono font-semibold text-ink">{Number(growthAction?.collapsed_edges ?? 0)}</p>
               </div>
-              <div className="rounded-lg border border-[var(--line)] bg-[rgba(39,40,34,0.88)] px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted">clusters</p>
+              <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
+                <p className="text-[12px] uppercase tracking-wide text-muted">clusters</p>
                 <p className="font-mono font-semibold text-ink">{Number(growthAction?.clusters ?? 0)}</p>
               </div>
             </div>
@@ -142,9 +142,9 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
           return (
             <article
               key={e.id}
-              className={`border-2 rounded-2xl p-5 bg-[rgba(45,46,39,0.9)] shadow-sm hover:shadow-md transition-all group ${
+              className={`border-2 rounded-2xl p-5 bg-[#2d2e27] shadow-sm hover:shadow-md transition-all group ${
                 isWitnessCard
-                  ? "border-[rgba(102,217,239,0.48)] shadow-[0_0_0_1px_rgba(102,217,239,0.22)]"
+                  ? "border-[#3e758a] shadow-[0_0_0_1px_#2a4458]"
                   : "border-[var(--line)]"
               }`}
             >
