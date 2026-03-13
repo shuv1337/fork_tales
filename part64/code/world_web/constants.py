@@ -1224,7 +1224,7 @@ ETA_MU_FIELD_KEYWORDS = {
         "fork",
         "tax",
         "debt",
-        "canticle",
+        "cost",
         "payment",
         "paid",
         "balance",
@@ -2411,11 +2411,11 @@ PROJECTION_FIELD_SCHEMAS: list[dict[str, Any]] = [
     },
     {
         "field": "f2",
-        "name": "witness_tension",
+        "name": "observer_tension",
         "delta_keys": ["click_ratio", "continuity_index", "lineage_links"],
         "interpretation": {
-            "en": "Witness pressure and continuity tension across presences.",
-            "ja": "証人圧と連続性テンション。",
+            "en": "Observer pressure and continuity tension across presences.",
+            "ja": "観測者圧と連続性テンション。",
         },
     },
     {
@@ -2499,7 +2499,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
     {
         "id": "nexus.ui.inspiration_atlas",
         "kind": "panel",
-        "title": "Inspiration Atlas",
+        "title": "System Overview",
         "binds_to": ["/api/catalog"],
         "field_bindings": {"f1": 0.18, "f3": 0.24, "f6": 0.4, "f8": 0.18},
         "presence": "log_writer",
@@ -2519,11 +2519,11 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
     {
         "id": "nexus.ui.chat.observer_thread",
         "kind": "chat-lens",
-        "title": "Chat Lens: Witness Thread",
+        "title": "Chat Lens: Observer Thread",
         "binds_to": ["/api/chat", "/api/presence/say"],
         "field_bindings": {"f2": 0.38, "f3": 0.14, "f6": 0.22, "f7": 0.14, "f8": 0.12},
         "presence": "observer_thread",
-        "tags": ["chat", "lens", "witness"],
+        "tags": ["chat", "lens", "observer"],
         "lane": "voice",
         "memory_scope": "shared",
     },
@@ -2548,13 +2548,13 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "lane": "memory",
     },
     {
-        "id": "nexus.ui.myth_commons",
+        "id": "nexus.ui.world_simulation",
         "kind": "panel",
-        "title": "Myth Commons",
+        "title": "World Simulation",
         "binds_to": ["/api/world", "/api/world/interact"],
         "field_bindings": {"f2": 0.22, "f3": 0.22, "f6": 0.2, "f7": 0.2, "f8": 0.16},
         "presence": "compliance_gate",
-        "tags": ["world", "people", "interaction"],
+        "tags": ["world", "actors", "interaction"],
         "lane": "voice",
     },
     {

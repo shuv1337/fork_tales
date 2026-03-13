@@ -28,47 +28,47 @@ def _seed_value(text: str) -> int:
     return int(sha1(text.encode("utf-8")).hexdigest()[:8], 16)
 
 
-def _make_people() -> list[dict[str, Any]]:
+def _make_actors() -> list[dict[str, Any]]:
     return [
         {
             "id": "scribe_aya",
-            "name": {"en": "Aya the Scribe", "ja": "書記アヤ"},
-            "role": {"en": "Scribe", "ja": "書記"},
+            "name": {"en": "Aya the Logger", "ja": "書記アヤ"},
+            "role": {"en": "Logger", "ja": "書記"},
             "instrument": "glass-bell",
-            "prays_to": "witness_thread",
-            "faith": 0.64,
+            "linked_presence": "observer_thread",
+            "base_weight": 0.64,
         },
         {
             "id": "cantor_ren",
-            "name": {"en": "Ren the Cantor", "ja": "詠唱者レン"},
-            "role": {"en": "Cantor", "ja": "聖歌手"},
+            "name": {"en": "Ren the Synthesizer", "ja": "詠唱者レン"},
+            "role": {"en": "Synthesizer", "ja": "聖歌手"},
             "instrument": "sub-bass drum",
-            "prays_to": "fork_tax_canticle",
-            "faith": 0.58,
+            "linked_presence": "fork_cost_metric",
+            "base_weight": 0.58,
         },
         {
             "id": "keeper_mio",
             "name": {"en": "Mio of the Registry", "ja": "台帳のミオ"},
-            "role": {"en": "Keeper", "ja": "番人"},
+            "role": {"en": "Guardian", "ja": "番人"},
             "instrument": "reed-organ",
-            "prays_to": "anchor_registry",
-            "faith": 0.72,
+            "linked_presence": "anchor_registry",
+            "base_weight": 0.72,
         },
         {
             "id": "witness_kai",
-            "name": {"en": "Kai the Witness", "ja": "証人カイ"},
-            "role": {"en": "Witness", "ja": "証人"},
+            "name": {"en": "Kai the Observer", "ja": "証人カイ"},
+            "role": {"en": "Observer", "ja": "証人"},
             "instrument": "hollow-choir",
-            "prays_to": "gates_of_truth",
-            "faith": 0.67,
+            "linked_presence": "compliance_gate",
+            "base_weight": 0.67,
         },
         {
             "id": "weaver_noa",
             "name": {"en": "Noa the Weaver", "ja": "織り手ノア"},
-            "role": {"en": "Field Weaver", "ja": "場の織り手"},
+            "role": {"en": "Integrator", "ja": "場の織り手"},
             "instrument": "tape-piano",
-            "prays_to": "receipt_river",
-            "faith": 0.61,
+            "linked_presence": "log_stream",
+            "base_weight": 0.61,
         },
     ]
 
@@ -76,25 +76,25 @@ def _make_people() -> list[dict[str, Any]]:
 def build_interaction_response(
     world_summary: dict[str, Any], person_id: str, action: str = "speak"
 ) -> dict[str, Any]:
-    people = world_summary.get("people", [])
-    if not isinstance(people, list) or not people:
+    actors = world_summary.get("actors", [])
+    if not isinstance(actors, list) or not actors:
         return {
             "ok": False,
-            "error": "world_has_no_people",
+            "error": "world_has_no_actors",
             "line_en": "The field is still gathering voices.",
             "line_ja": "場はまだ声を集めている。",
         }
 
     person = next(
-        (item for item in people if str(item.get("id", "")) == person_id), people[0]
+        (item for item in actors if str(item.get("id", "")) == person_id), actors[0]
     )
     action_key = str(action or "speak").strip().lower()
-    prayer = float(person.get("prayer_intensity", 0.0))
-    devotion = float(person.get("devotion", 0.0))
-    bpm = int(person.get("hymn_bpm", 78))
+    activity = float(person.get("activity_level", 0.0))
+    engagement = float(person.get("engagement", 0.0))
+    bpm = int(person.get("bpm", 78))
 
     presences = world_summary.get("presences", [])
-    presence_id = str(person.get("prays_to", "unknown"))
+    presence_id = str(person.get("linked_presence", "unknown"))
     presence = next(
         (item for item in presences if str(item.get("id", "")) == presence_id),
         {
@@ -110,21 +110,21 @@ def build_interaction_response(
 
     if action_key == "pray":
         line_en = (
-            f"{person['name']['en']} kneels to {presence_name['en']}, "
-            f"offering a {int(prayer * 100)}% pulse of living proof."
+            f"{person['name']['en']} focuses on {presence_name['en']}, "
+            f"offering a {int(activity * 100)}% pulse of living proof."
         )
         line_ja = (
-            f"{person['name']['ja']}は{presence_name['ja']}へ祈り、"
-            f"{int(prayer * 100)}%の証明の脈を捧げる。"
+            f"{person['name']['ja']}は{presence_name['ja']}へ集中し、"
+            f"{int(activity * 100)}%の証明の脈を捧げる。"
         )
     elif action_key == "sing":
         line_en = (
             f"{person['name']['en']} sings at {bpm} BPM; "
-            f"{presence_name['en']} answers in witness-light."
+            f"{presence_name['en']} answers in signal-light."
         )
         line_ja = (
             f"{person['name']['ja']}は{bpm} BPMで歌い、"
-            f"{presence_name['ja']}は証の光で応える。"
+            f"{presence_name['ja']}は信号の光で応える。"
         )
     else:
         line_en = (
@@ -150,8 +150,8 @@ def build_interaction_response(
         "line_ja": line_ja,
         "voice_text_en": line_en,
         "voice_text_ja": line_ja,
-        "prayer_intensity": round(prayer, 4),
-        "devotion": round(devotion, 4),
+        "activity_level": round(activity, 4),
+        "engagement": round(engagement, 4),
     }
 
 
@@ -159,8 +159,8 @@ class LifeStateTracker:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._tick = 0
-        self._people = _make_people()
-        self._books: list[dict[str, Any]] = []
+        self._actors = _make_actors()
+        self._reports: list[dict[str, Any]] = []
 
     def snapshot(
         self,
@@ -175,76 +175,76 @@ class LifeStateTracker:
             attribution_weight = float(attribution_summary.get("top_cover_weight", 0.0))
             top_claim = str(attribution_summary.get("top_cover_claim", ""))
 
-            people_out: list[dict[str, Any]] = []
-            songs: list[dict[str, Any]] = []
-            prayer_total = 0.0
+            actors_out: list[dict[str, Any]] = []
+            tracks: list[dict[str, Any]] = []
+            activity_total = 0.0
 
-            for person in self._people:
+            for person in self._actors:
                 seed = _seed_value(person["id"])
                 phase = (seed % 360) / 180.0 * math.pi
                 pulse = 0.5 + 0.5 * math.sin((self._tick * 0.16) + phase)
-                devotion = max(0.0, min(1.0, person["faith"] * 0.65 + pulse * 0.35))
-                prayer = max(
+                engagement = max(0.0, min(1.0, person["base_weight"] * 0.65 + pulse * 0.35))
+                activity = max(
                     0.0,
                     min(
                         1.0,
-                        devotion * 0.6 + attribution_weight * 0.3 + min(audio_count, 9) / 30.0,
+                        engagement * 0.6 + attribution_weight * 0.3 + min(audio_count, 9) / 30.0,
                     ),
                 )
-                prayer_total += prayer
+                activity_total += activity
 
                 mood = max(0.0, min(1.0, 0.42 + 0.4 * pulse + 0.2 * attribution_weight))
-                hymn_bpm = 72 + int((seed % 16) + pulse * 8)
+                track_bpm = 72 + int((seed % 16) + pulse * 8)
 
-                people_out.append(
+                actors_out.append(
                     {
                         "id": person["id"],
                         "name": person["name"],
                         "role": person["role"],
                         "instrument": person["instrument"],
-                        "prays_to": person["prays_to"],
-                        "devotion": round(devotion, 4),
-                        "prayer_intensity": round(prayer, 4),
+                        "linked_presence": person["linked_presence"],
+                        "engagement": round(engagement, 4),
+                        "activity_level": round(activity, 4),
                         "mood": round(mood, 4),
-                        "hymn_bpm": hymn_bpm,
+                        "bpm": track_bpm,
                     }
                 )
 
-                songs.append(
+                tracks.append(
                     {
-                        "id": f"song_{person['id']}",
+                        "id": f"track_{person['id']}",
                         "leader": person["name"],
                         "title": {
-                            "en": f"Canticle of {person['prays_to'].replace('_', ' ').title()}",
-                            "ja": "祈りの聖歌",
+                            "en": f"Track of {person['linked_presence'].replace('_', ' ').title()}",
+                            "ja": "演奏トラック",
                         },
-                        "bpm": hymn_bpm,
-                        "energy": round(0.3 + prayer * 0.7, 4),
+                        "bpm": track_bpm,
+                        "energy": round(0.3 + activity * 0.7, 4),
                     }
                 )
 
             if self._tick % 9 == 0:
-                book_id = f"book_{self._tick}"
+                report_id = f"report_{self._tick}"
                 claim_text = (
                     top_claim.replace("_", " ").title() if top_claim else "Quiet Field"
                 )
-                self._books.append(
+                self._reports.append(
                     {
-                        "id": book_id,
+                        "id": report_id,
                         "title": {
                             "en": f"Chronicle of {claim_text}",
                             "ja": "場の年代記",
                         },
-                        "author": people_out[self._tick % len(people_out)]["name"],
+                        "author": actors_out[self._tick % len(actors_out)]["name"],
                         "excerpt": {
-                            "en": "The people sang to the Presences, and the ledger answered in light.",
-                            "ja": "人々がプレゼンスへ歌い、台帳は光で応えた。",
+                            "en": "The actors signaled the Presences, and the ledger answered in light.",
+                            "ja": "アクターがプレゼンスへ信号を送り、台帳は光で応えた。",
                         },
                         "written_at_tick": self._tick,
                     }
                 )
-                if len(self._books) > 12:
-                    self._books = self._books[-12:]
+                if len(self._reports) > 12:
+                    self._reports = self._reports[-12:]
 
             presences = [
                 {
@@ -253,15 +253,15 @@ class LifeStateTracker:
                     "type": entry.get("type", "unknown"),
                 }
                 for entry in entity_manifest
-                if entry.get("id") and entry.get("id") != "core_pulse"
+                if entry.get("id") and entry.get("id") != "core_heartbeat"
             ]
 
             return {
                 "generated_at": datetime.now(timezone.utc).isoformat(),
                 "tick": self._tick,
                 "presences": presences,
-                "people": people_out,
-                "songs": songs,
-                "books": list(self._books),
-                "prayer_intensity": round(prayer_total / max(len(people_out), 1), 4),
+                "actors": actors_out,
+                "tracks": tracks,
+                "reports": list(self._reports),
+                "activity_level": round(activity_total / max(len(actors_out), 1), 4),
             }

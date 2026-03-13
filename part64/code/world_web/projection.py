@@ -1053,7 +1053,7 @@ def _build_projection_vector_view(
         "mode": mode,
         "axes": {
             "x": "f3.coherence_focus",
-            "y": "f2.witness_tension",
+            "y": "f2.observer_tension",
             "z": "f7.gate_pressure",
         },
         "overlay_reiso": list(field_snapshot.get("applied_reiso", []))[:6],
