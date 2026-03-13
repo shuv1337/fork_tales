@@ -1,0 +1,58 @@
+{
+  "surface": "repo-shell",
+  "testedAt": "2026-03-13T08:14:33.127341-07:00",
+  "assertions": [
+    {
+      "id": "VAL-CI-005",
+      "status": "pass",
+      "summary": "Broad residue scanning still found non-blocking false positives in docs/test-data/generated artifacts, but the narrowed Docker/config/code surface, the previously failing files, the compose filename check, and the targeted `code.tests.test_world_web_pm2` regression validator all came back clean.",
+      "evidence": [
+        {
+          "file": "config-integration/repo-shell-ci-005-round2/residue-content.log",
+          "command": "rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!artifacts/**' -g '!**/node_modules/**' -e 'fork_tales' -e 'fork\\.tales' -e 'io\\.fork_tales' -e 'docker-compose\\.muse-song-lab' -e 'muse-song-lab' /home/shuv/repos/fork_tales/part64 /home/shuv/repos/fork_tales/docker-llm-proxy",
+          "exitCode": 0,
+          "observation": "Broad scan matched only four off-surface buckets: part64/README.md old label examples, part64/frontend/e2e/particle-deck.spec.ts fixture path `/vaults/fork_tales/part64`, part64/frontend/.cov-tmp/coverage-summary.json generated coverage paths, and part64/world_state/config/github_seeds.json repo seed `octave-commons/fork_tales`."
+        },
+        {
+          "file": "config-integration/repo-shell-ci-005-round2/relevant-surface.log",
+          "command": "rg -n --hidden -g '!.git/**' -g '!.factory/**' -g '!artifacts/**' -g '!**/node_modules/**' -g '*.py' -g '*.html' -g 'Dockerfile*' -g 'docker-compose*.yml' -g 'docker-compose*.yaml' -e 'fork_tales' -e 'fork\\.tales' -e 'io\\.fork_tales' -e 'docker-compose\\.muse-song-lab' -e 'muse-song-lab' /home/shuv/repos/fork_tales/part64 /home/shuv/repos/fork_tales/docker-llm-proxy",
+          "exitCode": 1,
+          "observation": "No matches found on the relevant Docker/config/code surface."
+        },
+        {
+          "file": "config-integration/repo-shell-ci-005-round2/regression-locations.log",
+          "command": "rg -n -e 'fork_tales' -e 'fork\\.tales' -e 'io\\.fork_tales' -e 'docker-compose\\.muse-song-lab' -e 'muse-song-lab' /home/shuv/repos/fork_tales/part64/code/world_web/chamber.py /home/shuv/repos/fork_tales/part64/code/tests/test_docker_runtime.py /home/shuv/repos/fork_tales/part64/code/tests/test_world_web_pm2.py /home/shuv/repos/fork_tales/docker-llm-proxy/src/rotator_library/client.py",
+          "exitCode": 1,
+          "observation": "The four files called out in the prior failure report are now clean."
+        },
+        {
+          "file": "config-integration/repo-shell-ci-005-round2/residue-filenames.log",
+          "command": "python3 filename walk over /home/shuv/repos/fork_tales/part64 and /home/shuv/repos/fork_tales/docker-llm-proxy for names containing 'muse-song-lab'",
+          "exitCode": 0,
+          "observation": "No matching filenames found; old compose naming residue is absent."
+        },
+        {
+          "file": "config-integration/repo-shell-ci-005-round2/test_world_web_pm2.log",
+          "command": "cd /home/shuv/repos/fork_tales/part64 && python3 -m code.tests.test_world_web_pm2",
+          "exitCode": 0,
+          "observation": "Targeted regression validator exited 0 with no logged failures."
+        }
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "Read",
+    "Grep",
+    "Glob",
+    "LS",
+    "Execute",
+    "TodoWrite"
+  ],
+  "frictions": [],
+  "blockers": [],
+  "notes": [
+    "Validation scope stayed read-only against repository files and validator commands; only the requested evidence logs and flow report were written.",
+    "VAL-CROSS-001/002/003 were not re-opened per the parent instructions.",
+    "The broad required ripgrep produced acceptable false positives outside the relevant Docker/config/code surface; they are recorded in the assertion evidence rather than treated as failures."
+  ]
+}
