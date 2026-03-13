@@ -8,6 +8,8 @@ commands:
   test_python_attribution: cd part64 && python3 -m code.tests.test_attribution
   test_python_sonify: cd part64 && python3 -m code.tests.test_sonify_determinism
   test_python_world_web_pm2: cd part64 && python3 -m code.tests.test_world_web_pm2
+  validate_docker_compose: cd part64 && docker compose config --quiet
+  test_contract_fork_tax_git: node contracts/contract_fork_tax_git_v1.mjs --test
 
 services:
   vite-dev:

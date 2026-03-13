@@ -1,0 +1,33 @@
+{
+  "featureId": "update-docker-configs",
+  "reviewedAt": "2026-03-13T07:42:41-07:00",
+  "commitId": "97f3b1cbf885d5127e1f2ff2e0ae9ccd4861b5cd",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit correctly rewrites io.fork_tales labels to io.eta_mu across the reviewed files and renames docker-compose.muse-song-lab.yml, but it leaves one stale narrative/discovery hint in the root compose file, so the feature is not fully complete.",
+    "issues": [
+      {
+        "file": "part64/docker-compose.yml",
+        "line": 120,
+        "severity": "blocking",
+        "description": "`DOCKER_SIMULATION_NAME_HINTS` still contains `muse-song` even though the feature renamed the experiment stack to `agent-song-lab`. This leaves a narrative residue in a Docker-related config file and overrides `docker_runtime.py`'s current default hint list (`agent-song` at lines 101-107), reintroducing the old name into runtime discovery config."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "services",
+      "observation": "`.factory/services.yaml` does not include any docker-compose validation commands even though the config-integration milestone requires compose syntax verification. The worker had to invent the compose checks manually.",
+      "evidence": "`.factory/services.yaml:1-13` lists frontend/python validators only; transcript skeleton shows ad hoc commands `docker compose config --quiet` and `docker compose -f ... config --quiet` for this feature."
+    },
+    {
+      "area": "skills",
+      "observation": "The refactor-worker skill has no guidance for safely proving a config validation failure is pre-existing, and the worker resorted to `git stash && ... && git stash pop` on a dirty tree to compare `docker-compose.local-llm.yml` behavior.",
+      "evidence": "`refactor-worker/SKILL.md` has no procedure for pre-existing-validator triage; transcript skeleton includes `cd /home/shuv/repos/fork_tales && git stash && cd part64 && docker compose -f docker-compose.local-llm.yml config --quiet 2>&1; cd /home/shuv/repos/fork_tales && git stash pop`."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Fail: one blocking completeness issue remains in `part64/docker-compose.yml` (`muse-song` discovery hint). Otherwise the label namespace rewrite and compose-file rename look correct. Shared-state gaps: missing docker validation commands in services metadata and no documented safe procedure for pre-existing compose validation failures."
+}

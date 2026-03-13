@@ -1,0 +1,106 @@
+{
+  "milestone": "config-integration",
+  "round": 1,
+  "status": "fail",
+  "validatorsRun": {
+    "test": {
+      "passed": true,
+      "command": "cd part64/frontend && npx vitest run --exclude 'e2e/**'; cd part64 && python3 -m code.tests.test_world_life; cd part64 && python3 -m code.tests.test_attribution; cd part64 && python3 -m code.tests.test_sonify_determinism; cd part64 && python3 -m code.tests.test_world_web_pm2",
+      "exitCode": 0,
+      "notes": "Frontend vitest exited 1 but matched the accepted baseline of 111 passing / 12 failing tests; all Python test suites exited 0.",
+      "details": [
+        {
+          "command": "cd part64/frontend && npx vitest run --exclude 'e2e/**'",
+          "exitCode": 1,
+          "observation": "Accepted baseline: 111 passed / 12 failed across 6 files, matching mission AGENTS guidance for pre-existing frontend failures."
+        },
+        {
+          "command": "cd part64 && python3 -m code.tests.test_world_life",
+          "exitCode": 0,
+          "observation": "Exited 0 with no reported failures."
+        },
+        {
+          "command": "cd part64 && python3 -m code.tests.test_attribution",
+          "exitCode": 0,
+          "observation": "Exited 0 with no reported failures."
+        },
+        {
+          "command": "cd part64 && python3 -m code.tests.test_sonify_determinism",
+          "exitCode": 0,
+          "observation": "Exited 0 and printed 'ok'."
+        },
+        {
+          "command": "cd part64 && python3 -m code.tests.test_world_web_pm2",
+          "exitCode": 0,
+          "observation": "Exited 0 with no reported failures."
+        }
+      ]
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "cd part64/frontend && npx tsc -b --pretty false",
+      "exitCode": 0,
+      "notes": "TypeScript build completed without diagnostics."
+    },
+    "lint": {
+      "passed": true,
+      "command": "cd part64/frontend && npx eslint .",
+      "exitCode": 0,
+      "notes": "ESLint reported 0 errors and 94 warnings, which improves on the accepted baseline of 10 errors / 92 warnings."
+    }
+  },
+  "reviewsSummary": {
+    "total": 3,
+    "passed": 1,
+    "failed": 2,
+    "failedFeatures": [
+      "update-docker-configs",
+      "update-cli-contracts-headers"
+    ]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "update-docker-configs",
+      "severity": "blocking",
+      "description": "`part64/docker-compose.yml:120` still sets `DOCKER_SIMULATION_NAME_HINTS` to `eta-mu,muse-song,sim-slice,simulation,experiment`, leaving stale `muse-song` discovery residue after the compose stack rename to `agent-song-lab`."
+    },
+    {
+      "featureId": "update-cli-contracts-headers",
+      "severity": "blocking",
+      "description": "`.opencode/command/promethean.fork-tax-git.v1.md:24,34,39` still declares `fork-tax-canticle`, `witness-thread`, and `keeper-of-receipts` while `contracts/contract_fork_tax_git_v1.mjs` now emits `fork-cost-metric`, `observer-thread`, and `log-guardian`, leaving the contract surface inconsistent."
+    }
+  ],
+  "appliedUpdates": [
+    {
+      "target": "services.yaml",
+      "description": "Added `validate_docker_compose` so workers can run `cd part64 && docker compose config --quiet` from shared services metadata.",
+      "sourceFeature": "update-docker-configs"
+    },
+    {
+      "target": "services.yaml",
+      "description": "Added `test_contract_fork_tax_git` so workers can run `node contracts/contract_fork_tax_git_v1.mjs --test` from shared services metadata.",
+      "sourceFeature": "update-cli-contracts-headers"
+    },
+    {
+      "target": "library",
+      "description": "Added `.factory/library/contract-id-conventions.md` documenting underscore entity IDs versus hyphenated contract/opencode presence IDs.",
+      "sourceFeature": "update-cli-contracts-headers"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "skill:refactor-worker",
+      "suggestion": "Document a safe procedure for proving config-validation failures are pre-existing without using `git stash` on a dirty tree.",
+      "evidence": "The `update-docker-configs` transcript used `git stash && ... && git stash pop` to compare a compose validation failure because the skill had no safer pre-existing-failure triage guidance.",
+      "isSystemic": false
+    },
+    {
+      "target": "skill:refactor-worker",
+      "suggestion": "Explicitly allow verification-only frontend/config features to complete with scoped checks when no code edits are needed, instead of implying `test_frontend` is always required.",
+      "evidence": "The `update-pm2-package-configs` review found the feature was correctly completed as a no-op verification task using `tsc -b`, `vite build`, and greps, but the skill text currently suggests frontend work should always run `test_frontend`.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [],
+  "previousRound": null
+}

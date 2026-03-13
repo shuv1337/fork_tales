@@ -1,0 +1,33 @@
+{
+  "featureId": "update-cli-contracts-headers",
+  "reviewedAt": "2026-03-13T07:42:43-07:00",
+  "commitId": "962980bdea5971948410dcb7f6aba213ed80b289",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "Fail. The executable contract, lib config, and SPDX header updates landed cleanly, and the transcript shows the worker followed the expected investigation and verification flow. However, the paired `promethean.fork-tax-git` command/spec still advertises the old presence IDs, so the contract surface is now internally inconsistent: the script emits `fork-cost-metric`, `observer-thread`, and `log-guardian`, while the checked-in command definition still declares `fork-tax-canticle`, `witness-thread`, and `keeper-of-receipts`.",
+    "issues": [
+      {
+        "file": ".opencode/command/promethean.fork-tax-git.v1.md",
+        "line": 24,
+        "severity": "blocking",
+        "description": "The feature renamed the executable contract presence IDs in `contracts/contract_fork_tax_git_v1.mjs` (`fork-cost-metric` at line 326, `observer-thread` at line 381, `log-guardian` at line 394), but the paired command/spec file still declares the old IDs at lines 24, 34, and 39 (`fork-tax-canticle`, `witness-thread`, `keeper-of-receipts`). That leaves the contract's documented interface out of sync with the emitted audit payloads and does not fully satisfy the requested contract cleanup."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "conventions",
+      "observation": "The naming map does not explain that contract/opencode presence identifiers use hyphenated forms, while backend/frontend entity IDs use underscore forms. That ambiguity likely contributed to the mixed underscore-vs-hyphen expectations in this feature.",
+      "evidence": "`.factory/library/naming-map.md:102-105` maps `witness_thread`, `fork_tax_canticle`, `mage_of_receipts`, and `keeper_of_receipts` to underscore-based replacements, while `contracts/contract_fork_tax_git_v1.mjs:326,381,394` uses the hyphenated forms `fork-cost-metric`, `observer-thread`, and `log-guardian`."
+    },
+    {
+      "area": "services",
+      "observation": "Repository-shared validator commands do not currently document the contract self-test used to verify this feature, so future workers have to rediscover it from the contract file or prior transcripts.",
+      "evidence": "`.factory/services.yaml` lists frontend and Python validators but no contract checks, while the reviewed handoff for `update-cli-contracts-headers` records `node contracts/contract_fork_tax_git_v1.mjs --test` as a verification command."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Fail. Found 1 blocking issue: the executable fork-tax contract was renamed, but the paired `.opencode/command/promethean.fork-tax-git.v1.md` spec still exposes the old presence IDs. Shared-state notes: document hyphenated contract IDs vs underscore entity IDs, and add contract self-test commands to shared services guidance."
+}
