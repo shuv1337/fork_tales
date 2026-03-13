@@ -1,0 +1,26 @@
+{
+  "featureId": "fix-duplicate-hooks-dead-code",
+  "reviewedAt": "2026-03-13T06:06:18-07:00",
+  "commitId": "b176b87e011da4ed3cc7d05788bbc3b1576ca321",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit successfully removes the dead galaxy/vignette DOM, vignette control, and parallax wiring, and the new `processEvents` guard prevents duplicate `agentEvents` side effects. However, it does not resolve the stale bootstrap wiring left by the App decomposition: chat-command and autopilot helpers still read from the bootstrap `useAgentHandlers` instance while the UI mutates the final one.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/App.tsx",
+        "line": 107,
+        "severity": "blocking",
+        "description": "This fix adds `processEvents: false` to the bootstrap `useAgentHandlers` call, which stops duplicate event draining, but `useAutopilotController` and `useChatCommandHandlers` are still wired to `agentBootstrap` (`App.tsx:107, 110-117`) while the UI and panel actions use `agentWithDeps` state (`App.tsx:146-155`). Each hook call owns independent `activeAgentPresenceId` and workspace state (`part64/frontend/src/hooks/useAgentHandlers.ts:116-176, 277-300, 667-698`), so slash commands and autopilot-tagged system messages can still operate on stale bootstrap context after the user changes the active agent or workspace. That leaves the original stale-state failure from `decompose-app-tsx` unresolved."
+      }
+    ]
+  },
+  "sharedStateObservations": [],
+  "addressesFailureFrom": [
+    "decompose-app-tsx",
+    "overhaul-css",
+    "fix-eslint-regression-frontend"
+  ],
+  "summary": "Fail. The current tree removes the duplicate event-processing side effect and fully strips the galaxy/vignette backdrop DOM, parallax computation, and user-facing vignette control. But `App.tsx` still routes autopilot/chat-command helpers through the bootstrap `useAgentHandlers` instance, so the stale active-agent/workspace problem from the original decomposition review remains. `useWorldPanelManager.ts` is untouched and still contains the earlier `react-hooks/refs` suppression, so this rerun does not resolve that separate issue either."
+}

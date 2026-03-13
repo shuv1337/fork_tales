@@ -1,0 +1,25 @@
+{
+  "featureId": "fix-frontend-runtime-contract",
+  "reviewedAt": "2026-03-13T13:05:54Z",
+  "commitId": "0d80908ef4fd99d60a021d30770379a8df2d1b7f",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "Pass. The fix removes the blocking frontend/runtime mismatches called out in the prior reviews: the current frontend source has no remaining `/api/muse/` or `/api/witness` references, `useAgentHandlers.ts` now consumes the renamed `agent.*` event kinds and `eventPayload.particles`, the user-visible `muse` status strings are gone, `PresenceCallDeck` now renders `Particle Deck`, and the touched tests now assert the renamed `/api/agent/*`, `/api/continuity*`, and updated labels consistently.",
+    "issues": []
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "`refactor-worker` still has a procedure/compliance mismatch for frontend fixes: it says to run lint for frontend changes, but this worker's handoff marks `followedProcedure: true` after recording only grep checks, `tsc`, and `vitest`.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md:30,65` requires frontend `typecheck`/`test_frontend` and says to run lint for frontend changes, while `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-57-12-192Z__fix-frontend-runtime-contract__3810aaff-73b1-4b86-8d5a-efffdcdddaa8.json:51,56,80-81` records only `npx tsc -b --pretty false`, `npx vitest run --exclude 'e2e/**'`, and `followedProcedure: true`."
+    }
+  ],
+  "addressesFailureFrom": [
+    "rename-frontend-types-and-files",
+    "strip-narrative-labels",
+    "update-frontend-tests"
+  ],
+  "summary": "Pass: commit `0d80908ef4fd99d60a021d30770379a8df2d1b7f` resolves the previously-blocking frontend runtime contract residues and visible label issues, updates the relevant tests to the renamed contract, and I did not find any new blocking regressions in the touched frontend files."
+}

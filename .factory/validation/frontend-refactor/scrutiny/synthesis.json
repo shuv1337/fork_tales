@@ -1,6 +1,6 @@
 {
   "milestone": "frontend-refactor",
-  "round": 1,
+  "round": 2,
   "status": "fail",
   "validatorsRun": {
     "test": {
@@ -31,135 +31,32 @@
       "exitCode": 0,
       "details": {
         "summary": "0 errors, 94 warnings",
-        "note": "The lint command now exits cleanly; error count improved below the mission's accepted baseline of 10 errors."
+        "note": "The lint command exits cleanly; error count remains improved below the mission's accepted baseline of 10 errors."
       }
     }
   },
   "reviewsSummary": {
-    "total": 6,
-    "passed": 0,
-    "failed": 6,
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
     "failedFeatures": [
-      "decompose-app-tsx",
-      "rename-frontend-types-and-files",
-      "overhaul-css",
-      "strip-narrative-labels",
-      "update-frontend-tests",
-      "fix-eslint-regression-frontend"
+      "fix-duplicate-hooks-dead-code"
     ]
   },
   "blockingIssues": [
     {
-      "featureId": "decompose-app-tsx",
+      "featureId": "fix-duplicate-hooks-dead-code",
       "severity": "blocking",
-      "description": "`part64/frontend/src/App.tsx` mounts `useMuseHandlers` twice, so incoming agent events are processed twice and can duplicate toasts/overlay side effects."
-    },
-    {
-      "featureId": "decompose-app-tsx",
-      "severity": "blocking",
-      "description": "Slash-command and autopilot flows are wired to the bootstrap `muse` hook instance while the UI mutates `museWithDeps`, leaving command execution and workspace context stale relative to the visible selection."
-    },
-    {
-      "featureId": "rename-frontend-types-and-files",
-      "severity": "blocking",
-      "description": "Frontend runtime code still calls removed backend routes such as `/api/muse/*` and `/api/witness*` in `useAgentHandlers.ts`, `ThreatRadarPanel.tsx`, `Chat.tsx`, `Canvas.tsx`, and `useChatCommandHandlers.ts`, so checked-in agent/continuity flows do not match the renamed backend contract."
-    },
-    {
-      "featureId": "rename-frontend-types-and-files",
-      "severity": "blocking",
-      "description": "Frontend live-event handling still listens for legacy `muse.*` event kinds and legacy payload fields like `eventPayload.daimoi`, so renamed backend runtime events such as `agent.turn.completed` are ignored or misread."
-    },
-    {
-      "featureId": "overhaul-css",
-      "severity": "blocking",
-      "description": "The React app still renders the removed galaxy/vignette backdrop path: `CoreBackdrop.tsx` keeps `simulation-galaxy-layer-*` and `simulation-core-vignette`, and `App.tsx` still computes their parallax transforms."
-    },
-    {
-      "featureId": "overhaul-css",
-      "severity": "blocking",
-      "description": "`CoreControlPanel.tsx` still exposes an `edge vignette` control even though the vignette styling was removed, leaving a user-facing control for a deleted effect."
-    },
-    {
-      "featureId": "strip-narrative-labels",
-      "severity": "blocking",
-      "description": "User-visible system messages in `useAgentHandlers.ts` still contain `muse` wording (`muse fallback active`, `muse turn signal`, `muse media action`, `muse request failed`), so narrative terminology remains visible in the frontend."
-    },
-    {
-      "featureId": "strip-narrative-labels",
-      "severity": "blocking",
-      "description": "`PresenceCallDeck.tsx` still renders the panel heading `Presence Call Deck` instead of the requested `Particle Deck`, leaving inconsistent visible naming for the same panel."
-    },
-    {
-      "featureId": "update-frontend-tests",
-      "severity": "blocking",
-      "description": "Several frontend tests still use legacy narrative-era test scaffolding strings such as `set mouse daimon`, `Witness Thread`, `muse-presence-*`, and `lazy-daimoi-panel`, so the test suite was not fully renamed to the milestone's target terminology."
-    },
-    {
-      "featureId": "fix-eslint-regression-frontend",
-      "severity": "blocking",
-      "description": "`useWorldPanelManager.ts` still performs a render-time `coreFlightVelocityRef.current` read and suppresses `react-hooks/refs` with an inline eslint disable instead of implementing the requested ref-safe fix."
+      "description": "`App.tsx` still routes `useAutopilotController` and `useChatCommandHandlers` through the bootstrap `useAgentHandlers` instance (`agentBootstrap`) while the UI mutates `agentWithDeps`, so slash commands and autopilot can still operate on stale active-agent/workspace state after the user changes selections."
     }
   ],
-  "appliedUpdates": [
-    {
-      "target": "library",
-      "description": "Updated `.factory/library/architecture.md` to reflect the decomposed frontend shell, the current large frontend modules, and the mixed renamed-path/legacy-payload API contract.",
-      "sourceFeature": "decompose-app-tsx"
-    },
-    {
-      "target": "library",
-      "description": "Updated `.factory/library/environment.md` with the checked-in `part64/frontend/.env.local` overrides (`VITE_RUNTIME_BASE_URL`, `VITE_WEAVER_BASE_URL`) and their effect on frontend test/runtime URL expectations.",
-      "sourceFeature": "update-frontend-tests"
-    },
-    {
-      "target": "library",
-      "description": "Updated `.factory/library/naming-map.md` to note that `/api/agent/*` path renames do not yet imply payload-field renames, because some handlers still accept `muse_id` and route through internal `muse` manager methods.",
-      "sourceFeature": "rename-frontend-types-and-files"
-    }
-  ],
-  "suggestedGuidanceUpdates": [
-    {
-      "target": "skill:refactor-worker",
-      "suggestion": "For frontend features, require handoffs to record every required validator actually run (typecheck, test, lint when applicable) and forbid `followedProcedure: true` when those commands are omitted from evidence.",
-      "evidence": "Reviews for `decompose-app-tsx`, `overhaul-css`, and `strip-narrative-labels` each found worker handoffs claiming procedure compliance despite missing required frontend validator evidence.",
-      "isSystemic": true
-    },
-    {
-      "target": "skill:refactor-worker",
-      "suggestion": "Rename-focused frontend work should explicitly grep runtime API paths, websocket/event kinds, and payload keys in addition to type names, file names, and display labels.",
-      "evidence": "`rename-frontend-types-and-files` passed its local rename checks but still left checked-in `/api/muse/*`, `/api/witness*`, `muse.*`, and `eventPayload.daimoi` residues in runtime code.",
-      "isSystemic": true
-    },
-    {
-      "target": "skill:refactor-worker",
-      "suggestion": "Add concrete guidance for fixing `react-hooks/refs` violations in render-path React code, and explicitly disallow satisfying the task by silencing the rule with inline eslint disables.",
-      "evidence": "`fix-eslint-regression-frontend` reduced lint errors but left a render-time ref read in `useWorldPanelManager.ts` behind an inline `react-hooks/refs` suppression.",
-      "isSystemic": true
-    },
-    {
-      "target": "skill:refactor-worker",
-      "suggestion": "Label-cleanup features should verify both container-derived labels and panel-internal headings/status strings before handoff.",
-      "evidence": "`strip-narrative-labels` updated outer panel labels, but `PresenceCallDeck.tsx` still rendered `Presence Call Deck` and `useAgentHandlers.ts` still emitted visible `muse` status strings.",
-      "isSystemic": true
-    }
-  ],
+  "appliedUpdates": [],
+  "suggestedGuidanceUpdates": [],
   "rejectedObservations": [
     {
-      "observation": "The shared architecture note was stale because it still described a monolithic `App.tsx`.",
-      "reason": "Applied directly to `.factory/library/architecture.md`."
-    },
-    {
-      "observation": "The repo's shared environment notes were missing the effect of `part64/frontend/.env.local` on Vitest/runtime URL behavior.",
-      "reason": "Applied directly to `.factory/library/environment.md`."
-    },
-    {
-      "observation": "The naming guidance did not capture that renamed `/api/agent/*` paths still use legacy payload keys like `muse_id`.",
-      "reason": "Applied directly to `.factory/library/naming-map.md`."
-    },
-    {
-      "observation": "Multiple reviews separately flagged missing validator evidence in worker handoffs.",
-      "reason": "Deduplicated into one systemic `refactor-worker` guidance recommendation instead of recording the same process issue multiple times."
+      "observation": "The round-2 review for `fix-frontend-runtime-contract` repeated the earlier observation that frontend worker handoffs can mark `followedProcedure: true` without recording the required lint step.",
+      "reason": "duplicate of the round-1 `refactor-worker` guidance recommendation already captured in `synthesis.round1.json`"
     }
   ],
-  "previousRound": null
+  "previousRound": ".factory/validation/frontend-refactor/scrutiny/synthesis.round1.json"
 }
