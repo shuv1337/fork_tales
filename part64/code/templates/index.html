@@ -1124,13 +1124,13 @@
           fieldOverlay.pulseAt(0.5, 0.5, 1.0);
           reply = reply.replaceAll("[[PULSE]]", "");
         }
-        if (reply.includes("[[GLITCH]]")) {
+        if (reply.includes("[[ALERT]]")) {
           for(let i=0; i<5; i++) setTimeout(() => fieldOverlay.pulseAt(Math.random(), Math.random(), 0.7), i*120);
-          reply = reply.replaceAll("[[GLITCH]]", "");
+          reply = reply.replaceAll("[[ALERT]]", "");
         }
-        if (reply.includes("[[SING]]")) {
+        if (reply.includes("[[TONE]]")) {
           fieldOverlay.singAll();
-          reply = reply.replaceAll("[[SING]]", "");
+          reply = reply.replaceAll("[[TONE]]", "");
         }
         reply = reply.trim();
 

@@ -73,7 +73,7 @@ COMMIT_RE = re.compile(r"\b[0-9a-f]{7,40}\b", re.IGNORECASE)
 URL_RE = re.compile(r"https?://[^\s)\]}>\"']+", re.IGNORECASE)
 FILE_RE = re.compile(r"\b[./~]?[-\w]+(?:/[-\w.]+)+\.[a-z0-9]{1,8}\b", re.IGNORECASE)
 PR_RE = re.compile(r"\b(?:PR|pr)\s*#\d+\b")
-OVERLAY_TAGS = ("[[PULSE]]", "[[GLITCH]]", "[[SING]]")
+OVERLAY_TAGS = ("[[PULSE]]", "[[ALERT]]", "[[TONE]]")
 
 
 def _c_embed_text_24(
@@ -1522,7 +1522,7 @@ def _apply_presence_tool(tool_name: str, line: str, user_text: str) -> str:
     if tool_name == "pulse_tag":
         return f"[[PULSE]] {line}"
     if tool_name == "glitch_tag":
-        return f"[[GLITCH]] {line}"
+        return f"[[ALERT]] {line}"
     if tool_name == "echo_proof":
         return f"{line} / prove it with artifacts."
     if tool_name == "anchor_register":
@@ -1676,7 +1676,7 @@ def _presence_prompt(
         "Optional line 3: one concrete next step.\n"
         "If uncertain, say what is unknown and what evidence is missing.\n"
         "Do not invent tool outputs, file changes, or runtime states.\n"
-        "Use trigger tags only if needed: [[PULSE]] [[GLITCH]] [[SING]].\n"
+        "Use trigger tags only if needed: [[PULSE]] [[ALERT]] [[TONE]].\n"
         f"Context:\n{context_block}\n"
         f"Conversation:\n{history_text}\n"
         f"Prior presence turns:\n{prior_lines}\n"

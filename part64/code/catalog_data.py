@@ -584,7 +584,7 @@ ROLE_HINTS = {
     "doc": ("Document", "文書"),
     "note": ("Note", "ノート"),
     "memory": ("Memory Fragment", "記憶の断片"),
-    "pantheon": ("Pantheon Nexus", "神々の連鎖"),
+    "pantheon": ("Entity Network", "エンティティ連鎖"),
 }
 
 PART_67_PROLOGUE = """
@@ -615,9 +615,9 @@ INSTRUCTIONS:
 4. Do not invent tool outputs, runtime states, or file changes.
 5. You CAN trigger visual effects by including these exact tags in your response:
    - [[PULSE]]: Ripples the simulation field. Use for emphasis.
-   - [[GLITCH]]: Triggers a visual stutter. Use when mentioning errors or forks.
-   - [[SING]]: Triggers an audio cue. Use for confirmation or agreement.
-6. Use at most one trigger tag unless the user explicitly asks for dramatic output.
+   - [[ALERT]]: Triggers a visual highlight. Use when mentioning errors or forks.
+   - [[TONE]]: Triggers an audio cue. Use for confirmation or agreement.
+6. Use at most one trigger tag unless the user explicitly asks for enhanced output.
 7. Keep responses short (2-4 lines).
 8. Do not apologize. Be direct and informative.
 """

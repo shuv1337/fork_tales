@@ -1024,7 +1024,7 @@ export default function App() {
     if (safeReply.includes("[[PULSE]]") || overlayTags.includes("[[PULSE]]")) {
       overlayApi?.pulseAt?.(0.5, 0.5, 1);
     }
-    if (safeReply.includes("[[SING]]") || overlayTags.includes("[[SING]]")) {
+    if (safeReply.includes("[[TONE]]") || overlayTags.includes("[[TONE]]")) {
       overlayApi?.singAll?.();
     }
   }, [activeMusePresenceId, emitChatMessage, emitUiToast, openMuseImage, overlayApi, playMuseAudio]);
