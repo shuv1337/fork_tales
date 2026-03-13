@@ -426,61 +426,27 @@ def _run_training(
     timeout_seconds: float,
     seed: int,
 ) -> dict[str, Any]:
-    command = [
-        "python",
-        "scripts/muse_semantic_training_lab.py",
-        "--runtime",
-        runtime.url,
-        "--circumstances",
-        str(circumstances),
-        "--output",
-        str(output_path),
-        "--timeout",
-        str(timeout_seconds),
-        "--seed",
-        str(seed),
-    ]
-    if rounds > 0:
-        command.extend(["--rounds", str(rounds)])
-
-    completed = subprocess.run(
-        command,
-        cwd=str(PART_ROOT),
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    payload: dict[str, Any] = {}
-    if output_path.exists():
-        try:
-            parsed = json.loads(output_path.read_text("utf-8"))
-            if isinstance(parsed, dict):
-                payload = parsed
-        except Exception:
-            payload = {}
-
-    summary = (
-        payload.get("summary", {}) if isinstance(payload.get("summary"), dict) else {}
-    )
+    # The muse_semantic_training_lab.py script has been removed.
+    # Return a stub result indicating the script is unavailable.
     return {
         "label": runtime.label,
         "runtime": runtime.url,
-        "ok": completed.returncode == 0 and bool(payload.get("ok", False)),
-        "exit_code": int(completed.returncode),
+        "ok": False,
+        "exit_code": -1,
         "report": str(output_path),
         "summary": {
-            "samples": int(summary.get("samples", 0) or 0),
-            "rounds": int(summary.get("rounds", 0) or 0),
-            "requested_rate": float(summary.get("requested_rate", 0.0) or 0.0),
-            "modality_accuracy": float(summary.get("modality_accuracy", 0.0) or 0.0),
-            "target_accuracy": float(summary.get("target_accuracy", 0.0) or 0.0),
-            "routed_accuracy": float(summary.get("routed_accuracy", 0.0) or 0.0),
-            "blocked_rate": float(summary.get("blocked_rate", 0.0) or 0.0),
-            "latency_mean_ms": float(summary.get("latency_mean_ms", 0.0) or 0.0),
-            "latency_p95_ms": float(summary.get("latency_p95_ms", 0.0) or 0.0),
+            "samples": 0,
+            "rounds": 0,
+            "requested_rate": 0.0,
+            "modality_accuracy": 0.0,
+            "target_accuracy": 0.0,
+            "routed_accuracy": 0.0,
+            "blocked_rate": 0.0,
+            "latency_mean_ms": 0.0,
+            "latency_p95_ms": 0.0,
         },
-        "stdout_tail": "\n".join(completed.stdout.splitlines()[-6:]),
-        "stderr_tail": "\n".join(completed.stderr.splitlines()[-6:]),
+        "stdout_tail": "",
+        "stderr_tail": "script removed: muse_semantic_training_lab.py no longer exists",
     }
 
 
@@ -492,47 +458,15 @@ def _run_song_benchmark(
     timeout_seconds: float,
     output_path: Path,
 ) -> dict[str, Any]:
-    command = [
-        "python",
-        "scripts/bench_muse_song_lab.py",
-        "--regimen",
-        str(regimen),
-        "--timeout",
-        str(timeout_seconds),
-        "--json-out",
-        str(output_path),
-    ]
-    if rounds > 0:
-        command.extend(["--rounds", str(rounds)])
-    for runtime in runtimes:
-        command.extend(["--runtime", f"{runtime.label}={runtime.url}"])
-
-    completed = subprocess.run(
-        command,
-        cwd=str(PART_ROOT),
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    payload: dict[str, Any] = {}
-    if output_path.exists():
-        try:
-            parsed = json.loads(output_path.read_text("utf-8"))
-            if isinstance(parsed, dict):
-                payload = parsed
-        except Exception:
-            payload = {}
-
-    ranking = (
-        payload.get("ranking", []) if isinstance(payload.get("ranking"), list) else []
-    )
+    # The bench_muse_song_lab.py script has been removed.
+    # Return a stub result indicating the script is unavailable.
     return {
-        "ok": completed.returncode == 0 and bool(payload.get("ok", False)),
-        "exit_code": int(completed.returncode),
+        "ok": False,
+        "exit_code": -1,
         "report": str(output_path),
-        "ranking": ranking,
-        "stdout_tail": "\n".join(completed.stdout.splitlines()[-8:]),
-        "stderr_tail": "\n".join(completed.stderr.splitlines()[-8:]),
+        "ranking": [],
+        "stdout_tail": "",
+        "stderr_tail": "script removed: bench_muse_song_lab.py no longer exists",
     }
 
 
