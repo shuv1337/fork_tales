@@ -117,7 +117,7 @@ services:
       CDB_CLUSTER_STIFFNESS: "${CDB_CLUSTER_STIFFNESS:-1.0}"
       DOCKER_SIMULATION_LABEL_KEY: "io.eta_mu.simulation"
       DOCKER_SIMULATION_ROLE_LABEL_KEY: "io.eta_mu.simulation.role"
-      DOCKER_SIMULATION_NAME_HINTS: "eta-mu,muse-song,sim-slice,simulation,experiment"
+      DOCKER_SIMULATION_NAME_HINTS: "eta-mu,agent-song,sim-slice,simulation,experiment"
       DOCKER_SIMULATION_NETWORK_HINT: "eta-mu-sim-net"
       DOCKER_SIMULATION_WS_REFRESH_SECONDS: "2.5"
       DOCKER_SIMULATION_WS_HEARTBEAT_SECONDS: "18"

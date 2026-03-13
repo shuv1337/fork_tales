@@ -21,7 +21,7 @@
       "If ahead exceeds max-unpushed-commits, push is mandatory unless remote/upstream is missing; then emit drift."))
 
   (presences
-    (presence fork-tax-canticle
+    (presence fork-cost-metric
       (facts ["commit age" "ahead/behind" "branch state"])
       (asks ["are we paying fork tax now?"])
       (repairs ["checkpoint commit" "push or declare gate block"]))
@@ -31,12 +31,12 @@
       (asks ["what must be staged now?"])
       (repairs ["git add -u" "triage untracked files"]))
 
-    (presence witness-thread
+    (presence observer-thread
       (facts ["remote origin" "upstream tracking" "behind count"])
       (asks ["is lineage publishable?"])
       (repairs ["set remote origin" "set upstream" "reconcile behind commits"]))
 
-    (presence keeper-of-receipts
+    (presence log-guardian
       (facts ["receipts.log present" "decision receipt appended"])
       (asks ["is checkpoint evidence written?"])
       (repairs ["append :decision receipt for each cycle"]))
