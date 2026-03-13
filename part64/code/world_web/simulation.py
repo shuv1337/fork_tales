@@ -11150,8 +11150,7 @@ def build_simulation_state(
         # The nexus_graph is the unified graph - all other graph payloads are
         # projections of this. The field_registry contains the bounded shared
         # fields that all presences contribute to.
-        # See specs/drafts/part64-deep-research-09-unified-nexus-graph.md
-        # See specs/drafts/part64-deep-research-10-shared-fields-daimoi-dynamics.md
+        # Nexus graph and field dynamics concepts.
         # =====================================================================
         "nexus_graph": nexus_graph_payload,
         "field_registry": field_registry_payload,

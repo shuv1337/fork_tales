@@ -5,8 +5,6 @@ const path = require('path');
 const WORLD_API = process.env.WORLD_API || 'http://127.0.0.1:8787';
 const WATCH_PATHS = [
   path.join(__dirname, '../artifacts'),
-  path.join(__dirname, '../NEW_LYRICS*.md'),
-  path.join(__dirname, '../GATES_OF_TRUTH*.md'),
 ];
 
 console.log(`[world-io] Initializing Sensory Organ...`);

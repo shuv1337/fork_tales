@@ -138,11 +138,7 @@ def test_simulation_state_unifies_crawler_nodes_into_nexus_graph() -> None:
     )
 
 def test_simulation_state_includes_canonical_nexus_graph_and_field_registry() -> None:
-    """Test that simulation state includes the unified canonical model types.
-
-    See specs/drafts/part64-deep-research-09-unified-nexus-graph.md
-    See specs/drafts/part64-deep-research-10-shared-fields-daimoi-dynamics.md
-    """
+    """Test that simulation state includes the unified canonical model types."""
     source_path = "docs/canonical_test.md"
     file_id = world_web_module._file_id_for_path(source_path)
     catalog = {

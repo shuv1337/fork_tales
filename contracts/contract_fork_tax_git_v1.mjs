@@ -558,7 +558,6 @@ function runCycle(repoRoot, options) {
   const refs = [
     "contracts/contract_fork_tax_git_v1.mjs",
     ".opencode/command/promethean.fork-tax-git.v1.md",
-    "specs/drafts/fork-tax-git-cadence-protocol.md",
   ];
   const receipt = appendDecisionReceipt(before.repoRoot, { ...options, remoteOrigin: before.remoteOrigin }, commitMessage, refs);
   actions.push({ kind: "receipt", path: receipt.path });

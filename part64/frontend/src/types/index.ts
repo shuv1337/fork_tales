@@ -9,9 +9,7 @@
 // - Field: Shared global scalar field (demand, flow, entropy, graph)
 //
 // Everything else is a projection, view, or instance of these four.
-// See specs/drafts/part64-deep-research-09-unified-nexus-graph.md
-// See specs/drafts/part64-deep-research-10-shared-fields-daimoi-dynamics.md
-// See specs/drafts/part64-deep-research-11-model-audit-alien-concepts.md
+// Nexus graph, field dynamics, and model audit concepts are defined below.
 // ============================================================================
 
 // -------------- Nexus (Canonical Graph Node) -----------------

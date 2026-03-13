@@ -60,30 +60,6 @@
   },
   "files": [
     {
-      "path": "DIALOG_River_Gate.md",
-      "sha256": "3dedc62e0395b68933fb8653f82c6bb7d2864a5fbd0eba11803032646c9db132",
-      "bytes": 424,
-      "role": "doc"
-    },
-    {
-      "path": "GATES_OF_TRUTH_ANNOUNCEMENT.md",
-      "sha256": "faae151f0c3df738ef426f4ee03e234186bd0b5d315044db1653011b4139d165",
-      "bytes": 440,
-      "role": "doc"
-    },
-    {
-      "path": "NEW_LYRICS_Fork_Tax_Canticle.md",
-      "sha256": "f4b540091534ca15ca142d645bf37b0044b8346c1d281daafc10a382d6a3a7e2",
-      "bytes": 1046,
-      "role": "doc"
-    },
-    {
-      "path": "NEW_LYRICS_Witness_Thread.md",
-      "sha256": "dcb01f6aebdfd1c15e9cde7d83ac1d880d9d16cce34b875b2f4d62e7814b8c31",
-      "bytes": 1056,
-      "role": "doc"
-    },
-    {
       "path": "artifacts/audio/fork_tax_canticle_84bpm.mp3",
       "sha256": "33fd48eee674723b507486c55b1883d7197c9d41be69d03ba86126adf06acadc",
       "bytes": 1022469,

@@ -606,12 +606,12 @@ def main() -> int:
     parser.add_argument(
         "--skip-song-benchmark",
         action="store_true",
-        help="Skip bench_muse_song_lab execution",
+        help="Skip song benchmark execution",
     )
     parser.add_argument(
         "--skip-training",
         action="store_true",
-        help="Skip muse_semantic_training_lab execution",
+        help="Skip semantic training execution",
     )
     parser.add_argument(
         "--allow-failures",

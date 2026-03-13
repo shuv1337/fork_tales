@@ -162,9 +162,7 @@ EMSC_STREAM_LOG_REL = ".opencode/runtime/emsc_stream.v1.jsonl"
 # - Daimoi: Free particle with carrier embedding, seed embedding, type distribution, owner
 # - Field: Shared global scalar field (demand, flow, entropy, graph)
 #
-# See specs/drafts/part64-deep-research-09-unified-nexus-graph.md
-# See specs/drafts/part64-deep-research-10-shared-fields-daimoi-dynamics.md
-# See specs/drafts/part64-deep-research-11-model-audit-alien-concepts.md
+# Nexus graph, field dynamics, and model audit concepts.
 
 # Canonical unified graph (replaces file_graph, crawler_graph, logical_graph)
 NEXUS_GRAPH_RECORD = "ημ.nexus-graph.v1"

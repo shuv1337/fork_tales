@@ -66,9 +66,9 @@ TensorRT-LLM local tooling (optional local text path):
   - `C_LLM_ENGINE_DIR` (required for local generation)
   - `C_LLM_TOKENIZER_DIR` (recommended when engine does not embed tokenizer assets)
 - Output artifact: `part64/runs/model-bench/*.json`
-- Docs: `MODEL_BENCH_RUNNER.md`, `WHISPER_BENCHMARK.md`
+- Docs: see inline comments in benchmark scripts
 
-**For detailed operational instructions, see [SIMULATION_WORKFLOW.md](SIMULATION_WORKFLOW.md).**
+**For operational instructions, see inline comments in the Docker compose files and scripts.**
 
 Docker simulation discovery contract for experiment stacks:
 - Add labels to each simulation runtime container:
@@ -87,40 +87,14 @@ Docker simulation discovery contract for experiment stacks:
   - `GET|POST /api/meta/runs`
   - `POST /api/meta/objective/enqueue`
 
-Muse song lab (parallel tuned simulations for play-song behavior):
-- Start 3 tuned runtimes (`baseline`, `chaos`, `stability`) + shared Chroma:
-  - `python scripts/muse_song_lab_ctl.py start`
-- Start only selected runtimes to reduce load further:
-  - `python scripts/muse_song_lab_ctl.py start --runtimes baseline,chaos`
-- Inspect runtime + resource status:
-  - `python scripts/muse_song_lab_ctl.py status`
-- Endpoints:
-  - baseline: `http://127.0.0.1:19877/`
-  - chaos-tuned: `http://127.0.0.1:19878/`
-  - stability-tuned: `http://127.0.0.1:19879/`
-- Run cross-runtime task comparison:
-  - `python scripts/muse_song_lab_ctl.py bench --regimen world_state/muse_song_training_regime.json`
-- Run end-to-end NPU+learning evaluation (NPU checks, environment stimulus, latency benchmark, training, song benchmark):
-  - `python scripts/muse_song_lab_ctl.py eval --runtimes baseline,chaos,stability --rounds 4 --output ../.opencode/runtime/sim_learning_eval.latest.json`
-- Built-in command probes now include simple modality commands:
-  - `Play Music` (expects audio selection)
-  - `Open Image` (expects image selection)
-- Override/extend task battery by editing:
-  - `world_state/muse_song_training_regime.json`
-- Stop lab stack:
-  - `python scripts/muse_song_lab_ctl.py stop`
-
-Semantic routing training circumstances (concept-seed presences + classifier baseline):
+Simulation learning evaluation suite (NPU checks, latency benchmark, training, song benchmark):
+- Run end-to-end evaluation across runtimes:
+  - `python scripts/eval_sim_learning_suite.py --runtime baseline=http://127.0.0.1:8787`
 - Circumstances file (images + text seeds + classifier + noise policy):
   - `world_state/muse_semantic_training_circumstances.json`
-- Run iterative training/eval cycle against runtime (creates muse if missing, updates workspace pins, emits report):
-  - `python scripts/muse_semantic_training_lab.py --runtime http://127.0.0.1:8787`
-- Or run across selected song-lab runtimes:
-  - `python scripts/muse_song_lab_ctl.py train --runtimes baseline,chaos,stability`
 - Output report artifact (default):
-  - `../.opencode/runtime/muse_semantic_training.latest.json`
-- The script posts aggregate metrics to `POST /api/meta/runs` by default.
-- Docker simulation dashboard now visualizes these metrics in **Training Charts** under Meta Operations:
+  - `../.opencode/runtime/sim_learning_eval.latest.json`
+- Docker simulation dashboard visualizes training metrics in **Training Charts** under Meta Operations:
   - `http://127.0.0.1:8787/dashboard/docker`
 
 Run world as local PM2 daemon (legacy fallback) and open in browser:
@@ -185,7 +159,7 @@ Web Graph Weaver crawler service:
 - Example cross-reference crawl seeds:
   - `https://arxiv.org/list/cs.AI/recent`
   - `https://en.wikipedia.org/wiki/Artificial_intelligence`
-- Integration guide: `WEB_GRAPH_WEAVER.md`
+- Integration guide: see web graph weaver source in `code/web_graph_weaver.js`
 
 Embedding provider options (GPU/NPU experimental routing):
 - Inspect current provider config:

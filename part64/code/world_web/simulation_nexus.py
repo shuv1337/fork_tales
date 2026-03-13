@@ -316,8 +316,7 @@ def _build_unified_nexus_graph(
 # - Presence (unified)
 # - Daimon (unified)
 #
-# See specs/drafts/part64-deep-research-09-unified-nexus-graph.md
-# See specs/drafts/part64-deep-research-10-shared-fields-daimoi-dynamics.md
+# Nexus graph and field dynamics concepts are implemented below.
 # ============================================================================
 
 
