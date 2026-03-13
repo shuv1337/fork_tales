@@ -76,10 +76,10 @@ export function InspirationAtlasPanel({ simulation }: Props) {
   const riverFlowRatio = clamp01(
     Number(simulation?.presence_dynamics?.river_flow?.rate ?? 0) / 12,
   );
-  const witnessContinuity = clamp01(
+  const observerContinuity = clamp01(
     Number(simulation?.presence_dynamics?.witness_thread?.continuity_index ?? 0),
   );
-  const ghostPulse = clamp01(
+  const autoAgentPulse = clamp01(
     Number(simulation?.presence_dynamics?.ghost?.auto_commit_pulse ?? 0),
   );
   const forkTaxPaidRatio = clamp01(
@@ -92,11 +92,11 @@ export function InspirationAtlasPanel({ simulation }: Props) {
       let force = 0;
 
       if (board.id === "web-search-sync") {
-        force = riverFlowRatio * 0.5 + witnessContinuity * 0.2 + anchorForce * 0.3;
+        force = riverFlowRatio * 0.5 + observerContinuity * 0.2 + anchorForce * 0.3;
       } else if (board.id === "part64-runtime-system") {
-        force = witnessContinuity * 0.4 + anchorForce * 0.4 + (1 - forkTaxPaidRatio) * 0.2;
+        force = observerContinuity * 0.4 + anchorForce * 0.4 + (1 - forkTaxPaidRatio) * 0.2;
       } else {
-        force = ghostPulse * 0.4 + anchorForce * 0.4 + riverFlowRatio * 0.2;
+        force = autoAgentPulse * 0.4 + anchorForce * 0.4 + riverFlowRatio * 0.2;
       }
 
       return {
@@ -104,7 +104,7 @@ export function InspirationAtlasPanel({ simulation }: Props) {
         force: clamp01(force),
       };
     });
-  }, [forkTaxPaidRatio, ghostPulse, riverFlowRatio, simulation, witnessContinuity]);
+  }, [forkTaxPaidRatio, autoAgentPulse, riverFlowRatio, simulation, observerContinuity]);
 
   return (
     <section className="card inspiration-shell relative overflow-hidden">
@@ -159,12 +159,12 @@ export function InspirationAtlasPanel({ simulation }: Props) {
           <b>{Math.round(riverFlowRatio * 100)}%</b>
         </div>
         <div className="inspiration-signal">
-          <span>witness continuity</span>
-          <b>{Math.round(witnessContinuity * 100)}%</b>
+          <span>observer continuity</span>
+          <b>{Math.round(observerContinuity * 100)}%</b>
         </div>
         <div className="inspiration-signal">
           <span>auto-agent pulse</span>
-          <b>{Math.round(ghostPulse * 100)}%</b>
+          <b>{Math.round(autoAgentPulse * 100)}%</b>
         </div>
         <div className="inspiration-signal">
           <span>fork cost paid</span>

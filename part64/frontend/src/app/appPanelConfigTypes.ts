@@ -21,9 +21,9 @@ export interface UseAppPanelConfigsArgs {
   flyCameraToAnchor: (anchor: WorldAnchorTarget) => void;
   handleAgentWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
   handleAgentWorkspaceContextChange: (presenceId: string, workspace: AgentWorkspaceContext) => void;
-  handleAgentWorkspaceSend: (text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => void;
+  handleAgentWorkspaceSend: (text: string, agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
   handleRecord: () => Promise<void>;
-  handleSendVoice: (musePresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
+  handleSendVoice: (agentPresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
   handleTranscribe: () => Promise<string | undefined>;
   handleUserPresenceInput: (payload: UserPresenceInputPayload) => void;
   handleWorldInteract: (personId: string, action: "speak" | "boost" | "sing") => Promise<void>;

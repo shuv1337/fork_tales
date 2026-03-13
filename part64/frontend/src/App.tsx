@@ -114,7 +114,7 @@ export default function App() {
     simulationTruthGateBlocked: simulation?.truth_state?.gate?.blocked,
     buildAgentSurroundingNodes: agentBootstrap.buildAgentSurroundingNodes,
     emitSystemMessage: agentBootstrap.emitSystemMessage,
-    emitWitnessChatReply: agentBootstrap.emitWitnessChatReply,
+    emitAgentChatReply: agentBootstrap.emitAgentChatReply,
   });
 
   // Final agent handlers with all real dependencies
@@ -230,7 +230,7 @@ export default function App() {
   ];
   const activeChatLens = activeProjection?.chat_sessions?.[0] ?? null;
   const latestAutopilotEvent = autopilotEvents[0] ?? null;
-  const museRuntimeSnapshot = catalog?.muse_runtime ?? null;
+  const agentRuntimeSnapshot = catalog?.muse_runtime ?? null;
 
   return (
     <>
@@ -289,7 +289,7 @@ export default function App() {
           activeCoreLayerCount={simTuning.activeCoreLayerCount}
           coreLayerManagerOpen={simTuning.coreLayerManagerOpen}
           coreLayerVisibility={simTuning.coreLayerVisibility}
-          museRuntimeSnapshot={museRuntimeSnapshot}
+          agentRuntimeSnapshot={agentRuntimeSnapshot}
           agentForgeLabel={agentWithDeps.agentForgeLabel}
           agentForgeBusy={agentWithDeps.agentForgeBusy}
           agentForgePreviewId={agentWithDeps.agentForgePreviewId}
@@ -315,8 +315,8 @@ export default function App() {
           onToggleCoreLayerManagerOpen={() => simTuning.setCoreLayerManagerOpen(!simTuning.coreLayerManagerOpen)}
           onSetAllLayers={simTuning.setAllCoreLayers}
           onSetLayerEnabled={simTuning.setCoreLayerEnabled}
-          onMuseForgeLabelChange={agentWithDeps.setAgentForgeLabel}
-          onCreateMuse={() => { void agentWithDeps.handleCreateAgent(); }}
+          onAgentForgeLabelChange={agentWithDeps.setAgentForgeLabel}
+          onCreateAgent={() => { void agentWithDeps.handleCreateAgent(); }}
         />
 
         <WorldPanelsViewport

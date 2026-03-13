@@ -15,10 +15,10 @@ function mockJsonResponse(body: unknown, status = 200): Response {
 
 function createHookHarness() {
   const emitSystemMessage = vi.fn<(text: string) => void>();
-  const emitWitnessChatReply = vi.fn<(
+  const emitAgentChatReply = vi.fn<(
     payload: Record<string, unknown>,
     source: string,
-    requestedMusePresenceId?: string,
+    requestedAgentPresenceId?: string,
   ) => void>();
   const buildAgentSurroundingNodes = vi.fn((...args: [string, unknown]) => {
     void args;
@@ -31,16 +31,16 @@ function createHookHarness() {
     catalogTruthGateBlocked: false,
     simulationTimestamp: "2026-02-26T00:01:00Z",
     simulationTruthGateBlocked: false,
-    buildAgentSurroundingNodes: (musePresenceId, workspace) => buildAgentSurroundingNodes(musePresenceId, workspace),
+    buildAgentSurroundingNodes: (agentPresenceId, workspace) => buildAgentSurroundingNodes(agentPresenceId, workspace),
     emitSystemMessage: (text) => emitSystemMessage(text),
-    emitWitnessChatReply: (payload, source, requestedMusePresenceId) =>
-      emitWitnessChatReply(payload, source, requestedMusePresenceId),
+    emitAgentChatReply: (payload, source, requestedAgentPresenceId) =>
+      emitAgentChatReply(payload, source, requestedAgentPresenceId),
   }));
 
   return {
     hook,
     emitSystemMessage,
-    emitWitnessChatReply,
+    emitAgentChatReply,
     buildAgentSurroundingNodes,
   };
 }
@@ -91,14 +91,14 @@ describe("useChatCommandHandlers", () => {
       hook,
       buildAgentSurroundingNodes,
       emitSystemMessage,
-      emitWitnessChatReply,
+      emitAgentChatReply,
     } = createHookHarness();
 
     const consumed = await hook.result.current.handleChatCommand("/say chaos drift now");
 
     expect(consumed).toBe(true);
     expect(buildAgentSurroundingNodes).toHaveBeenCalledWith("chaos", null);
-    expect(emitWitnessChatReply).toHaveBeenCalledWith(
+    expect(emitAgentChatReply).toHaveBeenCalledWith(
       expect.objectContaining({ reply: "field acknowledged" }),
       "command:/say",
       "chaos",

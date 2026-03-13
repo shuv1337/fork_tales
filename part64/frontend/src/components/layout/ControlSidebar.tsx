@@ -39,7 +39,7 @@ interface ControlSidebarProps {
   activeCoreLayerCount: number;
   coreLayerManagerOpen: boolean;
   coreLayerVisibility: Record<CoreLayerId, boolean>;
-  museRuntimeSnapshot: { muse_count?: number; event_seq?: number } | null;
+  agentRuntimeSnapshot: { muse_count?: number; event_seq?: number } | null;
   agentForgeLabel: string;
   agentForgeBusy: boolean;
   agentForgePreviewId: string;
@@ -65,8 +65,8 @@ interface ControlSidebarProps {
   onToggleCoreLayerManagerOpen: () => void;
   onSetAllLayers: (enabled: boolean) => void;
   onSetLayerEnabled: (layerId: CoreLayerId, enabled: boolean) => void;
-  onMuseForgeLabelChange: (value: string) => void;
-  onCreateMuse: () => void;
+  onAgentForgeLabelChange: (value: string) => void;
+  onCreateAgent: () => void;
   children?: ReactNode;
 }
 
@@ -95,7 +95,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
     activeCoreLayerCount,
     coreLayerManagerOpen,
     coreLayerVisibility,
-    museRuntimeSnapshot,
+    agentRuntimeSnapshot,
     agentForgeLabel,
     agentForgeBusy,
     agentForgePreviewId,
@@ -121,8 +121,8 @@ export function ControlSidebar(props: ControlSidebarProps) {
     onToggleCoreLayerManagerOpen,
     onSetAllLayers,
     onSetLayerEnabled,
-    onMuseForgeLabelChange,
-    onCreateMuse,
+    onAgentForgeLabelChange,
+    onCreateAgent,
   } = props;
 
   return (
@@ -193,18 +193,18 @@ export function ControlSidebar(props: ControlSidebarProps) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Agent Creator</p>
           <p className="text-[12px] text-[#b8d9ef]">
-            runtime: <code>{museRuntimeSnapshot?.muse_count ?? 0}</code> agents | seq <code>{museRuntimeSnapshot?.event_seq ?? 0}</code>
+            runtime: <code>{agentRuntimeSnapshot?.muse_count ?? 0}</code> agents | seq <code>{agentRuntimeSnapshot?.event_seq ?? 0}</code>
           </p>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <input
             type="text"
             value={agentForgeLabel}
-            onChange={(event) => onMuseForgeLabelChange(event.target.value)}
+            onChange={(event) => onAgentForgeLabelChange(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
-                onCreateMuse();
+                onCreateAgent();
               }
             }}
             placeholder="create agent label (e.g. Archive Observer)"
@@ -213,7 +213,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
           <button
             type="button"
             disabled={agentForgeBusy || !agentForgePreviewId}
-            onClick={onCreateMuse}
+            onClick={onCreateAgent}
             className="rounded-md border border-[#59742e] bg-[#303a2e] px-3 py-1.5 text-xs font-semibold text-[#e9ffd3] disabled:opacity-45"
           >
             {agentForgeBusy ? "creating..." : "Create Agent"}

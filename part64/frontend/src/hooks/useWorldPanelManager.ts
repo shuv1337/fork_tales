@@ -373,7 +373,7 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
         const toolHints = PANEL_TOOL_HINTS[config.id] ?? ["inspect", "focus", "act"];
         const baseCouncilReason = String(state?.explain?.reason_en ?? "Council rank follows live field and presence signal.");
         const councilReason = glassPanel && glassPreferenceBoost > 0
-          ? `${baseCouncilReason} Glass lane preferred${lowPriorityCycle ? " during low-priority cycle." : "."}`
+          ? `${baseCouncilReason} Main lane preferred${lowPriorityCycle ? " during low-priority cycle." : "."}`
           : baseCouncilReason;
         return {
           ...config, anchorKind: config.anchorKind ?? preset?.kind ?? "node",

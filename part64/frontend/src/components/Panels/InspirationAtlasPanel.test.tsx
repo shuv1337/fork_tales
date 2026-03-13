@@ -56,7 +56,7 @@ describe("InspirationAtlasPanel", () => {
     expect(screen.getByText("Council Rhythm :: Artifact Workstation")).toBeTruthy();
     expect(screen.getByText("force 52% · anchor receipt_river")).toBeTruthy();
     expect(screen.getByText("river flow")).toBeTruthy();
-    expect(screen.getByText("witness continuity")).toBeTruthy();
+    expect(screen.getByText("observer continuity")).toBeTruthy();
     expect(screen.getByText("auto-agent pulse")).toBeTruthy();
     expect(screen.getByText("fork cost paid")).toBeTruthy();
     expect(screen.getByRole("img", { name: /web search sync inspiration board/i })).toBeTruthy();

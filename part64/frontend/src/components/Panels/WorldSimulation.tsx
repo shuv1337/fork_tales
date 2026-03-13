@@ -79,7 +79,7 @@ export function WorldSimulationPanel({
       </div>
 
       {interaction?.ok && (
-        <section className="border border-line rounded-xl bg-sky-50/70 p-3">
+        <section className="border border-line rounded-xl bg-[#2a3042] p-3">
           <h4 className="font-bold text-sm mb-2">Presence Dialogue / プレゼンス対話</h4>
           <p className="text-xs font-semibold">
             {interaction.speaker?.en} / {interaction.speaker?.ja}

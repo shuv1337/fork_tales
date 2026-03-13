@@ -59,7 +59,7 @@ type ChatChannel = "ledger" | "llm";
 const AUTOPILOT_OPTION_LIMIT = 5;
 const RUNTIME_REFRESH_MS = 6500;
 
-const FALLBACK_MUSES: WorldPresence[] = [
+const FALLBACK_AGENTS: WorldPresence[] = [
   {
     id: "witness_thread",
     name: { en: "Observer Thread", ja: "観測スレッド" },
@@ -140,11 +140,11 @@ function particleColor(particle: BackendFieldParticle): string {
 }
 
 function buildAgentPresenceOptions(catalog: Catalog | null, simulation: SimulationState | null): AgentPresenceOption[] {
-  const runtimeMuses = Array.isArray(catalog?.muse_runtime?.muses)
+  const runtimeAgents = Array.isArray(catalog?.muse_runtime?.muses)
     ? catalog.muse_runtime.muses
     : [];
-  if (runtimeMuses.length > 0) {
-    return runtimeMuses
+  if (runtimeAgents.length > 0) {
+    return runtimeAgents
       .map((row) => {
         const id = String(row?.id ?? "").trim();
         if (!id) {
@@ -200,7 +200,7 @@ function buildAgentPresenceOptions(catalog: Catalog | null, simulation: Simulati
     }
   }
 
-  return FALLBACK_MUSES.map((row) => ({
+  return FALLBACK_AGENTS.map((row) => ({
     id: row.id,
     en: row.name.en,
     ja: row.name.ja,
@@ -292,39 +292,39 @@ export function ChatPanel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const selectedMuseSeed = fixedAgentPresenceId ?? activeAgentPresenceId ?? "witness_thread";
+  const selectedAgentSeed = fixedAgentPresenceId ?? activeAgentPresenceId ?? "witness_thread";
 
-  const musePresenceOptions = useMemo(
+  const agentPresenceOptions = useMemo(
     () => buildAgentPresenceOptions(catalog, simulation),
     [catalog, simulation],
   );
 
-  const resolvedMusePresenceId = useMemo(() => {
+  const resolvedAgentPresenceId = useMemo(() => {
     if (fixedAgentPresenceId) {
       return fixedAgentPresenceId;
     }
-    const normalizedSelected = normalizeAgentPresenceId(selectedMuseSeed);
-    const selected = musePresenceOptions.find(
+    const normalizedSelected = normalizeAgentPresenceId(selectedAgentSeed);
+    const selected = agentPresenceOptions.find(
       (row) => normalizeAgentPresenceId(row.id) === normalizedSelected,
     );
     if (selected) {
       return selected.id;
     }
-    return musePresenceOptions[0]?.id ?? "witness_thread";
-  }, [fixedAgentPresenceId, musePresenceOptions, selectedMuseSeed]);
+    return agentPresenceOptions[0]?.id ?? "witness_thread";
+  }, [fixedAgentPresenceId, agentPresenceOptions, selectedAgentSeed]);
 
-  const activeMuse = useMemo(
+  const activeAgent = useMemo(
     () =>
-      musePresenceOptions.find(
-        (row) => normalizeAgentPresenceId(row.id) === normalizeAgentPresenceId(resolvedMusePresenceId),
+      agentPresenceOptions.find(
+        (row) => normalizeAgentPresenceId(row.id) === normalizeAgentPresenceId(resolvedAgentPresenceId),
       )
       ?? null,
-    [musePresenceOptions, resolvedMusePresenceId],
+    [agentPresenceOptions, resolvedAgentPresenceId],
   );
 
   const nearbyEmbedSummaries = useMemo(
-    () => collectNearbyEmbedSummaries(catalog, simulation, resolvedMusePresenceId),
-    [catalog, resolvedMusePresenceId, simulation],
+    () => collectNearbyEmbedSummaries(catalog, simulation, resolvedAgentPresenceId),
+    [catalog, resolvedAgentPresenceId, simulation],
   );
 
   const fileNodes = useMemo(() => {
@@ -362,7 +362,7 @@ export function ChatPanel({
 
   const filteredSearchNexus = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const normalizedMuseId = normalizeAgentPresenceId(resolvedMusePresenceId);
+    const normalizedAgentId = normalizeAgentPresenceId(resolvedAgentPresenceId);
     const rows = fileNodes
       .map((row) => {
         const searchable = [
@@ -378,11 +378,11 @@ export function ChatPanel({
         ].join(" ").toLowerCase();
 
         const matches = query.length <= 0 || searchable.includes(query);
-        const museAffinity =
-          normalizeAgentPresenceId(String(row.dominant_presence ?? "")) === normalizedMuseId
+        const agentAffinity =
+          normalizeAgentPresenceId(String(row.dominant_presence ?? "")) === normalizedAgentId
             ? 1
             : 0;
-        const weight = (Number(row.importance ?? 0) * 0.75) + (museAffinity * 0.9);
+        const weight = (Number(row.importance ?? 0) * 0.75) + (agentAffinity * 0.9);
         return { row, matches, weight };
       })
       .filter((item) => item.matches)
@@ -390,15 +390,15 @@ export function ChatPanel({
       .slice(0, 14)
       .map((item) => item.row);
     return rows;
-  }, [fileNodes, resolvedMusePresenceId, searchQuery]);
+  }, [fileNodes, resolvedAgentPresenceId, searchQuery]);
 
   const nearbyNexusRows = useMemo(() => {
-    const normalizedMuseId = normalizeAgentPresenceId(resolvedMusePresenceId);
+    const normalizedAgentId = normalizeAgentPresenceId(resolvedAgentPresenceId);
     const scored = fileNodes
       .map((row) => {
         const dominantPresence = normalizeAgentPresenceId(String(row.dominant_presence ?? ""));
         const conceptPresence = normalizeAgentPresenceId(String(row.concept_presence_id ?? ""));
-        const affinity = dominantPresence === normalizedMuseId || conceptPresence === normalizedMuseId ? 1 : 0;
+        const affinity = dominantPresence === normalizedAgentId || conceptPresence === normalizedAgentId ? 1 : 0;
         const score = (Number(row.importance ?? 0) * 0.78) + (Number(row.embed_layer_count ?? 0) * 0.09) + (affinity * 0.92);
         return { row, affinity, score };
       })
@@ -414,7 +414,7 @@ export function ChatPanel({
     }
 
     return scored.slice(0, 16).map((item) => item.row);
-  }, [fileNodes, resolvedMusePresenceId]);
+  }, [fileNodes, resolvedAgentPresenceId]);
 
   const liveWorkspaceContext = useMemo<AgentWorkspaceContext>(
     () => ({
@@ -449,20 +449,20 @@ export function ChatPanel({
   }, [normalizedExternalWorkspace, pinnedFileNodeIds, searchQuery]);
 
   useEffect(() => {
-    const normalizedCurrent = normalizeAgentPresenceId(selectedMuseSeed);
-    const normalizedResolved = normalizeAgentPresenceId(resolvedMusePresenceId);
+    const normalizedCurrent = normalizeAgentPresenceId(selectedAgentSeed);
+    const normalizedResolved = normalizeAgentPresenceId(resolvedAgentPresenceId);
     if (!fixedAgentPresenceId && onAgentPresenceChange && normalizedCurrent !== normalizedResolved) {
-      onAgentPresenceChange(resolvedMusePresenceId);
+      onAgentPresenceChange(resolvedAgentPresenceId);
     }
-  }, [fixedAgentPresenceId, onAgentPresenceChange, resolvedMusePresenceId, selectedMuseSeed]);
+  }, [fixedAgentPresenceId, onAgentPresenceChange, resolvedAgentPresenceId, selectedAgentSeed]);
 
   useEffect(() => {
-    onWorkspaceBindingsChange?.(resolvedMusePresenceId, pinnedFileNodeIds);
-  }, [onWorkspaceBindingsChange, pinnedFileNodeIds, resolvedMusePresenceId]);
+    onWorkspaceBindingsChange?.(resolvedAgentPresenceId, pinnedFileNodeIds);
+  }, [onWorkspaceBindingsChange, pinnedFileNodeIds, resolvedAgentPresenceId]);
 
   useEffect(() => {
-    onWorkspaceContextChange?.(resolvedMusePresenceId, workspaceSyncContext);
-  }, [onWorkspaceContextChange, resolvedMusePresenceId, workspaceSyncContext]);
+    onWorkspaceContextChange?.(resolvedAgentPresenceId, workspaceSyncContext);
+  }, [onWorkspaceContextChange, resolvedAgentPresenceId, workspaceSyncContext]);
 
   useEffect(() => {
     if (minimalAgentView && chatChannel !== "llm") {
@@ -470,27 +470,27 @@ export function ChatPanel({
     }
   }, [chatChannel, minimalAgentView]);
 
-  const activeMuseLabel = activeMuse
-    ? `${activeMuse.en}${activeMuse.ja ? ` / ${activeMuse.ja}` : ""}`
-    : resolvedMusePresenceId;
+  const activeAgentLabel = activeAgent
+    ? `${activeAgent.en}${activeAgent.ja ? ` / ${activeAgent.ja}` : ""}`
+    : resolvedAgentPresenceId;
 
-  const witnessState: ContinuityState | null =
+  const observerState: ContinuityState | null =
     simulation?.presence_dynamics?.witness_thread ?? null;
 
-  const witnessParticles = useMemo(() => {
+  const observerParticles = useMemo(() => {
     const rows = simulation?.presence_dynamics?.field_particles ?? simulation?.field_particles ?? [];
     return rows.filter(
       (row): row is BackendFieldParticle =>
         Boolean(row)
-        && normalizeAgentPresenceId(String(row.presence_id || "")) === normalizeAgentPresenceId(resolvedMusePresenceId),
+        && normalizeAgentPresenceId(String(row.presence_id || "")) === normalizeAgentPresenceId(resolvedAgentPresenceId),
     );
-  }, [resolvedMusePresenceId, simulation?.field_particles, simulation?.presence_dynamics?.field_particles]);
+  }, [resolvedAgentPresenceId, simulation?.field_particles, simulation?.presence_dynamics?.field_particles]);
 
   const particleSamples = useMemo(() => {
-    return [...witnessParticles]
+    return [...observerParticles]
       .sort((left, right) => Number(right.size ?? 0) - Number(left.size ?? 0))
       .slice(0, 6);
-  }, [witnessParticles]);
+  }, [observerParticles]);
 
   const refreshRuntimeLedger = useCallback(async (withSpinner = true) => {
     if (withSpinner) {
@@ -545,7 +545,7 @@ export function ChatPanel({
       }
 
       const effectiveChannel: ChatChannel = minimalAgentView ? "llm" : chatChannel;
-      const routedPresenceId = resolvedMusePresenceId || "witness_thread";
+      const routedPresenceId = resolvedAgentPresenceId || "witness_thread";
       const witnessFallbackRoute = `/say witness_thread ${trimmed}`;
       const routedLedgerCommand =
         routedPresenceId === "witness_thread"
@@ -567,7 +567,7 @@ export function ChatPanel({
             channel: effectiveChannel,
             source: outbound === trimmed ? "raw" : `auto:/say ${routedPresenceId}`,
             presenceId: routedPresenceId,
-            presenceName: activeMuse?.en,
+            presenceName: activeAgent?.en,
           },
         },
       ]);
@@ -575,7 +575,7 @@ export function ChatPanel({
       setPendingAsk(null);
       return true;
     },
-    [activeMuse?.en, chatChannel, isThinking, liveWorkspaceContext, minimalAgentView, onSend, resolvedMusePresenceId],
+    [activeAgent?.en, chatChannel, isThinking, liveWorkspaceContext, minimalAgentView, onSend, resolvedAgentPresenceId],
   );
 
   const handleSend = () => {
@@ -621,7 +621,7 @@ export function ChatPanel({
         return;
       }
       const incomingPresenceId = normalizeAgentPresenceId(String(customEvent.detail.meta?.presenceId ?? ""));
-      const currentPresenceId = normalizeAgentPresenceId(resolvedMusePresenceId);
+      const currentPresenceId = normalizeAgentPresenceId(resolvedAgentPresenceId);
       if (incomingPresenceId && incomingPresenceId !== currentPresenceId) {
         return;
       }
@@ -632,7 +632,7 @@ export function ChatPanel({
     };
     window.addEventListener("chat-message", handler);
     return () => window.removeEventListener("chat-message", handler);
-  }, [resolvedMusePresenceId]);
+  }, [resolvedAgentPresenceId]);
 
   useEffect(() => {
     const handler: EventListener = (event) => {
@@ -654,8 +654,8 @@ export function ChatPanel({
           meta: {
             channel: "command",
             source: "autopilot:ask",
-            presenceId: resolvedMusePresenceId,
-            presenceName: activeMuse?.en,
+            presenceId: resolvedAgentPresenceId,
+            presenceName: activeAgent?.en,
           },
         },
       ]);
@@ -667,7 +667,7 @@ export function ChatPanel({
 
     window.addEventListener("autopilot:ask", handler);
     return () => window.removeEventListener("autopilot:ask", handler);
-  }, [activeMuse?.en, resolvedMusePresenceId]);
+  }, [activeAgent?.en, resolvedAgentPresenceId]);
 
   if (minimalAgentView) {
     return (
@@ -676,7 +676,7 @@ export function ChatPanel({
         className="space-y-3 rounded-xl border border-[#355e73] bg-[linear-gradient(165deg,#0a1018,#0e0c15)] p-3"
       >
         <div className="rounded-md border border-[#2c475c] bg-[#101522] px-3 py-2">
-          <p className="text-sm font-semibold text-ink">{activeMuseLabel}</p>
+          <p className="text-sm font-semibold text-ink">{activeAgentLabel}</p>
           <p className="text-[12px] text-[#b7d8ee] mt-1">
             Pinned nexus in this agent panel are always included in generation context.
           </p>
@@ -782,7 +782,7 @@ export function ChatPanel({
                     {msg.role === "user"
                       ? "operator / 操作者"
                       : msg.role === "assistant"
-                        ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeMuse?.en || "agent"} / エージェント`
+                        ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeAgent?.en || "agent"} / エージェント`
                         : "system"}
                   </span>
                   {msg.text}
@@ -795,7 +795,7 @@ export function ChatPanel({
             {isThinking ? (
               <div className="border border-dashed border-[#3b6e82] rounded-lg p-2 text-sm bg-[#233045] animate-pulse text-[#66d9ef]">
                 <Sparkles size={14} className="inline mr-1" />
-                {activeMuse?.en || "agent"} is synthesizing from simulation state...
+                {activeAgent?.en || "agent"} is synthesizing from simulation state...
               </div>
             ) : null}
           </div>
@@ -830,29 +830,29 @@ export function ChatPanel({
     );
   }
 
-  const isWitnessMuse = normalizeAgentPresenceId(resolvedMusePresenceId) === "witness_thread";
+  const isObserverAgent = normalizeAgentPresenceId(resolvedAgentPresenceId) === "witness_thread";
   const selectedImpact = (simulation?.presence_dynamics?.presence_impacts ?? []).find(
-    (row) => normalizeAgentPresenceId(String(row?.id ?? "")) === normalizeAgentPresenceId(resolvedMusePresenceId),
+    (row) => normalizeAgentPresenceId(String(row?.id ?? "")) === normalizeAgentPresenceId(resolvedAgentPresenceId),
   );
 
-  const continuityPercent = isWitnessMuse
-    ? toPercentText(witnessState?.continuity_index)
+  const continuityPercent = isObserverAgent
+    ? toPercentText(observerState?.continuity_index)
     : toPercentText(Number(selectedImpact?.affects?.ledger ?? 0));
-  const clickPercent = isWitnessMuse
-    ? toPercentText(witnessState?.click_pressure)
+  const clickPercent = isObserverAgent
+    ? toPercentText(observerState?.click_pressure)
     : toPercentText(Number(selectedImpact?.affected_by?.clicks ?? 0));
-  const filePercent = isWitnessMuse
-    ? toPercentText(witnessState?.file_pressure)
+  const filePercent = isObserverAgent
+    ? toPercentText(observerState?.file_pressure)
     : toPercentText(Number(selectedImpact?.affected_by?.files ?? 0));
   const dominantField = String(chatLensState?.explain?.dominant_field || "(none)");
-  const linkedPresenceText = isWitnessMuse
-    ? (witnessState?.linked_presences ?? []).join(" · ") || "(none)"
+  const linkedPresenceText = isObserverAgent
+    ? (observerState?.linked_presences ?? []).join(" · ") || "(none)"
     : selectedImpact?.notes_en || "(no linked presences reported for this agent)";
-  const lineageRows = isWitnessMuse ? witnessState?.lineage ?? [] : [];
+  const lineageRows = isObserverAgent ? observerState?.lineage ?? [] : [];
   const runtimeSignals = studySnapshot?.signals;
   const checkpoint = lineageSnapshot?.checkpoint;
   const treeState = lineageSnapshot?.working_tree;
-  const ledgerTitle = isWitnessMuse
+  const ledgerTitle = isObserverAgent
     ? "Observer Thread Ledger / 観測スレッド台帳"
     : "Agent Workspace Ledger / エージェント作業台帳";
 
@@ -868,24 +868,24 @@ export function ChatPanel({
             Agent channel is the single conversation lane for operator input, system needs, and state translation.
           </p>
           <p className="text-[12px] text-[#b8d9ef] mt-1">
-            active agent <code>{activeMuseLabel}</code>
+            active agent <code>{activeAgentLabel}</code>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {fixedAgentPresenceId ? (
             <div className="rounded-md border border-[#305367] bg-[#0f1722] px-3 py-2">
               <p className="text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">Agent Workspace</p>
-              <p className="text-xs text-[#d9edff] mt-1">{activeMuseLabel}</p>
+              <p className="text-xs text-[#d9edff] mt-1">{activeAgentLabel}</p>
             </div>
           ) : (
             <label className="grid gap-1 text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">
               Agent Presence
               <select
-                value={resolvedMusePresenceId}
+                value={resolvedAgentPresenceId}
                 onChange={(event) => onAgentPresenceChange?.(event.target.value)}
                 className="min-w-[220px] rounded-md border border-[#335a6f] bg-[#0e1721] px-2 py-1.5 text-xs text-[#e5f3ff]"
               >
-                {musePresenceOptions.map((option) => (
+                {agentPresenceOptions.map((option) => (
                   <option key={option.id} value={option.id}>
                     {option.en}
                   </option>
@@ -1020,9 +1020,9 @@ export function ChatPanel({
         </div>
         <div className="rounded-md border border-[#44562d] bg-[#161d18] px-3 py-2">
           <p className="text-[12px] uppercase tracking-wide text-[#bfe8a7]">agent particles</p>
-          <p className="text-sm font-semibold text-[#e5ffdb]">{witnessParticles.length}</p>
+          <p className="text-sm font-semibold text-[#e5ffdb]">{observerParticles.length}</p>
           <p className="text-[12px] text-[#d2efc0] mt-1">
-            linked {isWitnessMuse ? witnessState?.linked_presences?.length ?? 0 : "n/a"}
+            linked {isObserverAgent ? observerState?.linked_presences?.length ?? 0 : "n/a"}
           </p>
         </div>
       </div>
@@ -1033,7 +1033,7 @@ export function ChatPanel({
         <div className="mt-2 grid gap-1.5">
           {lineageRows.length <= 0 ? (
             <p className="text-xs text-muted">
-              {isWitnessMuse
+              {isObserverAgent
                 ? "No lineage rows yet; waiting for observer touch or file drift."
                 : "Lineage ledger is currently observer-thread specific; this agent relies on nearby embedding context."}
             </p>
@@ -1054,8 +1054,8 @@ export function ChatPanel({
             ))
           )}
         </div>
-        {witnessState?.notes_en ? (
-          <p className="text-[12px] text-[#b8d9ef] mt-2">note: {witnessState.notes_en}</p>
+        {observerState?.notes_en ? (
+          <p className="text-[12px] text-[#b8d9ef] mt-2">note: {observerState.notes_en}</p>
         ) : null}
       </div>
 
@@ -1064,12 +1064,12 @@ export function ChatPanel({
         <p className="text-[12px] text-[#b4d6bb] mt-1">
           Active agent particles are shown as explicit slices with deterministic order.
         </p>
-        {witnessParticles.length <= 0 ? (
+        {observerParticles.length <= 0 ? (
           <p className="text-xs text-muted mt-2">No active agent particles in this frame.</p>
         ) : (
           <>
             <div className="mt-2 grid grid-cols-12 gap-1 sm:grid-cols-16">
-              {witnessParticles.slice(0, 64).map((particle, index) => {
+              {observerParticles.slice(0, 64).map((particle, index) => {
                 const width = `${Math.max(10, Math.min(100, Number(particle.size ?? 0.01) * 2100))}%`;
                 return (
                   <div
@@ -1187,7 +1187,7 @@ export function ChatPanel({
 
         <p className="text-[12px] text-muted mt-1">
           {chatChannel === "ledger"
-            ? `ledger mode auto-routes plain text into /say ${resolvedMusePresenceId} for deterministic evidence replies.`
+            ? `ledger mode auto-routes plain text into /say ${resolvedAgentPresenceId} for deterministic evidence replies.`
             : "llm mode uses /api/agent/message and carries live agent state + nearby embedding context."}
         </p>
 
@@ -1219,7 +1219,7 @@ export function ChatPanel({
                   {msg.role === "user"
                     ? "operator / 操作者"
                     : msg.role === "assistant"
-                      ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeMuse?.en || "agent"} / エージェント`
+                      ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeAgent?.en || "agent"} / エージェント`
                       : "system"}
                 </span>
                 {msg.text}
@@ -1232,7 +1232,7 @@ export function ChatPanel({
           {isThinking ? (
             <div className="border border-dashed border-[#3b6e82] rounded-lg p-2 text-sm bg-[#233045] animate-pulse text-[#66d9ef]">
               <Sparkles size={14} className="inline mr-1" />
-              {activeMuse?.en || "agent"} is synthesizing from simulation state... / エージェントが状態から合成中...
+              {activeAgent?.en || "agent"} is synthesizing from simulation state... / エージェントが状態から合成中...
             </div>
           ) : null}
         </div>
@@ -1285,7 +1285,7 @@ export function ChatPanel({
               isThinking
                 ? "Thinking... / 思考中..."
                 : chatChannel === "ledger"
-                  ? `Describe the work you want ${activeMuse?.en || "the agent"} to route into system signals...`
+                  ? `Describe the work you want ${activeAgent?.en || "the agent"} to route into system signals...`
                   : "Ask the agent for a state-derived language response..."
             }
             disabled={isThinking}
@@ -1326,7 +1326,7 @@ export function ChatPanel({
           </button>
           <button
             type="button"
-            onClick={() => onSendVoice(resolvedMusePresenceId, liveWorkspaceContext)}
+            onClick={() => onSendVoice(resolvedAgentPresenceId, liveWorkspaceContext)}
             className="flex items-center gap-2 btn-voice px-3 py-2 rounded-lg border border-[var(--line)]"
           >
             <MessageSquare size={16} />
@@ -1336,7 +1336,7 @@ export function ChatPanel({
 
         <p className="text-xs text-muted mt-1">{voiceInputMeta}</p>
         <p className="text-[12px] text-muted/80 mt-1">
-          commands: <code>/ledger ...</code> <code>{`/say ${resolvedMusePresenceId} ...`}</code> <code>/study</code> <code>/drift</code> <code>/push-truth --dry-run</code>
+          commands: <code>/ledger ...</code> <code>{`/say ${resolvedAgentPresenceId} ...`}</code> <code>/study</code> <code>/drift</code> <code>/push-truth --dry-run</code>
         </p>
         <p className="text-[12px] text-muted/80 mt-1">
           <Activity size={11} className="inline mr-1" />

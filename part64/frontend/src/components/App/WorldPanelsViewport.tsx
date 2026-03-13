@@ -1439,11 +1439,11 @@ function WorldPanelsViewportInner({
           <header className="world-focus-pane-header">
             <div>
               <p className="world-focus-kicker">{paneKind} focus pane</p>
-              <p className="world-focus-title">Glass lane awaiting presence</p>
+              <p className="world-focus-title">Panel lane awaiting presence</p>
             </div>
           </header>
           <div className="world-glass-pane world-glass-pane-empty-lane">
-            <p className="world-glass-title">transparent standby viewport</p>
+            <p className="world-glass-title">standby viewport</p>
             <div className="world-glass-grid">
               <p className="world-glass-row">This lane remains glass until a presence is focused here.</p>
               <p className="world-glass-row">Council votes can move glass panes forward when simulation view is preferred.</p>

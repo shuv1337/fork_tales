@@ -147,9 +147,9 @@ function buildGlassViewportPanel(): PanelConfig {
 }
 
 function buildAgentPresencePanels(args: BuildPanelConfigsArgs): PanelConfig[] {
-  return FIXED_AGENT_PRESENCES.map((muse) => {
-    const panelId = muse.id;
-    const agentPresenceId = muse.presenceId;
+  return FIXED_AGENT_PRESENCES.map((agent) => {
+    const panelId = agent.id;
+    const agentPresenceId = agent.presenceId;
     const panelState = args.projectionStateByElement.get(panelId) ?? null;
     const panelSession =
       args.activeProjection?.chat_sessions?.find(

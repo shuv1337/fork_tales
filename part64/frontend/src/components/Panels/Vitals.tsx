@@ -24,12 +24,12 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
   const impactById = new Map(
     (presenceDynamics?.presence_impacts ?? []).map((impact) => [impact.id, impact]),
   );
-  const witnessState = presenceDynamics?.witness_thread;
-  const witnessContinuityPct = Math.round((witnessState?.continuity_index ?? 0) * 100);
+  const observerState = presenceDynamics?.witness_thread;
+  const observerContinuityPct = Math.round((observerState?.continuity_index ?? 0) * 100);
   const growthGuard = presenceDynamics?.growth_guard;
   const growthPressurePct = Math.round(Number(growthGuard?.pressure?.blend ?? 0) * 100);
   const growthAction = growthGuard?.action;
-  const witnessLinks = (witnessState?.linked_presences ?? []).map((presenceId) => {
+  const observerLinks = (observerState?.linked_presences ?? []).map((presenceId) => {
     const item = manifestById.get(presenceId);
     if (!item) {
       return presenceId;
@@ -39,26 +39,26 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
 
   return (
     <div className="mt-3 space-y-4">
-      {witnessState && (
+      {observerState && (
         <article className="border border-[#335a6f] rounded-2xl p-4 bg-gradient-to-br from-[#2d2e27] via-[#272822] to-[#1f201d] shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:justify-between lg:items-start">
             <div>
-              <h3 className="text-xl font-semibold text-ink mb-1">{witnessState.en} / {witnessState.ja}</h3>
-              <p className="text-sm text-muted">{witnessState.notes_en}</p>
-              <p className="text-xs text-muted mt-1">{witnessState.notes_ja}</p>
+              <h3 className="text-xl font-semibold text-ink mb-1">{observerState.en} / {observerState.ja}</h3>
+              <p className="text-sm text-muted">{observerState.notes_en}</p>
+              <p className="text-xs text-muted mt-1">{observerState.notes_ja}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 w-full lg:w-auto">
               <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
                 <p className="text-[12px] uppercase tracking-wide text-muted">continuity</p>
-                <p className="font-mono font-semibold text-ink">{witnessContinuityPct}%</p>
+                <p className="font-mono font-semibold text-ink">{observerContinuityPct}%</p>
               </div>
               <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
                 <p className="text-[12px] uppercase tracking-wide text-muted">click pressure</p>
-                <p className="font-mono font-semibold text-ink">{Math.round((witnessState.click_pressure ?? 0) * 100)}%</p>
+                <p className="font-mono font-semibold text-ink">{Math.round((observerState.click_pressure ?? 0) * 100)}%</p>
               </div>
               <div className="rounded-lg border border-[var(--line)] bg-[#252623] px-3 py-2">
                 <p className="text-[12px] uppercase tracking-wide text-muted">file pressure</p>
-                <p className="font-mono font-semibold text-ink">{Math.round((witnessState.file_pressure ?? 0) * 100)}%</p>
+                <p className="font-mono font-semibold text-ink">{Math.round((observerState.file_pressure ?? 0) * 100)}%</p>
               </div>
             </div>
           </div>
@@ -69,17 +69,17 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
               <div
                 className="absolute inset-y-0 left-0 rounded-full"
                 style={{
-                  width: `${witnessContinuityPct}%`,
+                  width: `${observerContinuityPct}%`,
                   background: "linear-gradient(90deg, #56b2c8, #7eaa2e, #8464c4)",
                 }}
               />
               <div
                 className="absolute top-0 bottom-0 w-[2px] bg-white/90"
-                style={{ left: `${witnessContinuityPct}%` }}
+                style={{ left: `${observerContinuityPct}%` }}
               />
             </div>
             <p className="text-xs text-muted mt-2">
-              Linked presences: {witnessLinks.join(" -> ") || "(none)"}
+              Linked presences: {observerLinks.join(" -> ") || "(none)"}
             </p>
           </div>
 
@@ -87,7 +87,7 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
             <div className="rounded-xl border border-[var(--line)] bg-[#242523] p-3">
               <p className="text-[12px] uppercase tracking-wide text-muted mb-2">Lineage / 来歴</p>
               <div className="space-y-2">
-                {(witnessState.lineage ?? []).map((entry, index) => (
+                {(observerState.lineage ?? []).map((entry, index) => (
                   <div key={`${entry.kind}-${entry.ref}-${index}`} className="rounded-md border border-[var(--line)] bg-[#1e1e20] px-2 py-1.5">
                     <p className="text-[12px] text-[#66d9ef] font-mono">{entry.kind}{" -> "}{entry.ref}</p>
                     <p className="text-[12px] text-muted">{entry.why_ja}</p>
@@ -100,7 +100,7 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
               <ol className="space-y-1.5 text-xs text-ink list-decimal pl-4">
                 <li>Tap the field map to bind a target into observer continuity.</li>
                 <li>Check lineage rows to see what changed and where it landed.</li>
-                <li>Use <code>/say witness_thread ...</code> to describe why a trace matters.</li>
+                <li>Use <code>/say observer_thread ...</code> to describe why a trace matters.</li>
               </ol>
             </div>
           </div>

@@ -17,19 +17,19 @@ interface UseChatCommandHandlersArgs {
   simulationTimestamp?: string;
   simulationTruthGateBlocked?: boolean;
   buildAgentSurroundingNodes: (
-    musePresenceId: string,
+    agentPresenceId: string,
     workspace: AgentWorkspaceContext | null,
   ) => Array<Record<string, unknown>>;
   emitSystemMessage: (text: string) => void;
-  emitWitnessChatReply: (
+  emitAgentChatReply: (
     payload: Record<string, unknown>,
     source: string,
-    requestedMusePresenceId?: string,
+    requestedAgentPresenceId?: string,
   ) => void;
 }
 
 interface UseChatCommandHandlersResult {
-  handleChatCommand: (text: string, musePresenceId?: string) => Promise<boolean>;
+  handleChatCommand: (text: string, agentPresenceId?: string) => Promise<boolean>;
 }
 
 interface CommandContext {
@@ -38,14 +38,14 @@ interface CommandContext {
   simulationTimestamp: string | undefined;
   simulationTruthGateBlocked: boolean | undefined;
   buildAgentSurroundingNodes: (
-    musePresenceId: string,
+    agentPresenceId: string,
     workspace: AgentWorkspaceContext | null,
   ) => Array<Record<string, unknown>>;
   emitSystemMessage: (text: string) => void;
-  emitWitnessChatReply: (
+  emitAgentChatReply: (
     payload: Record<string, unknown>,
     source: string,
-    requestedMusePresenceId?: string,
+    requestedAgentPresenceId?: string,
   ) => void;
 }
 
@@ -121,7 +121,7 @@ async function handleLedgerCommand(text: string, context: CommandContext): Promi
   return true;
 }
 
-function parseSayCommand(trimmedText: string, fallbackMusePresenceId: string): {
+function parseSayCommand(trimmedText: string, fallbackAgentPresenceId: string): {
   presenceId: string;
   messageText: string;
 } {
@@ -130,14 +130,14 @@ function parseSayCommand(trimmedText: string, fallbackMusePresenceId: string): {
     .split(/\s+/)
     .filter((token) => token.length > 0);
   return {
-    presenceId: presenceIdRaw || fallbackMusePresenceId || "witness_thread",
+    presenceId: presenceIdRaw || fallbackAgentPresenceId || "witness_thread",
     messageText: messageTokens.join(" "),
   };
 }
 
 async function handlePresenceSayCommand(
   text: string,
-  fallbackMusePresenceId: string,
+  fallbackAgentPresenceId: string,
   context: CommandContext,
 ): Promise<boolean> {
   const trimmed = text.trim();
@@ -145,7 +145,7 @@ async function handlePresenceSayCommand(
     return false;
   }
 
-  const { presenceId, messageText } = parseSayCommand(trimmed, fallbackMusePresenceId);
+  const { presenceId, messageText } = parseSayCommand(trimmed, fallbackAgentPresenceId);
   const surroundingNodes = context.buildAgentSurroundingNodes(presenceId, null);
 
   try {
@@ -156,7 +156,7 @@ async function handlePresenceSayCommand(
       context.simulationTimestamp,
       context.catalogGeneratedAt,
     );
-    context.emitWitnessChatReply(payload as Record<string, unknown>, "command:/say", presenceId);
+    context.emitAgentChatReply(payload as Record<string, unknown>, "command:/say", presenceId);
     context.emitSystemMessage(buildSayCommandSystemMessage(payload, presenceId));
   } catch {
     context.emitSystemMessage("agent say failed");
@@ -427,13 +427,13 @@ async function handleStudyCommand(text: string, context: CommandContext): Promis
 
 async function dispatchChatCommand(
   text: string,
-  musePresenceId: string,
+  agentPresenceId: string,
   context: CommandContext,
 ): Promise<boolean> {
   if (await handleLedgerCommand(text, context)) {
     return true;
   }
-  if (await handlePresenceSayCommand(text, musePresenceId, context)) {
+  if (await handlePresenceSayCommand(text, agentPresenceId, context)) {
     return true;
   }
   if (await handleDriftCommand(text, context)) {
@@ -453,18 +453,18 @@ export function useChatCommandHandlers({
   simulationTruthGateBlocked,
   buildAgentSurroundingNodes,
   emitSystemMessage,
-  emitWitnessChatReply,
+  emitAgentChatReply,
 }: UseChatCommandHandlersArgs): UseChatCommandHandlersResult {
   const handleChatCommand = useCallback(
-    async (text: string, musePresenceId = activeAgentPresenceId): Promise<boolean> =>
-      dispatchChatCommand(text, musePresenceId, {
+    async (text: string, agentPresenceId = activeAgentPresenceId): Promise<boolean> =>
+      dispatchChatCommand(text, agentPresenceId, {
         catalogGeneratedAt,
         catalogTruthGateBlocked,
         simulationTimestamp,
         simulationTruthGateBlocked,
         buildAgentSurroundingNodes,
         emitSystemMessage,
-        emitWitnessChatReply,
+        emitAgentChatReply,
       }),
     [
       activeAgentPresenceId,
@@ -472,7 +472,7 @@ export function useChatCommandHandlers({
       catalogGeneratedAt,
       catalogTruthGateBlocked,
       emitSystemMessage,
-      emitWitnessChatReply,
+      emitAgentChatReply,
       simulationTimestamp,
       simulationTruthGateBlocked,
     ],

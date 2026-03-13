@@ -40,7 +40,7 @@ interface Props {
   glassCenterRatio?: { x: number; y: number };
   agentWorkspaceBindings?: Record<string, string[]>;
   className?: string;
-  // Mouse daimon controls
+  // Mouse particle controls
   mouseParticleEnabled?: boolean;
   mouseParticleMessage?: string;
   mouseParticleMode?: "push" | "pull" | "orbit" | "calm";
@@ -2334,7 +2334,7 @@ export function SimulationCanvas({
     musicNexusSpotlightRef.current = musicNexusSpotlight;
   }, [musicNexusSpotlight]);
 
-  // Mouse Daimon refs - synced from props (managed in CoreControlPanel)
+  // Mouse Particle refs - synced from props (managed in CoreControlPanel)
   const mouseParticleEnabledRef = useRef(mouseParticleEnabled);
   const mouseParticleMessageRef = useRef(mouseParticleMessage);
   const mouseParticleModeRef = useRef(mouseParticleMode);
@@ -3775,7 +3775,7 @@ export function SimulationCanvas({
 
       const flowRate = state.presence_dynamics?.river_flow?.rate;
       const forkTaxBalance = state.presence_dynamics?.fork_tax?.balance;
-      const witnessContinuity = state.presence_dynamics?.witness_thread?.continuity_index;
+      const observerContinuity = state.presence_dynamics?.witness_thread?.continuity_index;
       const witnessTrace = state.presence_dynamics?.witness_thread?.lineage?.[0]?.ref;
       const probabilisticSummary = state.presence_dynamics?.daimoi_probabilistic;
       const graphRuntimeSummary = probabilisticSummary?.graph_runtime;
@@ -3800,14 +3800,14 @@ export function SimulationCanvas({
       const truthStatus = String(truthClaim?.status ?? "undecided");
       const truthKappa = Number(truthClaim?.kappa ?? 0);
       const flowNorm = clamp01(Number(flowRate ?? 0) / 2.8);
-      const witnessNorm = clamp01(Number(witnessContinuity ?? 0));
+      const observerNorm = clamp01(Number(observerContinuity ?? 0));
       const truthNorm = truthState
         ? (truthStatus === "proved" ? 1 : truthStatus === "refuted" ? 0.34 : 0.58)
         : 0.46;
       const audioNorm = clamp01(Number(state.audio ?? 0) / Math.max(1, Number(state.total ?? 1)));
       const richnessNorm = clamp01(dynamicCount / 2200);
       scenePulseTarget = clampValue(
-        0.18 + flowNorm * 0.24 + witnessNorm * 0.22 + truthNorm * 0.16 + audioNorm * 0.12 + richnessNorm * 0.12,
+        0.18 + flowNorm * 0.24 + observerNorm * 0.22 + truthNorm * 0.16 + audioNorm * 0.12 + richnessNorm * 0.12,
         0.14,
         1,
       );
@@ -3862,8 +3862,8 @@ export function SimulationCanvas({
             (flowRate ?? 0).toFixed(2) +
             " | fork-tax: " +
             Math.round(forkTaxBalance ?? 0) +
-            " | witness: " +
-            Math.round((witnessContinuity ?? 0) * 100) +
+            " | observer: " +
+            Math.round((observerContinuity ?? 0) * 100) +
             "%" +
             (witnessTrace ? " [" + witnessTrace + "]" : "") +
             inboxLabel +
@@ -6804,7 +6804,7 @@ export function SimulationCanvas({
               <p className="mt-1 text-[#9ecbe8]">
                 stream signals: transfer ({particleLegendStats.overlays.transfer}) · resource ({particleLegendStats.overlays.resource})
               </p>
-              <p className="text-[#9ecbe8]">ghost trails: smart particles keep short path memory for easier tracing.</p>
+              <p className="text-[#9ecbe8]">particle trails: particles retain short path memory for easier tracing.</p>
               <p className="text-[#9ecbe8]">flow lanes: backend simulation drives nexus routing telemetry.</p>
               <p className="text-[#9ecbe8]">all nexus node movement now comes from backend simulation deltas.</p>
               <p className="text-[#9ecbe8]">graph view: particle flow is shown as lane lines + pulses + arrowheads from backend state.</p>
@@ -6897,11 +6897,11 @@ export function SimulationCanvas({
                 : undefined
             }
           >
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_0%,#22283e_48%,transparent_100%)] bg-[length:100%_3px] opacity-40" />
+
             <div className="pointer-events-none absolute -inset-8 bg-[#0b1424]" />
             <header className="relative h-14 px-4 flex items-center justify-between border-b border-[#3f5573] bg-[#0b1424]">
               <div className="min-w-0">
-                <p className="text-[12px] uppercase tracking-[0.14em] text-[#a9dbff]">hologram worldscreen / 投影スクリーン</p>
+                <p className="text-[12px] uppercase tracking-[0.14em] text-[#a9dbff]">simulation display / 投影スクリーン</p>
                 <p className="text-sm text-[#ecf7ff] font-semibold truncate">
                   {worldscreen.label}
                   <span className="text-[12px] text-[#b9dcf7]"> ({worldscreen.nodeKind})</span>

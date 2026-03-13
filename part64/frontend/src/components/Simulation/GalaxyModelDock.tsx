@@ -698,9 +698,9 @@ export function GalaxyModelDock({ onClose }: Props) {
     <section className="w-[min(96vw,31rem)] max-h-[72vh] overflow-hidden rounded-xl border border-[#4d7291] bg-[linear-gradient(152deg,#06101c,#081624,#06121e)] shadow-[0_26px_70px_#0b1021]">
       <header className="flex items-start justify-between gap-3 border-b border-[#3e5873] px-3 py-2.5">
         <div>
-          <p className="text-[12px] uppercase tracking-[0.13em] text-[#9fd4f5]">galaxy model dock</p>
+          <p className="text-[12px] uppercase tracking-[0.13em] text-[#9fd4f5]">model dock</p>
           <p className="text-sm font-semibold text-[#e3f4ff]">Multi-account OAuth + model control</p>
-          <p className="text-[12px] text-[#9abfd8]">Merged from proxy gateway interface for in-galaxy management.</p>
+          <p className="text-[12px] text-[#9abfd8]">Merged from proxy gateway interface for model management.</p>
         </div>
         <button
           type="button"

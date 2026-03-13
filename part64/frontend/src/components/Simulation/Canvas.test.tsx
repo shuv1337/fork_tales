@@ -548,7 +548,7 @@ describe("SimulationCanvas", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/hologram worldscreen/i)).toBeTruthy();
+      expect(screen.getByText(/simulation display/i)).toBeTruthy();
       expect(screen.getByText("Remote resource metadata from crawler encounter")).toBeTruthy();
     });
 
@@ -564,7 +564,7 @@ describe("SimulationCanvas", () => {
 
     fireEvent.keyDown(window, { key: "Escape" });
     await waitFor(() => {
-      expect(screen.queryByText(/hologram worldscreen/i)).toBeNull();
+      expect(screen.queryByText(/simulation display/i)).toBeNull();
     });
 
     expect(fetchSpy.mock.calls.some(([url]) => String(url).includes("/api/continuity"))).toBe(true);
@@ -609,7 +609,7 @@ describe("SimulationCanvas", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/hologram worldscreen/i)).toBeTruthy();
+      expect(screen.getByText(/simulation display/i)).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "conversation" }));

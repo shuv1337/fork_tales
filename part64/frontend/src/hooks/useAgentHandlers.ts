@@ -57,20 +57,20 @@ export interface AgentHandlersActions {
   openAgentImage: (rawUrl: string, label: string) => boolean;
   handleCreateAgent: () => Promise<void>;
   buildAgentSurroundingNodes: (
-    musePresenceId: string,
+    agentPresenceId: string,
     workspace?: AgentWorkspaceContext | null,
   ) => Array<Record<string, unknown>>;
-  emitWitnessChatReply: (
+  emitAgentChatReply: (
     payload: Record<string, unknown>,
     source: string,
-    requestedMusePresenceId?: string,
+    requestedAgentPresenceId?: string,
   ) => void;
   handleRecord: () => Promise<void>;
   handleTranscribe: () => Promise<string | undefined>;
-  handleSendVoice: (musePresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
+  handleSendVoice: (agentPresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
   handleAgentWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
   handleAgentWorkspaceContextChange: (presenceId: string, workspace: AgentWorkspaceContext) => void;
-  handleAgentWorkspaceSend: (text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => void;
+  handleAgentWorkspaceSend: (text: string, agentPresenceId: string, workspace: AgentWorkspaceContext) => void;
   handleWorldInteract: (personId: string, action: "speak" | "boost" | "sing") => Promise<void>;
   handleOverlayInit: (api: unknown) => void;
 }
@@ -95,7 +95,7 @@ interface UseAgentHandlersParams {
   } | null;
   agentEvents: AgentEvent[] | undefined;
   handleAutopilotUserInput: (text: string) => boolean;
-  handleChatCommand: (text: string, musePresenceId: string) => Promise<boolean>;
+  handleChatCommand: (text: string, agentPresenceId: string) => Promise<boolean>;
   /** When false, skip the agentEvents processing side-effect (toasts, overlays, system messages). */
   processEvents?: boolean;
 }
@@ -275,10 +275,10 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
 
   // --- Build surrounding nodes ---
   const buildAgentSurroundingNodes = useCallback((
-    musePresenceId: string,
+    agentPresenceId: string,
     workspace: AgentWorkspaceContext | null = null,
   ): Array<Record<string, unknown>> => {
-    const normalizedAgent = normalizeAgentPresenceId(musePresenceId || "witness_thread") || "witness_thread";
+    const normalizedAgent = normalizeAgentPresenceId(agentPresenceId || "witness_thread") || "witness_thread";
     const graphNodes = (
       simulation?.file_graph?.file_nodes ?? catalog?.file_graph?.file_nodes ?? []
     ).filter((row): row is FileGraphNode => Boolean(row));
@@ -362,11 +362,11 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     return [...pinnedRows, ...nearbyRows, ...buildDeviceSurroundingNodes(simulation)].slice(0, 36);
   }, [catalog?.file_graph?.file_nodes, agentWorkspaceBindings, simulation]);
 
-  // --- Witness chat reply ---
-  const emitWitnessChatReply = useCallback((
+  // --- Agent chat reply ---
+  const emitAgentChatReply = useCallback((
     payload: Record<string, unknown>,
     source: string,
-    requestedMusePresenceId?: string,
+    requestedAgentPresenceId?: string,
   ) => {
     const reply = String(payload.reply ?? "").trim();
     const mode = String(payload.mode ?? "canonical").trim() || "canonical";
@@ -382,7 +382,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     const muse = payload.muse && typeof payload.muse === "object"
       ? payload.muse as Record<string, unknown> : null;
     const tracePresenceId = String(
-      muse?.id ?? entities[0]?.presence_id ?? requestedMusePresenceId ?? activeAgentPresenceId ?? "witness_thread",
+      muse?.id ?? entities[0]?.presence_id ?? requestedAgentPresenceId ?? activeAgentPresenceId ?? "witness_thread",
     ).trim() || "witness_thread";
     const tracePresenceName = String(
       muse?.label ?? entities[0]?.presence_en ?? tracePresenceId,
@@ -391,7 +391,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       ? payload.manifest as Record<string, unknown> : null;
     const explicitSelected = Array.isArray(manifest?.explicit_selected) ? manifest.explicit_selected : [];
     const surroundSelected = Array.isArray(manifest?.surround_selected) ? manifest.surround_selected : [];
-    const daimoiRows = Array.isArray(payload.daimoi)
+    const particleRows = Array.isArray(payload.daimoi)
       ? payload.daimoi.filter((row): row is Record<string, unknown> => Boolean(row && typeof row === "object")) : [];
     const fieldDeltas = Array.isArray(payload.field_deltas)
       ? payload.field_deltas.filter((row): row is Record<string, unknown> => Boolean(row && typeof row === "object")) : [];
@@ -427,13 +427,13 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       });
     }
 
-    if (manifest || daimoiRows.length > 0 || fieldDeltas.length > 0 || gpuStatus || toolRows.length > 0) {
+    if (manifest || particleRows.length > 0 || fieldDeltas.length > 0 || gpuStatus || toolRows.length > 0) {
       const turnId = String(payload.turn_id ?? "").trim() || "(none)";
       emitChatMessage({
         role: "assistant",
         text: [
           "agent turn signal", `turn_id=${turnId}`, `explicit=${explicitSelected.length}`,
-          `surrounding=${surroundSelected.length}`, `daimoi=${daimoiRows.length}`,
+          `surrounding=${surroundSelected.length}`, `particles=${particleRows.length}`,
           `field_deltas=${fieldDeltas.length}`, `gpu=${gpuStatus || "released"}`,
           `tools=${toolRows.length}`, `media=${mediaActions.length}`,
         ].join("\n"),
@@ -449,7 +449,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     });
 
     if (fieldDeltas.length === 0) {
-      daimoiRows.slice(0, 6).forEach((row, index) => {
+      particleRows.slice(0, 6).forEach((row, index) => {
         const x = clamp(Number(row.x ?? (0.2 + (stableUnitHash(`${tracePresenceId}|daimon|${index}`) * 0.6))), 0, 1);
         const y = clamp(Number(row.y ?? (0.18 + (stableUnitHash(`${tracePresenceId}|daimon|${index}|y`) * 0.62))), 0, 1);
         const energy = clamp(Number(row.energy ?? 0.44), 0, 1);
@@ -591,34 +591,34 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     } catch { setVoiceInputMeta("transcribe failed"); return undefined; }
   }, [recordedBlob]);
 
-  const handleSendVoice = useCallback(async (musePresenceId: string, workspace: AgentWorkspaceContext) => {
+  const handleSendVoice = useCallback(async (agentPresenceId: string, workspace: AgentWorkspaceContext) => {
     const text = await handleTranscribe();
     if (!text) return;
-    const resolvedMusePresenceId = String(musePresenceId || activeAgentPresenceId || "witness_thread").trim() || "witness_thread";
-    const surroundingNodes = buildAgentSurroundingNodes(resolvedMusePresenceId, workspace);
-    emitChatMessage({ role: "user", text, meta: { channel: "llm", source: "voice", presenceId: resolvedMusePresenceId } });
+    const resolvedAgentPresenceId = String(agentPresenceId || activeAgentPresenceId || "witness_thread").trim() || "witness_thread";
+    const surroundingNodes = buildAgentSurroundingNodes(resolvedAgentPresenceId, workspace);
+    emitChatMessage({ role: "user", text, meta: { channel: "llm", source: "voice", presenceId: resolvedAgentPresenceId } });
     const baseUrl = runtimeBaseUrl();
     try {
       const response = await fetch(`${baseUrl}/api/agent/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          muse_id: resolvedMusePresenceId || "witness_thread", multi_entity: true,
-          presence_ids: [resolvedMusePresenceId || "witness_thread"], text, mode: "stochastic",
+          muse_id: resolvedAgentPresenceId || "witness_thread", multi_entity: true,
+          presence_ids: [resolvedAgentPresenceId || "witness_thread"], text, mode: "stochastic",
           token_budget: 2048, graph_revision: simulation?.timestamp || catalog?.generated_at || "",
           surrounding_nodes: surroundingNodes,
         }),
       });
       if (!response.ok) throw new Error(`agent request failed (${response.status})`);
       const payload = (await response.json()) as { reply?: unknown; mode?: unknown; model?: unknown; trace?: unknown };
-      emitWitnessChatReply(payload as Record<string, unknown>, "voice:/api/agent/message", resolvedMusePresenceId);
+      emitAgentChatReply(payload as Record<string, unknown>, "voice:/api/agent/message", resolvedAgentPresenceId);
     } catch {
       emitChatMessage({
         role: "assistant", text: "voice chat request failed",
-        meta: { channel: "command", source: "voice:/api/agent/message", presenceId: resolvedMusePresenceId },
+        meta: { channel: "command", source: "voice:/api/agent/message", presenceId: resolvedAgentPresenceId },
       });
     }
-  }, [activeAgentPresenceId, buildAgentSurroundingNodes, catalog, emitChatMessage, emitWitnessChatReply, handleTranscribe, simulation]);
+  }, [activeAgentPresenceId, buildAgentSurroundingNodes, catalog, emitChatMessage, emitAgentChatReply, handleTranscribe, simulation]);
 
   // --- Workspace ---
   const handleAgentWorkspaceBindingsChange = useCallback((presenceId: string, fileNodeIds: string[]) => {
@@ -664,38 +664,38 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
   }, []);
 
   // --- Workspace send ---
-  const handleAgentWorkspaceSend = useCallback((text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => {
-    const resolvedMusePresenceId = String(musePresenceId || activeAgentPresenceId || "witness_thread").trim() || "witness_thread";
-    setActiveAgentPresenceId(resolvedMusePresenceId);
+  const handleAgentWorkspaceSend = useCallback((text: string, agentPresenceId: string, workspace: AgentWorkspaceContext) => {
+    const resolvedAgentPresenceId = String(agentPresenceId || activeAgentPresenceId || "witness_thread").trim() || "witness_thread";
+    setActiveAgentPresenceId(resolvedAgentPresenceId);
     if (handleAutopilotUserInput(text)) return;
     setIsThinking(true);
     (async () => {
-      const consumed = await handleChatCommand(text, resolvedMusePresenceId);
+      const consumed = await handleChatCommand(text, resolvedAgentPresenceId);
       if (consumed) return;
       const baseUrl = runtimeBaseUrl();
-      const surroundingNodes = buildAgentSurroundingNodes(resolvedMusePresenceId, workspace);
+      const surroundingNodes = buildAgentSurroundingNodes(resolvedAgentPresenceId, workspace);
       const response = await fetch(`${baseUrl}/api/agent/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          muse_id: resolvedMusePresenceId || "witness_thread", multi_entity: true,
-          presence_ids: [resolvedMusePresenceId || "witness_thread"], text, mode: "stochastic",
+          muse_id: resolvedAgentPresenceId || "witness_thread", multi_entity: true,
+          presence_ids: [resolvedAgentPresenceId || "witness_thread"], text, mode: "stochastic",
           token_budget: 2048, graph_revision: simulation?.timestamp || catalog?.generated_at || "",
           surrounding_nodes: surroundingNodes,
         }),
       });
       if (!response.ok) throw new Error(`agent request failed (${response.status})`);
       const payload = (await response.json()) as { reply?: unknown; mode?: unknown; model?: unknown; trace?: unknown };
-      emitWitnessChatReply(payload as Record<string, unknown>, "chat:/api/agent/message", resolvedMusePresenceId);
+      emitAgentChatReply(payload as Record<string, unknown>, "chat:/api/agent/message", resolvedAgentPresenceId);
     })()
       .catch(() => {
         emitChatMessage({
           role: "assistant", text: "agent request failed",
-          meta: { channel: "command", source: "chat:/api/agent/message", presenceId: resolvedMusePresenceId },
+          meta: { channel: "command", source: "chat:/api/agent/message", presenceId: resolvedAgentPresenceId },
         });
       })
       .finally(() => { setIsThinking(false); });
-  }, [activeAgentPresenceId, catalog, emitChatMessage, emitWitnessChatReply, handleAutopilotUserInput, buildAgentSurroundingNodes, handleChatCommand, simulation]);
+  }, [activeAgentPresenceId, catalog, emitChatMessage, emitAgentChatReply, handleAutopilotUserInput, buildAgentSurroundingNodes, handleChatCommand, simulation]);
 
   // --- World interaction ---
   const handleWorldInteract = useCallback(async (personId: string, action: "speak" | "boost" | "sing") => {
@@ -740,7 +740,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     emitChatMessage, emitSystemMessage,
     playAgentAudio, openAgentImage,
     handleCreateAgent, buildAgentSurroundingNodes,
-    emitWitnessChatReply,
+    emitAgentChatReply,
     handleRecord, handleTranscribe, handleSendVoice,
     handleAgentWorkspaceBindingsChange,
     handleAgentWorkspaceContextChange,
