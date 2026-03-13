@@ -5,7 +5,7 @@ commands:
   test_frontend: cd part64/frontend && npx vitest run --exclude 'e2e/**'
   lint: cd part64/frontend && npx eslint .
   test_python_world_life: cd part64 && python3 -m code.tests.test_world_life
-  test_python_myth_bridge: cd part64 && python3 -m code.tests.test_myth_bridge
+  test_python_attribution: cd part64 && python3 -m code.tests.test_attribution
   test_python_sonify: cd part64 && python3 -m code.tests.test_sonify_determinism
 
 services:

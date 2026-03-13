@@ -1,8 +1,8 @@
-from code.world_web.ecs import LithECS
+from code.world_web.ecs import LithECS as ECS
 
 
-def test_lith_ecs_dsl():
-    ecs = LithECS()
+def test_ecs_dsl():
+    ecs = ECS()
 
     dsl_source = """
     (entity {:in :sim :id :e/duck :type :agent})
@@ -60,4 +60,4 @@ def test_lith_ecs_dsl():
 
 
 if __name__ == "__main__":
-    test_lith_ecs_dsl()
+    test_ecs_dsl()

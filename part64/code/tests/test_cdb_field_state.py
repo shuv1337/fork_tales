@@ -3,8 +3,8 @@ import ctypes
 from code.world_web.c_double_buffer_backend import _get_engine, _CDB_MAX_PRESENCE_SLOTS
 
 
-class TestCDBNooiIntegration(unittest.TestCase):
-    def test_nooi_update(self):
+class TestCDBFieldStateIntegration(unittest.TestCase):
+    def test_field_state_update(self):
         engine = _get_engine(count=100, seed=123)
 
         # Create a dummy field: 64*64*8*2 floats

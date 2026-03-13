@@ -77,7 +77,7 @@ For runtime bring-up, prefer Docker unless a task explicitly requires PM2.
 
 - PM2/browser integration suite: `python -m code.tests.test_world_web_pm2`
 - World life suite: `python -m code.tests.test_world_life`
-- Myth bridge suite: `python -m code.tests.test_myth_bridge`
+- Attribution suite: `python -m code.tests.test_attribution`
 - Sonify determinism suite: `python -m code.tests.test_sonify_determinism`
 
 ### Single test file

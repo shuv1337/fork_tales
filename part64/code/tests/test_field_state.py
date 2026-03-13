@@ -9,7 +9,7 @@ from code.world_web.field_state import (
 )
 
 
-class TestNooiField(unittest.TestCase):
+class TestFieldState(unittest.TestCase):
     def test_initialization(self):
         field = NooiField()
         self.assertEqual(field.cols, NOOI_GRID_COLS)
