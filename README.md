@@ -1,4 +1,4 @@
-# Fork Tales
+# eta-mu
 
 This repository contains both code and creative works, licensed under a 
 dual-licensing model to ensure everything remains free and share-alike.

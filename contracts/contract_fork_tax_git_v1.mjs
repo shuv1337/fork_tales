@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: GPL-3.0-or-later
-// This file is part of Fork Tales.
-// Copyright (C) 2024-2025 Fork Tales Contributors
+// This file is part of eta-mu.
+// Copyright (C) 2024-2025 eta-mu Contributors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -323,7 +323,7 @@ function evaluatePresences(state, options) {
       repairs.push("Push branch to upstream or reduce ahead count before new work.");
     }
 
-    presences.push(makePresence("fork-tax-canticle", status, unique(facts), unique(asks), unique(repairs), refs));
+    presences.push(makePresence("fork-cost-metric", status, unique(facts), unique(asks), unique(repairs), refs));
   }
 
   {
@@ -378,7 +378,7 @@ function evaluatePresences(state, options) {
       repairs.push("Reconcile remote changes before pushing new checkpoints.");
     }
 
-    presences.push(makePresence("witness-thread", status, unique(facts), unique(asks), unique(repairs), refs));
+    presences.push(makePresence("observer-thread", status, unique(facts), unique(asks), unique(repairs), refs));
   }
 
   {
@@ -391,7 +391,7 @@ function evaluatePresences(state, options) {
       asks.push("receipts.log missing at repository root.");
       repairs.push("Create receipts.log before claiming fork-tax compliance.");
     }
-    presences.push(makePresence("keeper-of-receipts", status, facts, asks, repairs, refs));
+    presences.push(makePresence("log-guardian", status, facts, asks, repairs, refs));
   }
 
   {
@@ -653,8 +653,8 @@ function runSelfTests() {
     const audit = buildAudit(state, options);
     assert.equal(audit.gate.commit_ready, true);
     assert.equal(audit.gate.push_ready, false);
-    assert.ok(audit.gate.blocked_by.includes("fork-tax-canticle"));
-    assert.ok(audit.gate.blocked_by.includes("witness-thread"));
+    assert.ok(audit.gate.blocked_by.includes("fork-cost-metric"));
+    assert.ok(audit.gate.blocked_by.includes("observer-thread"));
   }
 
   process.stdout.write(

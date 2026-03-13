@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// This file is part of Fork Tales.
-// Copyright (C) 2024-2025 Fork Tales Contributors
+// This file is part of eta-mu.
+// Copyright (C) 2024-2025 eta-mu Contributors
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { UiToast } from "../app/appShellTypes";

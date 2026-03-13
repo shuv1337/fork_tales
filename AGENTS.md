@@ -1,8 +1,8 @@
 # AGENTS.md
 
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
-<!-- This file is part of Fork Tales. -->
-<!-- Copyright (C) 2024-2025 Fork Tales Contributors -->
+<!-- This file is part of eta-mu. -->
+<!-- Copyright (C) 2024-2025 eta-mu Contributors -->
 <!-- See LICENSE.txt for details. -->
 
 Practical guidance for coding agents working in this repository.
