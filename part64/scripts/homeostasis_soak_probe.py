@@ -394,7 +394,7 @@ def _user_input_writer(
             "kind": "search",
             "target": "simulation",
             "message": query,
-            "embed_daimoi": True,
+            "embed_particle": True,
             "meta": {"query": query},
         }
         ok, status, latency_ms, error = _http_post_json(

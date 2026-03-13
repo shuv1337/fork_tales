@@ -2497,7 +2497,7 @@ PROJECTION_ELEMENTS: list[dict[str, Any]] = [
         "lane": "senses",
     },
     {
-        "id": "nexus.ui.inspiration_atlas",
+        "id": "nexus.ui.system_overview",
         "kind": "panel",
         "title": "System Overview",
         "binds_to": ["/api/catalog"],

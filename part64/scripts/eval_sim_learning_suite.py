@@ -233,7 +233,7 @@ def _ensure_npu(
                     "kind": "input",
                     "target": "simulation",
                     "message": "npu c runtime probe",
-                    "embed_daimoi": True,
+                    "embed_particle": True,
                 }
             ]
         },
@@ -249,8 +249,8 @@ def _ensure_npu(
     c_runtime_error = ""
     c_runtime_cpu_fallback = False
     c_runtime_cpu_fallback_detail = ""
-    daimoi_backend = ""
-    daimoi_backend_error = ""
+    particle_backend = ""
+    particle_backend_error = ""
     try:
         simulation = _probe_simulation_payload(
             runtime_url=runtime.url,
@@ -263,8 +263,8 @@ def _ensure_npu(
             else {}
         )
         probabilistic = (
-            presence.get("daimoi_probabilistic", {})
-            if isinstance(presence.get("daimoi_probabilistic", {}), dict)
+            presence.get("particle_probabilistic", {})
+            if isinstance(presence.get("particle_probabilistic", {}), dict)
             else {}
         )
         c_runtime_source = str(
@@ -277,8 +277,8 @@ def _ensure_npu(
         c_runtime_cpu_fallback_detail = str(
             probabilistic.get("embedding_runtime_cpu_fallback_detail", "")
         ).strip()
-        daimoi_backend = str(probabilistic.get("backend", "")).strip().lower()
-        daimoi_backend_error = str(probabilistic.get("backend_error", "")).strip()
+        particle_backend = str(probabilistic.get("backend", "")).strip().lower()
+        particle_backend_error = str(probabilistic.get("backend_error", "")).strip()
     except Exception as exc:
         c_runtime_error = f"simulation_probe_failed:{exc.__class__.__name__}"
 
@@ -293,13 +293,13 @@ def _ensure_npu(
         c_runtime_source.startswith("c-onnxruntime:NPU")
         and not fallback_signaled
         and not c_runtime_error
-        and (not daimoi_backend or daimoi_backend == "c-double-buffer")
+        and (not particle_backend or particle_backend == "c-double-buffer")
     )
     probe_error = c_runtime_error
     if fallback_signaled and not probe_error:
         probe_error = c_runtime_cpu_fallback_detail or "cpu_fallback_detected"
-    if not probe_error and daimoi_backend and daimoi_backend != "c-double-buffer":
-        probe_error = daimoi_backend_error or f"daimoi_backend={daimoi_backend}"
+    if not probe_error and particle_backend and particle_backend != "c-double-buffer":
+        probe_error = particle_backend_error or f"particle_backend={particle_backend}"
     return {
         "label": runtime.label,
         "runtime": runtime.url,
@@ -313,8 +313,8 @@ def _ensure_npu(
         "c_runtime_error": c_runtime_error,
         "c_runtime_cpu_fallback": c_runtime_cpu_fallback,
         "c_runtime_cpu_fallback_detail": c_runtime_cpu_fallback_detail,
-        "daimoi_backend": daimoi_backend,
-        "daimoi_backend_error": daimoi_backend_error,
+        "particle_backend": particle_backend,
+        "particle_backend_error": particle_backend_error,
         "apply_ok": bool(apply.get("ok", False)),
     }
 
@@ -345,7 +345,7 @@ def _inject_environment_events(
                 "target": targets[index % len(targets)],
                 "x_ratio": round(rng.random(), 6),
                 "y_ratio": round(rng.random(), 6),
-                "embed_daimoi": True,
+                "embed_particle": True,
                 "message": prompts[index % len(prompts)],
             }
         )
@@ -599,7 +599,7 @@ def main() -> int:
             f"npu-check {runtime.label}: backend={check.get('backend')} device={check.get('openvino_device')} "
             f"c_runtime={check.get('c_runtime_source') or '(none)'} "
             f"cpu_fallback={check.get('c_runtime_cpu_fallback')} "
-            f"daimoi_backend={check.get('daimoi_backend') or '(none)'} ok={check.get('ok')}"
+            f"particle_backend={check.get('particle_backend') or '(none)'} ok={check.get('ok')}"
         )
         if not bool(check.get("ok", False)):
             failures += 1

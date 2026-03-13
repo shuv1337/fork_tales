@@ -31,7 +31,7 @@ def _seed_value(text: str) -> int:
 def _make_actors() -> list[dict[str, Any]]:
     return [
         {
-            "id": "scribe_aya",
+            "id": "logger_aya",
             "name": {"en": "Aya the Logger", "ja": "書記アヤ"},
             "role": {"en": "Logger", "ja": "書記"},
             "instrument": "glass-bell",
@@ -39,7 +39,7 @@ def _make_actors() -> list[dict[str, Any]]:
             "base_weight": 0.64,
         },
         {
-            "id": "cantor_ren",
+            "id": "synth_ren",
             "name": {"en": "Ren the Synthesizer", "ja": "詠唱者レン"},
             "role": {"en": "Synthesizer", "ja": "聖歌手"},
             "instrument": "sub-bass drum",
@@ -47,7 +47,7 @@ def _make_actors() -> list[dict[str, Any]]:
             "base_weight": 0.58,
         },
         {
-            "id": "keeper_mio",
+            "id": "guardian_mio",
             "name": {"en": "Mio of the Registry", "ja": "台帳のミオ"},
             "role": {"en": "Guardian", "ja": "番人"},
             "instrument": "reed-organ",
@@ -55,7 +55,7 @@ def _make_actors() -> list[dict[str, Any]]:
             "base_weight": 0.72,
         },
         {
-            "id": "witness_kai",
+            "id": "observer_kai",
             "name": {"en": "Kai the Observer", "ja": "証人カイ"},
             "role": {"en": "Observer", "ja": "証人"},
             "instrument": "hollow-choir",
@@ -63,7 +63,7 @@ def _make_actors() -> list[dict[str, Any]]:
             "base_weight": 0.67,
         },
         {
-            "id": "weaver_noa",
+            "id": "integrator_noa",
             "name": {"en": "Noa the Weaver", "ja": "織り手ノア"},
             "role": {"en": "Integrator", "ja": "場の織り手"},
             "instrument": "tape-piano",
@@ -108,7 +108,7 @@ def build_interaction_response(
     )
     presence_name = presence.get("name", {"en": "Unknown", "ja": "未知"})
 
-    if action_key == "pray":
+    if action_key == "boost":
         line_en = (
             f"{person['name']['en']} focuses on {presence_name['en']}, "
             f"offering a {int(activity * 100)}% pulse of living proof."

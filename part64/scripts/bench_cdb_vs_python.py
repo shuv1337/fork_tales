@@ -20,9 +20,9 @@ from code.world_web.c_double_buffer_backend import (
     build_double_buffer_field_particles,
     shutdown_c_double_buffer_backend,
 )
-from code.world_web.daimoi_probabilistic import (
-    build_probabilistic_daimoi_particles,
-    reset_probabilistic_daimoi_state_for_tests,
+from code.world_web.particle_probabilistic import (
+    build_probabilistic_particles,
+    reset_probabilistic_particle_state_for_tests,
 )
 
 
@@ -141,13 +141,13 @@ def main() -> int:
     sample = _sample_inputs()
     now_seed = 1_700_900_000.0
 
-    reset_probabilistic_daimoi_state_for_tests()
+    reset_probabilistic_particle_state_for_tests()
 
     py_counter = {"i": 0}
 
     def run_python() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         py_counter["i"] += 1
-        return build_probabilistic_daimoi_particles(
+        return build_probabilistic_particles(
             file_graph=sample["file_graph"],
             presence_impacts=sample["presence_impacts"],
             resource_heartbeat=sample["resource_heartbeat"],

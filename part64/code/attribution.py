@@ -110,7 +110,7 @@ def build_mentions_from_catalog(catalog: dict[str, Any]) -> list[dict[str, Any]]
 
 
 def fetch_remote_attribution() -> dict[str, Any] | None:
-    source_url = str(os.getenv("MYTH_BRIDGE_URL", "")).strip()
+    source_url = str(os.getenv("ATTRIBUTION_URL", "")).strip()
     if not source_url:
         return None
 

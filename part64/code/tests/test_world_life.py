@@ -69,10 +69,10 @@ def test_world_life_interaction_response_uses_presence_and_action() -> None:
     ]
     snapshot = tracker.snapshot(catalog, myth, entities)
 
-    response = build_interaction_response(snapshot, "scribe_aya", "pray")
+    response = build_interaction_response(snapshot, "logger_aya", "boost")
 
     assert response["ok"] is True
-    assert response["action"] == "pray"
+    assert response["action"] == "boost"
     assert "Observer Thread" in response["line_en"]
     assert "観測者の糸" in response["line_ja"]
 

@@ -26,8 +26,8 @@ class RuntimeCheck:
     c_runtime_error: str
     c_runtime_cpu_fallback: bool
     c_runtime_cpu_fallback_detail: str
-    daimoi_backend: str
-    daimoi_backend_error: str
+    particle_backend: str
+    particle_backend_error: str
 
 
 def _has_cpu_fallback_signal(text: str) -> bool:
@@ -230,7 +230,7 @@ def _check_runtime(
                     "kind": "input",
                     "target": "simulation",
                     "message": str(probe_text).strip() or "npu c runtime probe",
-                    "embed_daimoi": True,
+                    "embed_particle": True,
                 }
             ]
         },
@@ -249,8 +249,8 @@ def _check_runtime(
     c_runtime_error = ""
     c_runtime_cpu_fallback = False
     c_runtime_cpu_fallback_detail = ""
-    daimoi_backend = ""
-    daimoi_backend_error = ""
+    particle_backend = ""
+    particle_backend_error = ""
     try:
         simulation = _probe_simulation_payload(
             runtime=runtime,
@@ -263,8 +263,8 @@ def _check_runtime(
             else {}
         )
         probabilistic = (
-            presence.get("daimoi_probabilistic", {})
-            if isinstance(presence.get("daimoi_probabilistic", {}), dict)
+            presence.get("particle_probabilistic", {})
+            if isinstance(presence.get("particle_probabilistic", {}), dict)
             else {}
         )
         c_runtime_source = str(
@@ -277,8 +277,8 @@ def _check_runtime(
         c_runtime_cpu_fallback_detail = str(
             probabilistic.get("embedding_runtime_cpu_fallback_detail", "")
         ).strip()
-        daimoi_backend = str(probabilistic.get("backend", "")).strip().lower()
-        daimoi_backend_error = str(probabilistic.get("backend_error", "")).strip()
+        particle_backend = str(probabilistic.get("backend", "")).strip().lower()
+        particle_backend_error = str(probabilistic.get("backend_error", "")).strip()
     except Exception as exc:
         c_runtime_error = f"simulation_probe_failed:{exc.__class__.__name__}"
 
@@ -291,13 +291,13 @@ def _check_runtime(
         c_runtime_source.startswith("c-onnxruntime:NPU")
         and not fallback_signaled
         and not c_runtime_error
-        and (not daimoi_backend or daimoi_backend == "c-double-buffer")
+        and (not particle_backend or particle_backend == "c-double-buffer")
     )
     probe_error = c_runtime_error
     if fallback_signaled and not probe_error:
         probe_error = c_runtime_cpu_fallback_detail or "cpu_fallback_detected"
-    if not probe_error and daimoi_backend and daimoi_backend != "c-double-buffer":
-        probe_error = daimoi_backend_error or f"daimoi_backend={daimoi_backend}"
+    if not probe_error and particle_backend and particle_backend != "c-double-buffer":
+        probe_error = particle_backend_error or f"particle_backend={particle_backend}"
 
     ok = backend == "openvino" and device == "NPU" and probe_ok
     return RuntimeCheck(
@@ -313,8 +313,8 @@ def _check_runtime(
         c_runtime_error=c_runtime_error,
         c_runtime_cpu_fallback=c_runtime_cpu_fallback,
         c_runtime_cpu_fallback_detail=c_runtime_cpu_fallback_detail,
-        daimoi_backend=daimoi_backend,
-        daimoi_backend_error=daimoi_backend_error,
+        particle_backend=particle_backend,
+        particle_backend_error=particle_backend_error,
     )
 
 
@@ -411,8 +411,8 @@ def main() -> int:
                 c_runtime_error="",
                 c_runtime_cpu_fallback=False,
                 c_runtime_cpu_fallback_detail="",
-                daimoi_backend="",
-                daimoi_backend_error="",
+                particle_backend="",
+                particle_backend_error="",
             )
         checks.append(result)
         if not result.ok:
@@ -422,7 +422,7 @@ def main() -> int:
             f"{label}: backend={result.backend or '(none)'} device={result.openvino_device or '(none)'} "
             f"c_runtime={result.c_runtime_source or '(none)'} "
             f"cpu_fallback={result.c_runtime_cpu_fallback} "
-            f"daimoi_backend={result.daimoi_backend or '(none)'} ok={result.ok}"
+            f"particle_backend={result.particle_backend or '(none)'} ok={result.ok}"
         )
         if result.probe_error:
             print(f"  probe_error={result.probe_error}")
@@ -444,8 +444,8 @@ def main() -> int:
                 "c_runtime_error": row.c_runtime_error,
                 "c_runtime_cpu_fallback": row.c_runtime_cpu_fallback,
                 "c_runtime_cpu_fallback_detail": row.c_runtime_cpu_fallback_detail,
-                "daimoi_backend": row.daimoi_backend,
-                "daimoi_backend_error": row.daimoi_backend_error,
+                "particle_backend": row.particle_backend,
+                "particle_backend_error": row.particle_backend_error,
             }
             for row in checks
         ],

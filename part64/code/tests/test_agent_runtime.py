@@ -31,13 +31,13 @@ def _manager(*, turns_per_minute: int = 24) -> AgentRuntimeManager:
 
 def _reply_builder(**_: Any) -> dict[str, Any]:
     return {
-        "reply": "stable muse reply",
+        "reply": "stable agent reply",
         "mode": "canonical",
         "model": "unit",
     }
 
 
-def test_muse_pause_resume_and_rate_limit() -> None:
+def test_agent_pause_resume_and_rate_limit() -> None:
     manager = _manager(turns_per_minute=1)
 
     paused = manager.set_pause(
@@ -49,7 +49,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert paused["ok"] is True
 
     blocked = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="hello while paused",
         mode="deterministic",
         token_budget=1024,
@@ -61,7 +61,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
         seed="s1",
     )
     assert blocked["ok"] is False
-    assert blocked["error"] == "muse_paused"
+    assert blocked["error"] == "agent_paused"
     assert blocked["status_code"] == 409
 
     resumed = manager.set_pause(
@@ -73,7 +73,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert resumed["ok"] is True
 
     first = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="hello after resume",
         mode="deterministic",
         token_budget=1024,
@@ -87,7 +87,7 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert first["ok"] is True
 
     limited = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="second turn in same minute",
         mode="deterministic",
         token_budget=1024,
@@ -103,12 +103,12 @@ def test_muse_pause_resume_and_rate_limit() -> None:
     assert limited["status_code"] == 429
 
     kinds = [row["kind"] for row in manager.list_events(limit=200)]
-    assert "muse.paused" in kinds
-    assert "muse.resumed" in kinds
-    assert "muse.rate_limited" in kinds
+    assert "agent.paused" in kinds
+    assert "agent.resumed" in kinds
+    assert "agent.rate_limited" in kinds
 
 
-def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
+def test_agent_dedupe_tool_events_and_sealed_compliance_drop() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -117,7 +117,7 @@ def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="/study then report drift",
         mode="deterministic",
         token_budget=900,
@@ -146,7 +146,7 @@ def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
         seed="seed-1",
     )
     assert payload["ok"] is True
-    assert payload["reply"] == "stable muse reply"
+    assert payload["reply"] == "stable agent reply"
     assert tool_calls
     dropped = payload["manifest"].get("dropped", [])
     assert any(
@@ -157,7 +157,7 @@ def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
     )
 
     deduped = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="same idempotency should replay",
         mode="deterministic",
         token_budget=900,
@@ -172,12 +172,12 @@ def test_muse_dedupe_tool_events_and_sealed_compliance_drop() -> None:
     assert deduped["turn_id"] == payload["turn_id"]
 
     kinds = [row["kind"] for row in manager.list_events(limit=240)]
-    assert "muse.tool.requested" in kinds
-    assert "muse.tool.result" in kinds
-    assert "muse.message.deduped" in kinds
+    assert "agent.tool.requested" in kinds
+    assert "agent.tool.result" in kinds
+    assert "agent.message.deduped" in kinds
 
 
-def test_muse_tool_request_parses_facts_and_graph_commands() -> None:
+def test_agent_tool_request_parses_facts_and_graph_commands() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -203,7 +203,7 @@ def test_muse_tool_request_parses_facts_and_graph_commands() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="/facts then /graph overview",
         mode="deterministic",
         token_budget=900,
@@ -226,7 +226,7 @@ def test_muse_tool_request_parses_facts_and_graph_commands() -> None:
     assert "overview" in receipts.get("queries_used", [])
 
 
-def test_muse_graph_neighbors_command_carries_argument_tail() -> None:
+def test_agent_graph_neighbors_command_carries_argument_tail() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -235,7 +235,7 @@ def test_muse_graph_neighbors_command_carries_argument_tail() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="/graph neighbors url:aaaa",
         mode="deterministic",
         token_budget=700,
@@ -250,7 +250,7 @@ def test_muse_graph_neighbors_command_carries_argument_tail() -> None:
     assert "graph_query:neighbors url:aaaa" in tool_calls
 
 
-def test_muse_tool_request_maps_natural_language_crawler_queries() -> None:
+def test_agent_tool_request_maps_natural_language_crawler_queries() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -267,7 +267,7 @@ def test_muse_tool_request_maps_natural_language_crawler_queries() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="what did the crawler learn from https://example.org/a and what is crawler status?",
         mode="deterministic",
         token_budget=900,
@@ -286,7 +286,7 @@ def test_muse_tool_request_maps_natural_language_crawler_queries() -> None:
     )
 
 
-def test_muse_tool_request_maps_natural_language_arxiv_paper_query() -> None:
+def test_agent_tool_request_maps_natural_language_arxiv_paper_query() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -315,7 +315,7 @@ def test_muse_tool_request_maps_natural_language_arxiv_paper_query() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="what arxiv papers have we crawled so far?",
         mode="deterministic",
         token_budget=900,
@@ -333,7 +333,7 @@ def test_muse_tool_request_maps_natural_language_arxiv_paper_query() -> None:
     assert "https://arxiv.org/abs/2602.23342" in reply
 
 
-def test_muse_tool_request_maps_natural_language_github_threat_radar() -> None:
+def test_agent_tool_request_maps_natural_language_github_threat_radar() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -375,7 +375,7 @@ def test_muse_tool_request_maps_natural_language_github_threat_radar() -> None:
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
+        agent_id=DEFAULT_AGENT_ID,
         text="run github threat radar for security cve code review risks",
         mode="deterministic",
         token_budget=900,
@@ -395,7 +395,7 @@ def test_muse_tool_request_maps_natural_language_github_threat_radar() -> None:
     assert "CVE-2026-1234" in reply
 
 
-def test_muse_tool_request_maps_natural_language_particle_outcome_queries() -> None:
+def test_agent_tool_request_maps_natural_language_particle_outcome_queries() -> None:
     manager = _manager()
     tool_calls: list[str] = []
 
@@ -412,8 +412,8 @@ def test_muse_tool_request_maps_natural_language_particle_outcome_queries() -> N
         return {"ok": True, "summary": f"ran:{tool_name}"}
 
     payload = manager.send_message(
-        muse_id=DEFAULT_AGENT_ID,
-        text="why did particle field:observer_thread:001 die? show recent outcomes",
+        agent_id=DEFAULT_AGENT_ID,
+        text="explain particle field:observer_thread:001 and show recent outcomes",
         mode="deterministic",
         token_budget=900,
         idempotency_key="particle-natural-1",
@@ -425,16 +425,16 @@ def test_muse_tool_request_maps_natural_language_particle_outcome_queries() -> N
     )
     assert payload["ok"] is True
     assert any(
-        call.startswith("graph_query:explain_particle field:witness_thread:001")
+        call.startswith("graph_query:explain_particle field:observer_thread:001")
         for call in tool_calls
     )
     assert any(call.startswith("graph_query:recent_outcomes") for call in tool_calls)
 
 
-def test_bootstrap_fixed_muses_are_present_and_typed() -> None:
+def test_bootstrap_fixed_agents_are_present_and_typed() -> None:
     manager = _manager()
-    rows = manager.list_muses()
-    muse_by_id = {
+    rows = manager.list_agents()
+    agent_by_id = {
         str(row.get("id", "")).strip(): row for row in rows if isinstance(row, dict)
     }
     expected_ids = {
@@ -442,11 +442,11 @@ def test_bootstrap_fixed_muses_are_present_and_typed() -> None:
         for spec in BOOTSTRAP_AGENT_SPECS
         if str(spec.get("id", "")).strip()
     }
-    assert expected_ids.issubset(set(muse_by_id.keys()))
-    for muse_id in expected_ids:
-        row = muse_by_id[muse_id]
-        assert row.get("presence_type") == "muse"
-        assert row.get("panel_id") == f"nexus.ui.chat.{muse_id}"
+    assert expected_ids.issubset(set(agent_by_id.keys()))
+    for agent_id in expected_ids:
+        row = agent_by_id[agent_id]
+        assert row.get("presence_type") == "agent"
+        assert row.get("panel_id") == f"nexus.ui.chat.{agent_id}"
 
 
 def test_chaos_pinned_node_is_explicit_context() -> None:
@@ -460,7 +460,7 @@ def test_chaos_pinned_node_is_explicit_context() -> None:
     assert pin_result["ok"] is True
 
     payload = manager.send_message(
-        muse_id="chaos",
+        agent_id="chaos",
         text="use my pinned node",
         mode="deterministic",
         token_budget=1024,
@@ -479,7 +479,7 @@ def test_chaos_pinned_node_is_explicit_context() -> None:
 def test_play_song_path_requests_audio_and_routes_particle() -> None:
     manager = _manager()
     payload = manager.send_message(
-        muse_id="chaos",
+        agent_id="chaos",
         text="play witness thread song mp3 now",
         mode="deterministic",
         token_budget=1024,
@@ -533,7 +533,7 @@ def test_play_song_path_requests_audio_and_routes_particle() -> None:
     )
 
     kinds = [row["kind"] for row in manager.list_events(limit=400)]
-    assert "muse.audio.intent.detected" in kinds
+    assert "agent.audio.intent.detected" in kinds
     assert "agent.particles.audio.collided" in kinds
     assert "audio.play.requested" in kinds
 
@@ -541,7 +541,7 @@ def test_play_song_path_requests_audio_and_routes_particle() -> None:
 def test_open_image_path_requests_image_and_routes_particle() -> None:
     manager = _manager()
     payload = manager.send_message(
-        muse_id="stability",
+        agent_id="stability",
         text="open image cover now",
         mode="deterministic",
         token_budget=1024,
@@ -595,7 +595,7 @@ def test_open_image_path_requests_image_and_routes_particle() -> None:
     )
 
     kinds = [row["kind"] for row in manager.list_events(limit=400)]
-    assert "muse.image.intent.detected" in kinds
+    assert "agent.image.intent.detected" in kinds
     assert "agent.particles.image.collided" in kinds
     assert "image.open.requested" in kinds
 
@@ -603,7 +603,7 @@ def test_open_image_path_requests_image_and_routes_particle() -> None:
 def test_play_song_path_blocks_when_no_audio_candidates() -> None:
     manager = _manager()
     payload = manager.send_message(
-        muse_id="stability",
+        agent_id="stability",
         text="play a song",
         mode="deterministic",
         token_budget=900,
@@ -632,14 +632,14 @@ def test_play_song_path_blocks_when_no_audio_candidates() -> None:
     assert action.get("reason") == "no_audio_candidates"
 
     kinds = [row["kind"] for row in manager.list_events(limit=400)]
-    assert "muse.audio.intent.detected" in kinds
+    assert "agent.audio.intent.detected" in kinds
     assert "audio.play.blocked" in kinds
 
 
 def test_open_image_path_blocks_when_no_image_candidates() -> None:
     manager = _manager()
     payload = manager.send_message(
-        muse_id="chaos",
+        agent_id="chaos",
         text="open image",
         mode="deterministic",
         token_budget=900,
@@ -672,14 +672,14 @@ def test_open_image_path_blocks_when_no_image_candidates() -> None:
     assert payload.get("audio_actions", []) == []
 
     kinds = [row["kind"] for row in manager.list_events(limit=400)]
-    assert "muse.image.intent.detected" in kinds
+    assert "agent.image.intent.detected" in kinds
     assert "image.open.blocked" in kinds
 
 
 def test_classifier_presence_biases_ambiguous_prompt_to_default_kind() -> None:
     manager = _manager()
     payload = manager.send_message(
-        muse_id="chaos",
+        agent_id="chaos",
         text="open play",
         mode="deterministic",
         token_budget=1024,
@@ -765,7 +765,7 @@ def test_concept_seed_focus_boosts_simple_prompt_targeting() -> None:
     ]
 
     without_seed = manager.send_message(
-        muse_id="chaos",
+        agent_id="chaos",
         text="play fork tax canticle music now",
         mode="deterministic",
         token_budget=1024,
@@ -781,7 +781,7 @@ def test_concept_seed_focus_boosts_simple_prompt_targeting() -> None:
     assert action_without.get("selected_node_id") == "audio:distractor-loop"
 
     with_seed = manager.send_message(
-        muse_id="chaos",
+        agent_id="chaos",
         text="play fork tax canticle music now",
         mode="deterministic",
         token_budget=1024,
@@ -811,3 +811,23 @@ def test_concept_seed_focus_boosts_simple_prompt_targeting() -> None:
     action_with = with_seed.get("media_actions", [])[0]
     assert action_with.get("selected_node_id") == "audio:target-canticle"
     assert action_with.get("media_kind") == "audio"
+
+
+if __name__ == "__main__":
+    test_agent_pause_resume_and_rate_limit()
+    test_agent_dedupe_tool_events_and_sealed_compliance_drop()
+    test_agent_tool_request_parses_facts_and_graph_commands()
+    test_agent_graph_neighbors_command_carries_argument_tail()
+    test_agent_tool_request_maps_natural_language_crawler_queries()
+    test_agent_tool_request_maps_natural_language_arxiv_paper_query()
+    test_agent_tool_request_maps_natural_language_github_threat_radar()
+    test_agent_tool_request_maps_natural_language_particle_outcome_queries()
+    test_bootstrap_fixed_agents_are_present_and_typed()
+    test_chaos_pinned_node_is_explicit_context()
+    test_play_song_path_requests_audio_and_routes_particle()
+    test_open_image_path_requests_image_and_routes_particle()
+    test_play_song_path_blocks_when_no_audio_candidates()
+    test_open_image_path_blocks_when_no_image_candidates()
+    test_classifier_presence_biases_ambiguous_prompt_to_default_kind()
+    test_concept_seed_focus_boosts_simple_prompt_targeting()
+    print("ok")
