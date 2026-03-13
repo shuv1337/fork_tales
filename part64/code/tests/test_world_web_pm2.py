@@ -779,7 +779,7 @@ def test_witness_thread_ledger_panel_contract_present() -> None:
         in panel_source
     )
 
-    assert 'if parsed.path == "/api/witness/lineage":' in server_source
+    assert 'if parsed.path == "/api/continuity/lineage":' in server_source
     assert "build_witness_lineage_payload(self.part_root)" in server_source
 
 
@@ -806,8 +806,8 @@ def test_threat_radar_panel_and_report_route_contract_present() -> None:
     assert "<ThreatRadarPanel />" in panel_builder_source
     assert "/api/muse/threat-radar/report" in panel_source
     assert "/api/github/conversation" in panel_source
-    assert 'if parsed.path == "/api/muse/threat-radar/report":' in server_source
-    assert '"record": "eta-mu.muse-threat-radar-report.v1"' in server_source
+    assert 'if parsed.path == "/api/agent/threat-radar/report":' in server_source
+    assert '"record": "eta-mu.agent-threat-radar-report.v1"' in server_source
 
 
 def test_stability_observatory_panel_npu_widget_contract_present() -> None:

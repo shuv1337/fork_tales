@@ -102,9 +102,9 @@ DOCKER_SIMULATION_NAME_HINTS = _csv_list(
     str(
         os.getenv(
             "DOCKER_SIMULATION_NAME_HINTS",
-            "eta-mu,muse-song,sim-slice,simulation,experiment",
+            "eta-mu,agent-song,sim-slice,simulation,experiment",
         )
-        or "eta-mu,muse-song,sim-slice,simulation,experiment"
+        or "eta-mu,agent-song,sim-slice,simulation,experiment"
     )
 )
 DOCKER_SIMULATION_PRIVATE_PORT_HINT = _env_int(

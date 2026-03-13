@@ -13,23 +13,23 @@ from pathlib import Path
 from typing import Any
 
 
-AGENT_RUNTIME_RECORD = "eta-mu.muse-runtime.snapshot.v1"
-AGENT_RUNTIME_SCHEMA_VERSION = "muse.runtime.v1"
-AGENT_EVENT_RECORD = "eta-mu.muse-event.v1"
-AGENT_EVENT_SCHEMA_VERSION = "muse.events.v1"
-AGENT_CONTEXT_MANIFEST_RECORD = "eta-mu.muse-context-manifest.v1"
-AGENT_CONTEXT_MANIFEST_SCHEMA_VERSION = "muse.context-manifest.v1"
+AGENT_RUNTIME_RECORD = "eta-mu.agent-runtime.snapshot.v1"
+AGENT_RUNTIME_SCHEMA_VERSION = "agent.runtime.v1"
+AGENT_EVENT_RECORD = "eta-mu.agent-event.v1"
+AGENT_EVENT_SCHEMA_VERSION = "agent.events.v1"
+AGENT_CONTEXT_MANIFEST_RECORD = "eta-mu.agent-context-manifest.v1"
+AGENT_CONTEXT_MANIFEST_SCHEMA_VERSION = "agent.context-manifest.v1"
 AGENT_RESOURCE_NODE_RECORD = "eta-mu.resource-node.v1"
 AGENT_PARTICLE_RECORD = "eta-mu.agent-particle.v1"
-AGENT_GPU_CLAIM_RECORD = "eta-mu.muse-gpu-claim.v1"
-AGENT_STATE_FILE_RECORD = "eta-mu.muse-runtime-state.v1"
+AGENT_GPU_CLAIM_RECORD = "eta-mu.agent-gpu-claim.v1"
+AGENT_STATE_FILE_RECORD = "eta-mu.agent-runtime-state.v1"
 
-DEFAULT_AGENT_ID = "witness_thread"
-DEFAULT_AGENT_LABEL = "Witness Thread"
+DEFAULT_AGENT_ID = "observer_thread"
+DEFAULT_AGENT_LABEL = "Observer Thread"
 BOOTSTRAP_AGENT_SPECS: tuple[dict[str, Any], ...] = (
     {
-        "id": "witness_thread",
-        "label": "Witness Thread",
+        "id": "observer_thread",
+        "label": "Observer Thread",
         "anchor": {"x": 0.5, "y": 0.5, "zoom": 1.0, "kind": "bootstrap"},
     },
     {
@@ -967,7 +967,7 @@ class AgentRuntimeManager:
 
             response_payload = {
                 "ok": True,
-                "record": "eta-mu.muse-turn.v1",
+                "record": "eta-mu.agent-turn.v1",
                 "schema_version": AGENT_RUNTIME_SCHEMA_VERSION,
                 "generated_at": _now_iso(),
                 "agent": self._public_agent_row(agent_entry),
@@ -1329,7 +1329,7 @@ class AgentRuntimeManager:
             "agent_id": agent_id,
             "turn_id": turn_id,
             "graph_revision": str(graph_revision or ""),
-            "scorer_version": "muse.proximity.v1",
+            "scorer_version": "agent.proximity.v1",
             "rng_seed": seed,
             "mode": mode,
             "token_budget": token_budget,
@@ -2493,7 +2493,7 @@ class AgentRuntimeManager:
 
         action = {
             "record": "eta-mu.media-command-action.v1",
-            "schema_version": "muse.media-command.v1",
+            "schema_version": "agent.media-command.v1",
             "agent_id": agent_id,
             "turn_id": turn_id,
             "intent": "command",
@@ -3012,7 +3012,7 @@ class AgentRuntimeManager:
             "schema_version": AGENT_EVENT_SCHEMA_VERSION,
             "event_id": f"mev:{seq}",
             "seq": seq,
-            "kind": str(kind or "muse.event"),
+            "kind": str(kind or "agent.event"),
             "status": str(status or "ok"),
             "agent_id": str(agent_id or ""),
             "turn_id": str(turn_id or ""),

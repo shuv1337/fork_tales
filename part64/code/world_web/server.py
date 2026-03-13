@@ -6303,7 +6303,7 @@ class WorldHandler(BaseHTTPRequestHandler):
         model_mode = (
             "canonical" if str(mode).strip().lower() == "deterministic" else "llm"
         )
-        clean_muse_id = str(muse_id or "").strip() or "witness_thread"
+        clean_muse_id = str(muse_id or "").strip() or "observer_thread"
         response = build_chat_reply(
             messages=[
                 {"role": "system", "text": context_block},
@@ -7159,7 +7159,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                 )
                 send_ws(
                     {
-                        "type": "muse_events",
+                        "type": "agent_events",
                         "events": muse_events,
                         "since_seq": previous_muse_seq,
                         "next_seq": muse_event_seq,
@@ -7202,7 +7202,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                 )
                 send_ws(
                     {
-                        "type": "muse_events",
+                        "type": "agent_events",
                         "events": muse_bootstrap_events,
                         "since_seq": 0,
                         "next_seq": muse_event_seq,
@@ -9064,22 +9064,22 @@ class WorldHandler(BaseHTTPRequestHandler):
             )
             return
 
-        if parsed.path == "/api/muse/runtime":
+        if parsed.path == "/api/agent/runtime":
             manager = self._agent_manager()
             self._send_json({"ok": True, "runtime": manager.snapshot()})
             return
 
-        if parsed.path == "/api/muse/threat-radar/status":
+        if parsed.path == "/api/agent/threat-radar/status":
             self._send_json(
                 {
                     "ok": True,
-                    "record": "eta-mu.muse-threat-radar-status.v1",
+                    "record": "eta-mu.agent-threat-radar-status.v1",
                     "runtime": self._muse_threat_radar_status(),
                 }
             )
             return
 
-        if parsed.path == "/api/muse/threat-radar/tick":
+        if parsed.path == "/api/agent/threat-radar/tick":
             force = _safe_bool_query(
                 str(params.get("force", ["false"])[0] or "false"),
                 default=False,
@@ -9096,7 +9096,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload, status=status)
             return
 
-        if parsed.path == "/api/muse/threat-radar/report":
+        if parsed.path == "/api/agent/threat-radar/report":
             window_ticks = max(
                 1,
                 min(
@@ -9171,7 +9171,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(
                 {
                     "ok": True,
-                    "record": "eta-mu.muse-threat-radar-report.v1",
+                    "record": "eta-mu.agent-threat-radar-report.v1",
                     "snapshot_hash": str(query_payload.get("snapshot_hash", "")),
                     "runtime": self._muse_threat_radar_status(),
                     "result": result,
@@ -9179,7 +9179,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             )
             return
 
-        if parsed.path == "/api/muse/events":
+        if parsed.path == "/api/agent/events":
             manager = self._agent_manager()
             muse_id = str(params.get("muse_id", [""])[0] or "").strip()
             since_seq = max(
@@ -9218,7 +9218,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(
                 {
                     "ok": True,
-                    "record": "eta-mu.muse-event-page.v1",
+                    "record": "eta-mu.agent-event-page.v1",
                     "muse_id": muse_id,
                     "since_seq": since_seq,
                     "next_seq": next_seq,
@@ -9227,7 +9227,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             )
             return
 
-        if parsed.path == "/api/muse/context":
+        if parsed.path == "/api/agent/context":
             manager = self._agent_manager()
             muse_id = str(params.get("muse_id", [""])[0] or "").strip()
             turn_id = str(params.get("turn_id", [""])[0] or "").strip()
@@ -9406,7 +9406,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             )
             return
 
-        if parsed.path == "/api/witness/lineage":
+        if parsed.path == "/api/continuity/lineage":
             self._send_json(build_witness_lineage_payload(self.part_root))
             return
 
@@ -9584,7 +9584,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "memories": memories})
             return
 
-        if parsed.path == "/api/myth":
+        if parsed.path == "/api/attribution":
             catalog = self._collect_catalog_fast()
             try:
                 attribution_summary = self.attribution_tracker.snapshot(catalog)
@@ -10602,7 +10602,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             image_ref = str(req.get("image_ref", "") or "").strip()
             mime = str(req.get("mime", "image/png") or "image/png").strip()
             presence_id = str(
-                req.get("presence_id", "witness_thread") or "witness_thread"
+                req.get("presence_id", "observer_thread") or "observer_thread"
             ).strip()
             prompt = str(req.get("prompt", "") or "").strip()
             persist = _safe_bool_query(
@@ -11331,7 +11331,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             )
             return
 
-        if parsed.path == "/api/muse/create":
+        if parsed.path == "/api/agent/create":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             payload = manager.create_muse(
@@ -11350,7 +11350,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload, status=status)
             return
 
-        if parsed.path == "/api/muse/pause":
+        if parsed.path == "/api/agent/pause":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             muse_id = str(req.get("muse_id", "") or "").strip()
@@ -11375,7 +11375,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload)
             return
 
-        if parsed.path == "/api/muse/pin":
+        if parsed.path == "/api/agent/pin":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             payload = manager.pin_node(
@@ -11396,7 +11396,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload)
             return
 
-        if parsed.path == "/api/muse/unpin":
+        if parsed.path == "/api/agent/unpin":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             payload = manager.unpin_node(
@@ -11416,7 +11416,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload)
             return
 
-        if parsed.path == "/api/muse/bind-nexus":
+        if parsed.path == "/api/agent/bind-nexus":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             payload = manager.bind_nexus(
@@ -11437,7 +11437,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload)
             return
 
-        if parsed.path == "/api/muse/sync-pins":
+        if parsed.path == "/api/agent/sync-pins":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             pinned_node_ids = req.get("pinned_node_ids", [])
@@ -11461,7 +11461,7 @@ class WorldHandler(BaseHTTPRequestHandler):
             self._send_json(payload)
             return
 
-        if parsed.path == "/api/muse/message":
+        if parsed.path == "/api/agent/message":
             req = self._read_json_body() or {}
             manager = self._agent_manager()
             self._muse_tool_cache = {}
@@ -11770,7 +11770,7 @@ class WorldHandler(BaseHTTPRequestHandler):
                 )
             return
 
-        if parsed.path == "/api/witness":
+        if parsed.path == "/api/continuity":
             req = self._read_json_body() or {}
             event_type = str(req.get("type", "touch") or "touch")
             target = str(req.get("target", "unknown") or "unknown")
