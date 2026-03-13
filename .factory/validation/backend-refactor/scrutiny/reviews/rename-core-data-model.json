@@ -1,0 +1,75 @@
+{
+  "featureId": "rename-core-data-model",
+  "milestone": "backend-refactor",
+  "reviewedAt": "2026-03-13T10:35:12+00:00",
+  "commitId": "99dee817b01aa4f0e325b7136a5e60eaf563bb3d",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit correctly renamed `lore.py` to `catalog_data.py` and the eight `world_web/daimoi_*.py` modules, but it did not complete the promised daimoi→particle rename across the full Python backend. Functional scripts under `part64/scripts/` still contain stale daimoi imports, symbols, and payload keys, so VAL-BR-002 is not satisfied.",
+    "issues": [
+      {
+        "file": "part64/scripts/bench_cdb_vs_python.py",
+        "line": 23,
+        "severity": "blocking",
+        "description": "This script still imports `code.world_web.daimoi_probabilistic` and calls `build_probabilistic_daimoi_particles` / `reset_probabilistic_daimoi_state_for_tests` even though the feature renamed that module to `particle_probabilistic.py`. The rename was therefore not propagated to all backend Python code, and this helper script is left broken.",
+        "evidence": "`git grep -n -i \"daimo\" 99dee817b01aa4f0e325b7136a5e60eaf563bb3d -- \"*.py\"` returned `part64/scripts/bench_cdb_vs_python.py:23-25`."
+      },
+      {
+        "file": "part64/scripts/ensure_npu_embeddings.py",
+        "line": 29,
+        "severity": "blocking",
+        "description": "Backend scripts still expose daimoi-named runtime fields and payload keys such as `daimoi_backend`, `daimoi_backend_error`, `embed_daimoi`, and `daimoi_probabilistic`. Equivalent stale references also remain in `part64/scripts/eval_sim_learning_suite.py:236` and `part64/scripts/homeostasis_soak_probe.py:397`, so the backend-wide rename required by the feature/VAL-BR-002 is incomplete.",
+        "evidence": "The same `git grep` found `part64/scripts/ensure_npu_embeddings.py:29-30,233,266-267,...`, `part64/scripts/eval_sim_learning_suite.py:236,266-267,...`, and `part64/scripts/homeostasis_soak_probe.py:397`."
+      }
+    ]
+  },
+  "blockingIssues": [
+    {
+      "file": "part64/scripts/bench_cdb_vs_python.py",
+      "line": 23,
+      "severity": "blocking",
+      "description": "Stale imports still target the removed `code.world_web.daimoi_probabilistic` module, leaving this backend script inconsistent with the rename and breaking the promise to update all old module references."
+    },
+    {
+      "file": "part64/scripts/ensure_npu_embeddings.py",
+      "line": 29,
+      "severity": "blocking",
+      "description": "Functional Python scripts outside `part64/code/` still use daimoi-named fields and request keys (`daimoi_backend`, `embed_daimoi`, `daimoi_probabilistic`), so the daimoi→particle rename was not completed throughout the Python backend."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "area": "knowledge",
+      "observation": "Backend rename work is currently scoped/documented too narrowly around `part64/code`, which makes it easy to miss functional Python scripts in `part64/scripts/` during search and verification.",
+      "evidence": "`AGENTS.md:27-29` maps `part64/code` but does not mention `part64/scripts/`; the worker transcript/handoff verified `rg 'daimoi|daimon' part64/code/ --type py -l`; yet `git grep -n -i \"daimo\" 99dee817b01aa4f0e325b7136a5e60eaf563bb3d -- \"*.py\"` still finds multiple stale refs in `part64/scripts/*.py`."
+    },
+    {
+      "area": "conventions",
+      "observation": "`VAL-BR-002a` is broader than this feature slice: the feature claims it fulfills that assertion, but the commit still contains other narrative-named `world_web` modules that were only renamed by the later `rename-narrative-modules` feature.",
+      "evidence": "`features.json:490-493` maps `rename-core-data-model` to `VAL-BR-002a`; `validation-contract.md:43-45` defines VAL-BR-002a as renaming all narrative-named `world_web` modules including `muse_runtime.py`; `git ls-tree --name-only -r 99dee817b01aa4f0e325b7136a5e60eaf563bb3d part64/code/world_web | rg '(muse_runtime|nooi|lith_ecs)\\.py|particle_.*\\.py'` still lists `muse_runtime.py`, `nooi.py`, and `lith_ecs.py` in that commit."
+    }
+  ],
+  "evidence": {
+    "handoffFile": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T09-56-18-064Z__rename-core-data-model__bb1ee82b-2da2-4ec1-8673-4597d84f5a15.json",
+    "workerSessionId": "bb1ee82b-2da2-4ec1-8673-4597d84f5a15",
+    "commands": [
+      {
+        "command": "git show --stat --summary 99dee817b01aa4f0e325b7136a5e60eaf563bb3d",
+        "observation": "Confirmed the intended renames landed in 34 files, including `part64/code/lore.py -> catalog_data.py` and eight `world_web/daimoi_*.py -> particle_*.py` renames."
+      },
+      {
+        "command": "git grep -n -i \"daimo\" 99dee817b01aa4f0e325b7136a5e60eaf563bb3d -- \"*.py\"",
+        "observation": "Found residual daimoi/daimon references in functional Python scripts under `part64/scripts/`, including a stale import from `code.world_web.daimoi_probabilistic` and several daimoi-named payload keys/fields."
+      },
+      {
+        "command": "git ls-tree --name-only -r 99dee817b01aa4f0e325b7136a5e60eaf563bb3d part64/code/world_web | rg \"(muse_runtime|nooi|lith_ecs)\\.py|particle_.*\\.py\"",
+        "observation": "Showed that the commit mixed renamed particle modules with still-narrative `muse_runtime.py`, `nooi.py`, and `lith_ecs.py`, which is relevant to the over-broad VAL-BR-002a mapping."
+      }
+    ]
+  },
+  "addressesFailureFrom": null,
+  "summary": "Fail: the feature completed the core module/file renames inside `part64/code`, but it left broken and stale daimoi references in backend Python scripts under `part64/scripts/`, so the claimed backend-wide rename/VAL-BR-002 is not fully satisfied."
+}

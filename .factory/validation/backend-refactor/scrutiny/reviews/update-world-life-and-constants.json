@@ -1,0 +1,66 @@
+{
+  "featureId": "update-world-life-and-constants",
+  "milestone": "backend-refactor",
+  "reviewedAt": "2026-03-13T10:34:40Z",
+  "commitId": "c198866",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit completes the main field renames, but it does not fully satisfy VAL-BR-004 because narrative identifiers remain in world_life.py and one projection-element identifier in constants.py is still narrative.",
+    "issues": [
+      {
+        "file": "part64/code/world_life.py",
+        "line": 34,
+        "severity": "blocking",
+        "description": "world_life.py still exposes narrative actor identifiers (`scribe_aya`, `cantor_ren`, `keeper_mio`, `witness_kai`, `weaver_noa` at lines 34, 42, 50, 58, and 66). `build_interaction_response` also still uses the narrative `pray` action at line 111. That means the feature did not fully replace narrative terms in functional world_life.py data/API surfaces."
+      },
+      {
+        "file": "part64/code/world_web/constants.py",
+        "line": 2500,
+        "severity": "blocking",
+        "description": "PROJECTION_ELEMENTS still contains the narrative machine identifier `nexus.ui.inspiration_atlas`. The feature description and naming map require projection elements to use neutral names (`Inspiration Atlas` -> `System Overview`), but only the title was updated; the functional id remains narrative and is consumed elsewhere in the app."
+      }
+    ]
+  },
+  "blockingIssues": [
+    {
+      "file": "part64/code/world_life.py",
+      "line": 34,
+      "description": "Narrative actor ids remain in the emitted world-life payload, and the interaction path still uses `pray`, so the file is not fully de-narrativized."
+    },
+    {
+      "file": "part64/code/world_web/constants.py",
+      "line": 2500,
+      "description": "`nexus.ui.inspiration_atlas` was left in PROJECTION_ELEMENTS even though this feature was supposed to update projection-element naming to neutral equivalents."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "area": "conventions",
+      "observation": "The naming map documents panel-name renames, but it does not explicitly say whether projection-element machine ids/tags must be renamed too. The worker changed the title to `System Overview` but left the narrative id `nexus.ui.inspiration_atlas`, which is also referenced by frontend layout/config code.",
+      "evidence": "part64/code/world_web/constants.py:2500; part64/frontend/src/app/appShellConstants.ts:22; part64/frontend/src/app/panelConfigBuilders.tsx:229; part64/frontend/src/app/worldPanelLayout.ts:121"
+    },
+    {
+      "area": "skills",
+      "observation": "For rename work, the shared procedure should explicitly call out ids/slugs alongside display text. This worker's transcript shows searches for capitalized role names only, which missed lower-case role-derived ids that still ship in world_life.py.",
+      "evidence": "Residual ids at part64/code/world_life.py:34,42,50,58,66; transcript skeleton entry in worker-transcripts.jsonl line 11 shows grep patterns for `Scribe|Cantor|Keeper|Witness|Field Weaver` but not `scribe_|cantor_|keeper_|witness_|weaver_`."
+    }
+  ],
+  "evidence": {
+    "assertionsReviewed": [
+      "VAL-BR-004"
+    ],
+    "handoffFile": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T10-17-14-294Z__update-world-life-and-constants__58e58ed6-9d60-4f00-bf90-0cdaf270032c.json",
+    "transcriptSource": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/worker-transcripts.jsonl",
+    "reviewedDiffFiles": [
+      "part64/code/world_life.py",
+      "part64/code/world_web/constants.py",
+      "part64/code/world_web/projection.py",
+      "part64/code/tests/test_world_life.py"
+    ]
+  },
+  "addressesFailureFrom": null,
+  "summary": "Fail. The feature handled the headline field renames and updated the targeted tests, but narrative identifiers still remain in world_life.py and PROJECTION_ELEMENTS, so VAL-BR-004 is not fully met."
+}

@@ -1,0 +1,60 @@
+{
+  "featureId": "update-api-and-records",
+  "milestone": "backend-refactor",
+  "reviewedAt": "2026-03-13T10:35:19Z",
+  "commitId": "68235878e1eb2ba1d019e95710f60fd778f0a4ce",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit completes the backend endpoint and record-string renames in Python, but it removes the old HTTP and WebSocket contracts without updating the existing frontend consumers or preserving compatibility. As a result, current UI flows that still call `/api/muse/*`, `/api/witness*`, or listen for `muse_events` no longer match the backend this feature ships.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/app/useChatCommandHandlers.ts",
+        "line": 182,
+        "severity": "blocking",
+        "description": "The frontend still posts to removed `/api/muse/*` and `/api/witness*` routes (for example `useChatCommandHandlers.ts:182`, `App.tsx:632,1121,1216,2263`, `Chat.tsx:519`, `ThreatRadarPanel.tsx:133,203`, and `Canvas.tsx:5890`), while `server.py` now only serves `/api/agent/*` and `/api/continuity*` (`server.py:9082,9099,9409,11334,11440,11464,11773`). This breaks current chat, threat-radar, continuity, and sync-pins flows unless compatibility aliases are retained or the frontend is updated in the same change."
+      },
+      {
+        "file": "part64/frontend/src/hooks/useWorldState.ts",
+        "line": 424,
+        "severity": "blocking",
+        "description": "The WebSocket client still only handles `muse_events`, but `server.py` now emits `agent_events` at `server.py:7162` and `server.py:7205`. Live agent-event updates will therefore be dropped by the frontend after this commit."
+      }
+    ]
+  },
+  "blockingIssues": [
+    {
+      "severity": "blocking",
+      "description": "The feature removes the old backend routes without updating the current frontend callers, so the checked-in UI still targets endpoints that no longer exist on the server.",
+      "evidence": "Frontend callers still use old paths at `part64/frontend/src/app/useChatCommandHandlers.ts:182`, `part64/frontend/src/App.tsx:632`, `part64/frontend/src/App.tsx:1121`, `part64/frontend/src/App.tsx:1216`, `part64/frontend/src/App.tsx:2263`, `part64/frontend/src/components/Panels/Chat.tsx:519`, `part64/frontend/src/components/Panels/ThreatRadarPanel.tsx:133`, `part64/frontend/src/components/Panels/ThreatRadarPanel.tsx:203`, and `part64/frontend/src/components/Simulation/Canvas.tsx:5890`, while the backend only matches the renamed routes at `part64/code/world_web/server.py:9082`, `part64/code/world_web/server.py:9099`, `part64/code/world_web/server.py:9409`, `part64/code/world_web/server.py:11334`, `part64/code/world_web/server.py:11440`, `part64/code/world_web/server.py:11464`, and `part64/code/world_web/server.py:11773`. The repository's own contract test still encodes this mismatch in `part64/code/tests/test_world_web_pm2.py:775-808`."
+    },
+    {
+      "severity": "blocking",
+      "description": "The backend WebSocket event type rename is not coordinated with the frontend consumer, so live event streaming regresses even though the server-side rename itself is present.",
+      "evidence": "`part64/code/world_web/server.py:7162` and `part64/code/world_web/server.py:7205` now send `\"type\": \"agent_events\"`, but `part64/frontend/src/hooks/useWorldState.ts:424` still branches only on `msgType === 'muse_events'`."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "area": "services",
+      "observation": "`.factory/services.yaml` does not expose the runtime-facing `test_world_web_pm2` backend suite, even though this feature edited `part64/code/tests/test_world_web_pm2.py` and mission guidance treats that suite as the relevant API/runtime test entrypoint.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/services.yaml` only lists `test_python_world_life`, `test_python_attribution`, and `test_python_sonify`, while the reviewed handoff for worker session `2cc38af2-03d7-4ae7-bd94-2c6bc4af219f` records only `test_world_life` and `test_sonify_determinism` despite changing `part64/code/world_web/server.py` and `part64/code/tests/test_world_web_pm2.py`."
+    },
+    {
+      "area": "knowledge",
+      "observation": "Shared library docs disagree about API naming and do not document the staged frontend/backend dependency, which makes it easier for workers to land backend-only route renames that break existing clients.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/library/naming-map.md:66-68` lists the new `/api/attribution`, `/api/agent/*`, and `/api/continuity` names, but `/home/shuv/repos/fork_tales/.factory/library/architecture.md:45-46` still describes `/api/myth` and `/api/muse/*` as active REST endpoints. The current frontend also still uses the old routes in files such as `part64/frontend/src/App.tsx` and `part64/frontend/src/components/Panels/Chat.tsx`."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "evidence": [
+    "Reviewed feature metadata in `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/features.json`, which scopes the change to backend endpoint and record-string renames for `update-api-and-records` and marks it as fulfilling `VAL-BR-005` and `VAL-BR-006`.",
+    "Reviewed the worker handoff `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T10-25-09-029Z__update-api-and-records__2cc38af2-03d7-4ae7-bd94-2c6bc4af219f.json` and the matching transcript skeleton entry extracted from `worker-transcripts.jsonl` for session `2cc38af2-03d7-4ae7-bd94-2c6bc4af219f`.",
+    "Reviewed commit `68235878e1eb2ba1d019e95710f60fd778f0a4ce` with `git show --stat` and full diff. The commit only touches `part64/code/world_web/server.py`, `part64/code/world_web/agent_runtime.py`, `part64/code/world_web/docker_runtime.py`, and `part64/code/tests/test_world_web_pm2.py`.",
+    "Backend grep confirms the old record-type strings requested by the feature are gone from Python files, but frontend grep shows the current UI still calls old backend routes and still listens for `muse_events`.",
+    "`validation-contract.md:55-61` defines VAL-BR-005 and VAL-BR-006, and the feature's expected behavior in `features.json` also includes updating WebSocket message types. The server-side rename landed, but the existing frontend consumer contract did not."
+  ],
+  "summary": "Review failed: commit `68235878e1eb2ba1d019e95710f60fd778f0a4ce` completes the backend renames but breaks the currently checked-in frontend contract. Old frontend HTTP callers and the `muse_events` WebSocket consumer were left unchanged, so the feature is not safe to accept in its present form."
+}

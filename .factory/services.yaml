@@ -7,6 +7,7 @@ commands:
   test_python_world_life: cd part64 && python3 -m code.tests.test_world_life
   test_python_attribution: cd part64 && python3 -m code.tests.test_attribution
   test_python_sonify: cd part64 && python3 -m code.tests.test_sonify_determinism
+  test_python_world_web_pm2: cd part64 && python3 -m code.tests.test_world_web_pm2
 
 services:
   vite-dev:

@@ -1,0 +1,55 @@
+{
+  "featureId": "rename-narrative-modules",
+  "milestone": "backend-refactor",
+  "reviewedAt": "2026-03-13T03:40:00Z",
+  "commitId": "ac9dfdaa143b4963367e84dad08fe6e9a738812c",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "pass",
+  "codeReview": {
+    "summary": "Commit ac9dfdaa143b4963367e84dad08fe6e9a738812c satisfies the reviewed feature's asserted scope: `myth_bridge.py` was replaced by `attribution.py`, the targeted `world_web` modules were renamed with import consumers updated, the narrative text blocks were removed from `catalog_data.py`, and `SYSTEM_PROMPT_TEMPLATE` now uses neutral runtime language. The only issue I found is non-blocking: the renamed attribution module still reads the legacy `MYTH_BRIDGE_URL` environment variable.",
+    "issues": [
+      {
+        "file": "part64/code/attribution.py",
+        "line": 113,
+        "severity": "non_blocking",
+        "description": "The renamed attribution module still reads `MYTH_BRIDGE_URL`, leaving an old narrative configuration name in the new neutralized backend surface. This does not block VAL-BR-003 or VAL-BR-007, but it is an incomplete cleanup in the renamed module."
+      }
+    ]
+  },
+  "blockingIssues": [],
+  "nonBlockingIssues": [
+    {
+      "severity": "non_blocking",
+      "description": "The renamed attribution module still depends on the legacy `MYTH_BRIDGE_URL` environment variable name.",
+      "evidence": "part64/code/attribution.py:113 still does `os.getenv(\"MYTH_BRIDGE_URL\", \"\")` even though the module, tracker class, constant names, and fetch helper were renamed to attribution terminology."
+    }
+  ],
+  "sharedStateObservations": [
+    {
+      "target": "library",
+      "description": "`.factory/library/architecture.md` is stale after the backend refactor and still documents the pre-rename backend module names and API paths.",
+      "why": "Future workers and reviewers reading the shared architecture note will be pointed at `lore.py`, `myth_bridge.py`, `/api/myth`, and `/api/muse/*` even though the mission has already renamed the core data model and attribution module, and later backend-refactor features continue moving those API surfaces. Evidence: `.factory/library/architecture.md:23-24,45`."
+    },
+    {
+      "target": "library",
+      "description": "The naming guidance does not say whether environment variables should be renamed during de-narrativization, which likely contributed to `MYTH_BRIDGE_URL` surviving inside `attribution.py`.",
+      "why": "`.factory/library/naming-map.md` covers modules, classes, endpoints, record types, and constants, but not env var contracts. Adding env-var guidance would make these refactors more consistent. Evidence: `.factory/library/naming-map.md` has no env-var section, while `part64/code/attribution.py:113` still uses `MYTH_BRIDGE_URL`."
+    },
+    {
+      "target": "skill",
+      "description": "The `refactor-worker` skill should explicitly recommend scripted batch edits for 3k+ line rename-heavy files instead of relying on repeated manual replacement attempts.",
+      "why": "This worker hit multiple failed replacement/regex attempts while working through the large `muse_runtime.py` rename, and the handoff itself asks for this guidance. Evidence: `worker-transcripts.jsonl` for session `bc33c9ef-5702-4ebf-8d0a-5821043637ba` contains repeated `The text to replace was not found in the file` and `regex parse error` entries, and the handoff `skillFeedback.suggestedChanges` says the skill should mention sed/python strategies for 3000+ line files."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Pass. The reviewed commit covers the feature's required module renames and narrative text cleanup for VAL-BR-003 and VAL-BR-007, with one non-blocking leftover: `attribution.py` still reads the old `MYTH_BRIDGE_URL` environment variable.",
+  "evidence": [
+    "Reviewed feature metadata in `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/features.json`, the handoff `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T10-09-50-919Z__rename-narrative-modules__bc33c9ef-5702-4ebf-8d0a-5821043637ba.json`, and the transcript skeleton entry for worker session `bc33c9ef-5702-4ebf-8d0a-5821043637ba` in `worker-transcripts.jsonl`.",
+    "`git show --stat ac9dfdaa143b4963367e84dad08fe6e9a738812c` shows the targeted rename/content-cleanup footprint: `myth_bridge.py => attribution.py`, `muse_runtime.py => agent_runtime.py`, `lith_ecs.py => ecs.py`, `nooi.py => field_state.py`, plus updates in `catalog_data.py`, `sound_gen.py`, `world_web/__init__.py`, `server.py`, `db.py`, `simulation.py`, and dependent tests.",
+    "Commit-scope inspection confirms VAL-BR-003: the reviewed tree contains `part64/code/attribution.py` and the renamed import loaders in `part64/code/world_web/__init__.py` / `server.py`, while greps over the reviewed commit found no remaining `code.myth_bridge` imports and no `PANTHEON_DIALOG`, `MYTHIC_GLITCH_EPIC`, `COLLECTIVE_RESONANCE`, or `RECEIPT_OF_SURVIVAL` symbols in `catalog_data.py`.",
+    "`part64/code/catalog_data.py:596-622` now presents a neutral `SYSTEM_PROMPT_TEMPLATE` built around 'system assistant', 'simulation runtime', and 'SYSTEM CONCEPTS', removing the prior mythic framing required by VAL-BR-007.",
+    "`part64/scripts/eval_sim_learning_suite.py` already had the deleted-script subprocess paths replaced with stubbed helper functions in the reviewed commit, so the lack of a diff in that file did not leave a broken executable reference in this feature's commit.",
+    "The only code-level leftover I found in the reviewed scope is `part64/code/attribution.py:113`, which still uses the old env var name `MYTH_BRIDGE_URL`."
+  ]
+}

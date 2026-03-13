@@ -1,0 +1,43 @@
+{
+  "featureId": "update-backend-tests",
+  "milestone": "backend-refactor",
+  "reviewedAt": "2026-03-13T10:35:15+00:00",
+  "commitId": "a2ae820b7cd59b3abd232c793407513c87c1400c",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit correctly renamed the targeted backend test files and updated the mission/shared-state command references, but it did not actually update `test_agent_runtime.py` to the new agent runtime API. The renamed file still asserts the removed `muse_*` interface, so the feature does not satisfy the requirement that test contents be updated to the new module/class/variable names.",
+    "issues": [
+      {
+        "file": "part64/code/tests/test_agent_runtime.py",
+        "line": 52,
+        "severity": "blocking",
+        "description": "`test_agent_runtime.py` was renamed without being updated for the current `agent_runtime` API. The test still calls `manager.send_message(muse_id=...)`, checks `muse.*` event kinds, calls `manager.list_muses()`, and expects `presence_type == \"muse\"` (for example lines 52, 106-108, 436, and 448), but `part64/code/world_web/agent_runtime.py` now exposes `send_message(agent_id=...)`, `list_agents()`, `agent.*` event kinds, and `presence_type` values of `\"agent\"` (lines 598-606, 367-370, 425, 655, 678, 1622, 1645, 2551, 2561, and 2882). This leaves one of the renamed backend test files stale instead of updated to the new naming."
+      }
+    ]
+  },
+  "blockingIssues": [
+    {
+      "file": "part64/code/tests/test_agent_runtime.py",
+      "line": 52,
+      "description": "The renamed agent runtime test file still targets the removed muse-oriented API (`muse_id`, `list_muses`, `muse.*`, `presence_type == \"muse\"`) instead of the current agent-oriented API, so the feature does not fulfill its own requirement to update test contents to the new naming."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "Backend rename features can currently pass review while leaving renamed test files stale, because the prescribed verification only reruns a small subset of Python suites and does not require checking the renamed files themselves.",
+      "evidence": "This feature's expected verification in `features.json` and the handoff only covered `test_world_life`, `test_attribution`, `test_sonify_determinism`, and import smoke checks, while commit `a2ae820b7cd59b3abd232c793407513c87c1400c` left `part64/code/tests/test_agent_runtime.py` with unchanged `muse_*` assertions after the rename. The `refactor-worker` skill should require renamed tests to be run or at least statically checked against the current exported API before handoff."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "evidence": [
+    "Feature requirements in mission `features.json` require all renamed Python test files to update old module/class/variable names to the new naming and list `Test file contents updated with new module/class/variable names` as expected behavior.",
+    "Commit `a2ae820b7cd59b3abd232c793407513c87c1400c` renamed `test_muse_runtime.py` to `test_agent_runtime.py`, but the file still contains `muse_id`, `test_muse_*` names, `muse.*` event assertions, `list_muses()`, and `presence_type == \"muse\"`.",
+    "Current implementation in `part64/code/world_web/agent_runtime.py` uses the renamed agent API (`send_message(agent_id=...)`, `list_agents()`, `agent.*`, `presence_type: \"agent\"`), so the stale test file no longer matches the runtime it is supposed to cover.",
+    "The handoff's recorded validator evidence only proves `test_world_life`, `test_attribution`, `test_sonify_determinism`, and import smoke checks; it does not demonstrate that the renamed `test_agent_runtime.py` was brought into sync with the new backend naming."
+  ],
+  "summary": "Reviewed the feature handoff, transcript skeleton, and commit `a2ae820b7cd59b3abd232c793407513c87c1400c`. The file renames and command-reference updates are present, but the renamed `test_agent_runtime.py` still uses removed muse-era API names, so the feature does not fully satisfy its stated backend-test update requirement."
+}
