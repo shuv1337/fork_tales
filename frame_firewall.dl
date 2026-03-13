@@ -22,11 +22,11 @@ lexicon("vagueness", "soon").
 lexicon("vagueness", "later").
 lexicon("agency_theft", "just do it").
 
-utterance("u1", "The registry still hums. Every witness thread lands somewhere.", "DIALOG_Anchor_Registry.md", 1).
-utterance("u2", "Then log it under the old law: nothing erased, only dimmed.", "DIALOG_Anchor_Registry.md", 3).
-utterance("u3", "I felt the stutter again - an- an- anchor, ta- ta- tax.", "DIALOG_Anchor_Registry.md", 5).
-utterance("u4", "Good. Let the glitch remain audible. Smooth motion, rough memory.", "DIALOG_Anchor_Registry.md", 7).
-utterance("u5", "Entry accepted. EN/JA names bound. Presence rendered.", "DIALOG_Anchor_Registry.md", 9).
+utterance("u1", "The registry still hums. Every witness thread lands somewhere.", "inline", 1).
+utterance("u2", "Then log it under the old law: nothing erased, only dimmed.", "inline", 3).
+utterance("u3", "I felt the stutter again - an- an- anchor, ta- ta- tax.", "inline", 5).
+utterance("u4", "Good. Let the glitch remain audible. Smooth motion, rough memory.", "inline", 7).
+utterance("u5", "Entry accepted. EN/JA names bound. Presence rendered.", "inline", 9).
 
 speaker("u1", "Keeper of Receipts").
 speaker("u2", "Mage of Receipts").

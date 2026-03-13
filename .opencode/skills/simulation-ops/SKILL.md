@@ -60,7 +60,6 @@ Monitor self-protection status.
 ## Integration
 - **Agents**: Use this skill when requested to "benchmark simulations", "check simulation health", "spawn a test instance", or "debug a crash".
 - **Files**:
-  - `part64/SIMULATION_WORKFLOW.md` (Detailed guide)
   - `part64/scripts/sim_manager.py`
   - `part64/scripts/bench_sim_compare.py`
 
