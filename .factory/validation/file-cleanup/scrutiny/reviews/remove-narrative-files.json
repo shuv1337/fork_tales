@@ -1,0 +1,27 @@
+{
+  "featureId": "remove-narrative-files",
+  "milestone": "file-cleanup",
+  "status": "pass",
+  "summary": "Pass: commit 2981ea634d73807cc67638dc6c9d9c389d10a8df stays within the requested deletion scope and satisfies VAL-FC-001, VAL-FC-002, VAL-FC-003, and VAL-FC-007.",
+  "blockingIssues": [],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "target": "skill",
+      "description": "The refactor-worker skill's file-deletion procedure says to grep for references and remove/update them in the same feature, but this mission deliberately split that work into a separate follow-up feature (`cleanup-file-references`).",
+      "why": "This creates avoidable 'procedure mismatch' noise during scrutiny even when the worker correctly follows the feature boundary. Evidence: `.factory/skills/refactor-worker/SKILL.md` step 3 vs `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/features.json`, which separates `remove-narrative-files` from `cleanup-file-references`."
+    },
+    {
+      "target": "library",
+      "description": "Mission wording treats `NEW_LYRICS_*.md` as a root-level cleanup target, but the pre-change repository state had no root matches and instead had ten matching files under `part64/`.",
+      "why": "Recording this layout detail would help future validators and reviewers avoid false negatives when checking the file-cleanup milestone. Evidence: `git diff-tree --name-only -r 2981ea634d73807cc67638dc6c9d9c389d10a8df -- NEW_LYRICS_*.md` returned 0 paths, while the same command for `part64/NEW_LYRICS_*.md` returned 10 deletions."
+    }
+  ],
+  "evidence": [
+    "Reviewed handoff `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T09-02-46-059Z__remove-narrative-files__0a5fa2bb-dad6-4637-922d-cfba8e289a7f.json` and transcript skeleton entry for worker session `0a5fa2bb-dad6-4637-922d-cfba8e289a7f` in `worker-transcripts.jsonl`.",
+    "`git show --name-status --format=medium 2981ea634d73807cc67638dc6c9d9c389d10a8df` shows deletions for all assertion-targeted root files, the `docs/`, `narrative/`, `world_building/`, `hacks/`, and `specs/` directories, the targeted `part64/` narrative markdown files, `part64/code/world_web_massive.py.bak`, and the five narrative-named scripts.",
+    "A commit-scope allowlist comparison over `git diff-tree --name-only -r 2981ea634d73807cc67638dc6c9d9c389d10a8df` found 1126 deleted paths and no out-of-scope deletions outside the files, patterns, and directories named in the feature request.",
+    "Current-tree existence checks show the VAL-FC-001 / VAL-FC-002 / VAL-FC-003 / VAL-FC-007 targets are absent: root files (`demo.txt`, `Welcome.md`, `LIVE_CHOIR.md`, `opmf.lisp`, `eta_mu_holographic_session_full.txt`, `fork_tales_world_ui_fix.sha256`, the four `.lisp` prompt files, `entities.sample.json`, `PLAN-*.md`), directories (`docs`, `narrative`, `world_building`, `hacks`, `specs`), `part64` narrative markdown globs, `part64/code/world_web_massive.py.bak`, and the five narrative-named scripts.",
+    "The handoff's recorded verification shows the worker also preserved non-targeted protected paths (`receipts.log`, `manifest.json`, `manifest.lith`, `LICENSE*`, `package.json`, `contracts/`, `cli/`, `lib/`, `part64/code/`, `part64/frontend/`) and left a clean working tree after committing the deletions."
+  ]
+}

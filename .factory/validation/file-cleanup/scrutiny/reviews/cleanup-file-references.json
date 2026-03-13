@@ -1,0 +1,40 @@
+{
+  "featureId": "cleanup-file-references",
+  "milestone": "file-cleanup",
+  "status": "fail",
+  "summary": "Review failed: the cleanup commit still leaves deleted-script references in Python code, and the handoff does not cover the full VAL-FC-005 test requirement.",
+  "blockingIssues": [
+    {
+      "severity": "blocking",
+      "description": "VAL-FC-004 is not satisfied because deleted file references remain in functional Python code after the cleanup. `eval_sim_learning_suite.py` still shells out to deleted scripts, and `test_muse_semantic_training_lab.py` still imports a deleted script path.",
+      "evidence": "validation-contract.md:17-19 requires zero broken references; part64/scripts/eval_sim_learning_suite.py:431 references `scripts/muse_semantic_training_lab.py`, part64/scripts/eval_sim_learning_suite.py:497 references `scripts/bench_muse_song_lab.py`, and part64/code/tests/test_muse_semantic_training_lab.py:10 references `scripts/muse_semantic_training_lab.py`."
+    },
+    {
+      "severity": "blocking",
+      "description": "VAL-FC-005 is not fully satisfied by the recorded implementation evidence. The contract requires `test_myth_bridge` to keep passing, but the handoff only documents vitest, `test_world_life`, and `test_sonify_determinism`.",
+      "evidence": "validation-contract.md:21-23 requires vitest plus `test_world_life`, `test_myth_bridge`, and `test_sonify_determinism`; the handoff records only `cd part64/frontend && npx vitest run --exclude 'e2e/**'`, `cd part64 && python3 -m code.tests.test_world_life`, and `cd part64 && python3 -m code.tests.test_sonify_determinism` (handoff JSON lines 16-27, 59), and no `test_myth_bridge` entry appears in the handoff or transcript search."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "target": "skill",
+      "description": "The worker followed the feature text and omitted `test_myth_bridge`, even though VAL-FC-005 requires it. The refactor workflow should explicitly tell workers to reconcile feature verification steps with the validation contract before handoff.",
+      "why": "This would prevent future handoffs from claiming assertion coverage when a required suite was never run or documented."
+    },
+    {
+      "target": "skill",
+      "description": "The current guidance around excluding `.opencode/` is too broad. The reviewed handoff suggests excluding `.opencode/` from dead-reference searches, but `.opencode/skills/simulation-ops/SKILL.md:63` still points at deleted `part64/SIMULATION_WORKFLOW.md`.",
+      "why": "Shared guidance should distinguish generated/archive content from maintained skill files so stale repo references are not left behind."
+    }
+  ],
+  "evidence": [
+    "Repo HEAD is dc2d0f339c584e2b1a2dbac0fe13ac6ed4f79e04, matching the reviewed feature commit.",
+    "Commit dc2d0f3 changed 11 files and removed manifest/readme/comment references, but did not touch part64/code/tests/test_muse_semantic_training_lab.py or the subprocess paths in part64/scripts/eval_sim_learning_suite.py.",
+    "part64/scripts/eval_sim_learning_suite.py:431 and :497 still reference deleted scripts `scripts/muse_semantic_training_lab.py` and `scripts/bench_muse_song_lab.py`.",
+    "part64/code/tests/test_muse_semantic_training_lab.py:10 still references deleted `scripts/muse_semantic_training_lab.py`.",
+    "validation-contract.md:17-23 defines VAL-FC-004 and VAL-FC-005; the handoff only documents vitest, `test_world_life`, and `test_sonify_determinism` (handoff JSON lines 16-27, 59), with no `test_myth_bridge` record.",
+    "The handoff's render evidence covers screenshot/title only (handoff JSON lines 46-53).",
+    "The reviewed handoff suggested excluding `.opencode/` from searches, yet `.opencode/skills/simulation-ops/SKILL.md:63` still references deleted `part64/SIMULATION_WORKFLOW.md`."
+  ]
+}

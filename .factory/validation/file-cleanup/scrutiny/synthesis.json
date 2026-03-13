@@ -1,0 +1,86 @@
+{
+  "milestone": "file-cleanup",
+  "round": 1,
+  "status": "fail",
+  "validatorsRun": {
+    "test": {
+      "passed": true,
+      "command": "cd part64/frontend && npx vitest run --exclude 'e2e/**'; cd part64 && python3 -m code.tests.test_world_life; cd part64 && python3 -m code.tests.test_myth_bridge; cd part64 && python3 -m code.tests.test_sonify_determinism",
+      "exitCode": 0,
+      "details": {
+        "frontendVitest": "111 passed, 12 failed (pre-existing baseline)",
+        "pythonWorldLife": "passed",
+        "pythonMythBridge": "passed",
+        "pythonSonify": "passed"
+      }
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "cd part64/frontend && npx tsc -b --pretty false",
+      "exitCode": 0
+    },
+    "lint": {
+      "passed": false,
+      "command": "cd part64/frontend && npx eslint .",
+      "exitCode": 1,
+      "details": {
+        "summary": "10 errors, 92 warnings",
+        "note": "Matches the mission's documented pre-existing baseline rather than a regression introduced by file-cleanup work."
+      }
+    }
+  },
+  "reviewsSummary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "failedFeatures": [
+      "cleanup-file-references"
+    ]
+  },
+  "blockingIssues": [
+    {
+      "featureId": "cleanup-file-references",
+      "severity": "blocking",
+      "description": "Deleted-script references still remain after the cleanup feature, so VAL-FC-004 is not satisfied.",
+      "evidence": [
+        "part64/scripts/eval_sim_learning_suite.py:431 references scripts/muse_semantic_training_lab.py",
+        "part64/scripts/eval_sim_learning_suite.py:497 references scripts/bench_muse_song_lab.py",
+        "part64/code/tests/test_muse_semantic_training_lab.py:10 references scripts/muse_semantic_training_lab.py"
+      ]
+    }
+  ],
+  "appliedUpdates": [
+    {
+      "target": "library",
+      "description": "Added .factory/library/file-cleanup-validation.md with the file-layout nuance for NEW_LYRICS, current validation baselines, and the remaining deleted-script residue found during scrutiny.",
+      "sourceFeature": "remove-narrative-files"
+    }
+  ],
+  "suggestedGuidanceUpdates": [
+    {
+      "target": "skill:refactor-worker",
+      "suggestion": "When a mission intentionally splits deletion and reference cleanup into separate features, the skill should tell workers to follow feature boundaries rather than treating the follow-up cleanup as missing work in the deletion feature.",
+      "evidence": "The remove-narrative-files review noted that the skill's generic deletion procedure expects same-feature reference cleanup, while this mission split that work into remove-narrative-files and cleanup-file-references.",
+      "isSystemic": false
+    },
+    {
+      "target": "skill:refactor-worker",
+      "suggestion": "Require workers to reconcile feature verification steps with the validation contract before handoff so required suites are not omitted from recorded evidence.",
+      "evidence": "The cleanup-file-references review flagged that the worker handoff did not document test_myth_bridge even though VAL-FC-005 requires it.",
+      "isSystemic": true
+    },
+    {
+      "target": "skill:refactor-worker",
+      "suggestion": "Avoid broad advice to exclude .opencode/ from dead-reference searches; maintained skill files can still contain stale repository references and should be triaged case-by-case.",
+      "evidence": ".opencode/skills/simulation-ops/SKILL.md still references deleted part64/SIMULATION_WORKFLOW.md, which was missed when the worker treated .opencode/ as out-of-scope.",
+      "isSystemic": true
+    }
+  ],
+  "rejectedObservations": [
+    {
+      "observation": "The cleanup-file-references review marked missing handoff evidence for test_myth_bridge as a blocking issue.",
+      "reason": "Superseded by current scrutiny validation: python3 -m code.tests.test_myth_bridge was executed during this review and passed, so the milestone's current VAL-FC-005 test requirement is satisfied even though the original handoff evidence was incomplete."
+    }
+  ],
+  "previousRound": null
+}
