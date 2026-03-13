@@ -5,7 +5,7 @@
 // Panel state management: window states, pinning, council boosts,
 // panel sorting/ranking, and panel layout computation.
 
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { type PanInfo } from "framer-motion";
 import type { ParticleDisposition, RankedPanel } from "../app/appShellTypes";
 import {
@@ -116,9 +116,11 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
     resolveOverlayAnchorRatio,
   } = params;
 
-  const panelSideRef = useRef<Map<string, PanelPreferredSide>>(new Map());
-  const panelScreenRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const panelWorldScaleRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  // Stable mutable Maps (created once via useState lazy init; never updated via setter).
+  // Using useState instead of useRef avoids react-hooks/refs lint violations in useMemo.
+  const [panelSideMap] = useState(() => new Map<string, PanelPreferredSide>());
+  const [panelScreenMap] = useState(() => new Map<string, { x: number; y: number }>());
+  const [panelWorldScaleMap] = useState(() => new Map<string, { x: number; y: number }>());
 
   const [panelWorldBiases, setPanelWorldBiases] = useState<Record<string, { x: number; y: number }>>({});
   const [panelWindowStates, setPanelWindowStates] = useState<Record<string, PanelWindowState>>({});
@@ -619,8 +621,10 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
   // --- World panel layout ---
   const worldPanelLayout = useMemo<WorldPanelLayoutEntry[]>(() => {
     const panelsById = new Map(sortedPanels.map((panel) => [panel.id, panel]));
+    /* eslint-disable react-hooks/refs -- velocity ref read is intentional for smooth layout animation */
     const velocity = coreFlightVelocityRef.current;
     const speedNorm = clamp(Math.hypot(velocity.x, velocity.y, velocity.z) / 26, 0, 1);
+    /* eslint-enable react-hooks/refs */
     const stageTop = viewportHeight < 860 ? 104 : 118;
     const stageBottom = Math.max(stageTop + 132, viewportHeight - 14);
     const stageHeight = Math.max(120, stageBottom - stageTop);
@@ -652,12 +656,12 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
       const projected = overlayAnchor
         ? { x: overlayAnchor.x * viewportWidth, y: stageTop + (overlayAnchor.y * stageHeight), perspective: clamp(0.96 + ((deferredCoreCameraZoom - 1) * 0.18), 0.72, 1.34) }
         : projectWorldPoint(anchorWorld.x, anchorWorld.y, anchorWorld.z);
-      const side = preferredSideForAnchor(panelId, projected.x, projected.y, viewportWidth, viewportHeight, panelSideRef.current);
+      const side = preferredSideForAnchor(panelId, projected.x, projected.y, viewportWidth, viewportHeight, panelSideMap);
       const baseSize = panelSizeForWorld(panel.worldSize ?? "m", panel.priority, deferredCoreCameraZoom, speedNorm);
       const size = { width: Math.round(Math.min(baseSize.width, Math.max(176, viewportWidth - (WORLD_PANEL_MARGIN * 2)))), height: Math.round(Math.min(baseSize.height, Math.max(120, stageBottom - stageTop - 8))), collapse: baseSize.collapse };
       const pixelsPerWorldX = Math.max(90, viewportWidth * 0.34 * projected.perspective * deferredCoreCameraZoom);
       const pixelsPerWorldY = Math.max(74, stageHeight * 0.47 * projected.perspective * deferredCoreCameraZoom);
-      panelWorldScaleRef.current.set(panelId, { x: pixelsPerWorldX, y: pixelsPerWorldY });
+      panelWorldScaleMap.set(panelId, { x: pixelsPerWorldX, y: pixelsPerWorldY });
       trackedScaleIds.add(panelId);
       const halfWorldWidth = (size.width / pixelsPerWorldX) * 0.5;
       const halfWorldHeight = (size.height / pixelsPerWorldY) * 0.5;
@@ -683,7 +687,7 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
         glow, collapse: size.collapse,
       });
     });
-    panelWorldScaleRef.current.forEach((_scale, panelId) => { if (!trackedScaleIds.has(panelId)) panelWorldScaleRef.current.delete(panelId); });
+    panelWorldScaleMap.forEach((_scale, panelId) => { if (!trackedScaleIds.has(panelId)) panelWorldScaleMap.delete(panelId); });
     const clampEntry = (entry: WorldPanelLayoutEntry) => {
       entry.x = clamp(entry.x, WORLD_PANEL_MARGIN, viewportWidth - entry.width - WORLD_PANEL_MARGIN);
       entry.y = clamp(entry.y, stageTop, stageBottom - entry.height);
@@ -724,13 +728,13 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
     }
     const smoothAlpha = clamp(0.26 - (speedNorm * 0.16), 0.09, 0.26);
     entries.forEach((entry) => {
-      const previous = panelScreenRef.current.get(entry.id);
+      const previous = panelScreenMap.get(entry.id);
       if (previous) { entry.x = previous.x + ((entry.x - previous.x) * smoothAlpha); entry.y = previous.y + ((entry.y - previous.y) * smoothAlpha); }
-      panelScreenRef.current.set(entry.id, { x: entry.x, y: entry.y });
+      panelScreenMap.set(entry.id, { x: entry.x, y: entry.y });
       clampEntry(entry); updateTether(entry);
     });
     return entries;
-  }, [deferredCoreCameraPitch, deferredCoreRenderedCameraPosition, deferredCoreCameraYaw, deferredCoreCameraZoom, hoveredPanelId, panelAnchorById, panelStateSpaceBiases, panelWorldBiases, pinnedPanels, resolveOverlayAnchorRatio, selectedPanelId, sortedPanels, viewportHeight, viewportWidth, visiblePanelIds, coreFlightVelocityRef]);
+  }, [coreFlightVelocityRef, deferredCoreCameraPitch, deferredCoreRenderedCameraPosition, deferredCoreCameraYaw, deferredCoreCameraZoom, hoveredPanelId, panelAnchorById, panelScreenMap, panelSideMap, panelStateSpaceBiases, panelWorldBiases, panelWorldScaleMap, pinnedPanels, resolveOverlayAnchorRatio, selectedPanelId, sortedPanels, viewportHeight, viewportWidth, visiblePanelIds]);
 
   // --- Nexus layout ---
   const panelNexusLayout = useMemo<WorldPanelNexusEntry[]>(() => {
@@ -763,7 +767,7 @@ export function useWorldPanelManager(params: UseWorldPanelManagerParams): WorldP
   }, [viewportHeight, viewportWidth, worldPanelLayout]);
 
   const handleWorldPanelDragEnd = useCallback((panelId: string, info: PanInfo) => {
-    const panelScale = panelWorldScaleRef.current.get(panelId);
+    const panelScale = panelWorldScaleMap.get(panelId);
     const fallbackPixelsPerWorldX = Math.max(140, viewportWidth * 0.34 * deferredCoreCameraZoom);
     const fallbackPixelsPerWorldY = Math.max(110, Math.max(160, viewportHeight - 126) * 0.47 * deferredCoreCameraZoom);
     const pixelsPerWorldX = Math.max(90, panelScale?.x ?? fallbackPixelsPerWorldX);

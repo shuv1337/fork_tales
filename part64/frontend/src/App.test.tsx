@@ -12,6 +12,8 @@ import {
 } from "./app/appShellConstants";
 import type { Catalog, SimulationState } from "./types";
 
+type MockComponentProps = Record<string, ((...args: unknown[]) => unknown) | undefined>;
+
 const testMocks = vi.hoisted(() => {
   return {
     useWorldState: vi.fn(),
@@ -48,7 +50,7 @@ vi.mock("./app/useChatCommandHandlers", () => {
 
 vi.mock("./components/App/CoreBackdrop", () => {
   return {
-    CoreBackdrop: (props: any) => (
+    CoreBackdrop: (props: MockComponentProps) => (
       <div>
         <p>mock core backdrop</p>
         <button
@@ -65,7 +67,7 @@ vi.mock("./components/App/CoreBackdrop", () => {
                 xRatio: x,
                 yRatio: y,
               }),
-              interactClientAt: (_x: number, _y: number) => ({
+              interactClientAt: () => ({
                 hitNode: false,
                 openedWorldscreen: false,
                 target: "mock_target",
@@ -116,7 +118,7 @@ vi.mock("./components/App/CoreBackdrop", () => {
 
 vi.mock("./components/App/CoreControlPanel", () => {
   return {
-    CoreControlPanel: (props: any) => (
+    CoreControlPanel: (props: MockComponentProps) => (
       <div>
         <p>mock core control panel</p>
         <button type="button" onClick={props.onToggleAutopilot}>toggle autopilot</button>
@@ -136,7 +138,7 @@ vi.mock("./components/App/CoreControlPanel", () => {
 
 vi.mock("./components/App/CoreLayerManagerOverlay", () => {
   return {
-    CoreLayerManagerOverlay: (props: any) => (
+    CoreLayerManagerOverlay: (props: MockComponentProps) => (
       <div>
         <p>mock layer manager</p>
         <button type="button" onClick={props.onToggleOpen}>toggle layer manager</button>
@@ -149,7 +151,7 @@ vi.mock("./components/App/CoreLayerManagerOverlay", () => {
 
 vi.mock("./components/App/WorldPanelsViewport", () => {
   return {
-    WorldPanelsViewport: (props: any) => (
+    WorldPanelsViewport: (props: MockComponentProps) => (
       <div>
         <p>mock world panels viewport</p>
         <button type="button" onClick={props.onToggleEditMode}>toggle edit mode</button>

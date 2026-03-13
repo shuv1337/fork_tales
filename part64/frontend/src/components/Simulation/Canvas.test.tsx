@@ -6,6 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SimulationCanvas } from "./Canvas";
 import type { Catalog, SimulationState } from "../../types";
 
+interface MockOverlayApi {
+  getAnchorRatio: (kind: string, id: string) => { x: number; y: number } | null;
+  interactAt: (x: number, y: number, opts?: Record<string, unknown>) => void;
+  [key: string]: unknown;
+}
+
 vi.mock("./GalaxyModelDock", () => {
   return {
     GalaxyModelDock: ({ onClose }: { onClose: () => void }) => (
@@ -164,12 +170,12 @@ function createCatalogFixture(): Catalog {
 
 function createWorldscreenSimulationFixture(node: Record<string, unknown>): SimulationState {
   const base = createSimulationFixture() as unknown as Record<string, unknown>;
-  (base as any).file_graph = {
+  base.file_graph = {
     file_nodes: [node],
     nodes: [node],
     edges: [],
   };
-  (base as any).crawler_graph = {
+  base.crawler_graph = {
     nodes: [],
     edges: [],
   };
@@ -506,7 +512,7 @@ describe("SimulationCanvas", () => {
   it("opens worldscreen via overlay API, switches modes, and closes on escape", async () => {
     const raf = installInteractiveCanvasMocks();
     const { fetchSpy } = setupCanvasFetchMock();
-    let overlayApi: any = null;
+    let overlayApi: MockOverlayApi = null!;
 
     render(
       <SimulationCanvas
@@ -536,7 +542,7 @@ describe("SimulationCanvas", () => {
       expect(overlayApi.getAnchorRatio("file", "file:guide.md")).toBeTruthy();
     });
 
-    const anchor = overlayApi.getAnchorRatio("file", "file:guide.md");
+    const anchor = overlayApi.getAnchorRatio("file", "file:guide.md")!;
     act(() => {
       overlayApi.interactAt(anchor.x, anchor.y, { openWorldscreen: true });
     });
@@ -567,7 +573,7 @@ describe("SimulationCanvas", () => {
   it("loads and posts image comments in conversation mode", async () => {
     const raf = installInteractiveCanvasMocks();
     const { calls } = setupCanvasFetchMock();
-    let overlayApi: any = null;
+    let overlayApi: MockOverlayApi = null!;
 
     render(
       <SimulationCanvas
@@ -597,7 +603,7 @@ describe("SimulationCanvas", () => {
       expect(overlayApi.getAnchorRatio("file", "file:scene.png")).toBeTruthy();
     });
 
-    const anchor = overlayApi.getAnchorRatio("file", "file:scene.png");
+    const anchor = overlayApi.getAnchorRatio("file", "file:scene.png")!;
     act(() => {
       overlayApi.interactAt(anchor.x, anchor.y, { openWorldscreen: true });
     });
