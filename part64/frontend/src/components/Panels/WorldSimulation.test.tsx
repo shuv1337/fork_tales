@@ -85,16 +85,16 @@ describe("WorldSimulationPanel", () => {
 
     expect(screen.getByText("Aiko")).toBeTruthy();
     expect(screen.getByText("koto · 108 BPM")).toBeTruthy();
-    expect(screen.getByText("Songbook / 聖歌帳")).toBeTruthy();
+    expect(screen.getByText("Tracks / トラック帳")).toBeTruthy();
     expect(screen.getByText("Library / 文庫")).toBeTruthy();
     expect(screen.getByText("Presence Dialogue / プレゼンス対話")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Speak / 話す" }));
-    fireEvent.click(screen.getByRole("button", { name: "Pray / 祈る" }));
-    fireEvent.click(screen.getByRole("button", { name: "Sing / 歌う" }));
+    fireEvent.click(screen.getByRole("button", { name: "Boost / 増幅" }));
+    fireEvent.click(screen.getByRole("button", { name: "Generate / 生成" }));
 
     expect(onInteract).toHaveBeenNthCalledWith(1, "p-1", "speak");
-    expect(onInteract).toHaveBeenNthCalledWith(2, "p-1", "pray");
+    expect(onInteract).toHaveBeenNthCalledWith(2, "p-1", "boost");
     expect(onInteract).toHaveBeenNthCalledWith(3, "p-1", "sing");
   });
 
@@ -109,7 +109,7 @@ describe("WorldSimulationPanel", () => {
     );
 
     expect(screen.getByRole("button", { name: "Speak / 話す" }).getAttribute("disabled")).not.toBeNull();
-    expect(screen.getByRole("button", { name: "Pray / 祈る" }).getAttribute("disabled")).not.toBeNull();
-    expect(screen.getByRole("button", { name: "Sing / 歌う" }).getAttribute("disabled")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Boost / 増幅" }).getAttribute("disabled")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Generate / 生成" }).getAttribute("disabled")).not.toBeNull();
   });
 });

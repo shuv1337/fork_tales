@@ -43,7 +43,7 @@ describe("InspirationAtlasPanel", () => {
   it("renders default forces when simulation is absent", () => {
     render(<InspirationAtlasPanel simulation={null} />);
 
-    expect(screen.getByText("Inspiration Atlas / .eta-mu")).toBeTruthy();
+    expect(screen.getByText("System Overview / .eta-mu")).toBeTruthy();
     expect(screen.getByText("Web Search Sync")).toBeTruthy();
     expect(screen.getByText("force 0% · anchor receipt_river")).toBeTruthy();
   });
@@ -53,7 +53,7 @@ describe("InspirationAtlasPanel", () => {
 
     expect(screen.getByText("Web Search Sync")).toBeTruthy();
     expect(screen.getByText("Part 64 Runtime System")).toBeTruthy();
-    expect(screen.getByText("Operation Mindfuck :: Inner Jam")).toBeTruthy();
+    expect(screen.getByText("Council Rhythm :: Artifact Workstation")).toBeTruthy();
     expect(screen.getByText("force 52% · anchor receipt_river")).toBeTruthy();
     expect(screen.getByText("river flow")).toBeTruthy();
     expect(screen.getByText("witness continuity")).toBeTruthy();

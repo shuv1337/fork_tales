@@ -36,11 +36,11 @@ describe("PresenceCallDeck", () => {
     render(<PresenceCallDeck catalog={null} simulation={null} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("option", { name: "Witness Thread" })).toBeTruthy();
-      expect(screen.getByRole("option", { name: "Receipt River" })).toBeTruthy();
+      expect(screen.getByRole("option", { name: "Observer Thread" })).toBeTruthy();
+      expect(screen.getByRole("option", { name: "Log Stream" })).toBeTruthy();
     });
 
-    const composer = screen.getByPlaceholderText("Message Witness Thread...");
+    const composer = screen.getByPlaceholderText("Message Observer Thread...");
     fireEvent.change(composer, { target: { value: "hello from ui" } });
     fireEvent.click(screen.getByText("Send"));
 

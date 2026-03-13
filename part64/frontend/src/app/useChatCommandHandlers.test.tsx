@@ -103,7 +103,7 @@ describe("useChatCommandHandlers", () => {
       "command:/say",
       "chaos",
     );
-    expect(emitSystemMessage.mock.calls.at(-1)?.[0]).toContain("Chaos / muse turn turn-7");
+    expect(emitSystemMessage.mock.calls.at(-1)?.[0]).toContain("Chaos / agent turn turn-7");
     expect(emitSystemMessage.mock.calls.at(-1)?.[0]).toContain("explicit=1 surrounding=2");
   });
 
