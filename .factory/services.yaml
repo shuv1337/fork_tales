@@ -1,0 +1,17 @@
+commands:
+  install_frontend: cd part64/frontend && npm install --prefer-offline --no-audit
+  typecheck: cd part64/frontend && npx tsc -b --pretty false
+  build: cd part64/frontend && tsc -b && npx vite build
+  test_frontend: cd part64/frontend && npx vitest run --exclude 'e2e/**'
+  lint: cd part64/frontend && npx eslint .
+  test_python_world_life: cd part64 && python3 -m code.tests.test_world_life
+  test_python_myth_bridge: cd part64 && python3 -m code.tests.test_myth_bridge
+  test_python_sonify: cd part64 && python3 -m code.tests.test_sonify_determinism
+
+services:
+  vite-dev:
+    start: cd part64/frontend && PORT=5173 npx vite --port 5173 --host 127.0.0.1
+    stop: lsof -ti :5173 | xargs kill -9 2>/dev/null || true
+    healthcheck: curl -sf http://127.0.0.1:5173
+    port: 5173
+    depends_on: []
