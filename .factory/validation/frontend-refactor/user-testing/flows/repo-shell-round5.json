@@ -1,0 +1,60 @@
+{
+  "groupId": "repo-shell-round5",
+  "testedAt": "2026-03-13T14:28:02Z",
+  "assertionResults": [
+    {
+      "id": "VAL-FS-003",
+      "status": "pass",
+      "reason": "The exact legacy frontend type-name/type-alias residue is gone from active non-test source. Remaining old-term hits are limited to backend wire-format interoperability (`muse_id`, `payload.muse`, `payload.daimoi`, and `BackendFieldParticle` payload modeling), which are accepted for this round.",
+      "evidence": [
+        "`Grep` over `part64/frontend/src/**/*.ts{,x}` for `Daimoi|DaimoiPacket|DaimoiProbabilisticSummary|MythSummary|WorldPerson|WorldSong|WorldBook|GhostRoleState|ForkTaxState|WitnessThreadState|BraidThread|BraidDiagnostics|Echo` returned no matches.",
+        "`part64/frontend/src/types/index.ts:171-185` now documents presence kinds with `e.g., \"agent\", \"logos\", ...` instead of `muse` wording.",
+        "`part64/frontend/src/app/useChatCommandHandlers.ts:175-195` uses `muse_id` only in the JSON body sent to `/api/agent/message`, and the local error text is now `agent say request failed (...)`.",
+        "`part64/frontend/src/hooks/useAgentHandlers.ts:379-400` limits remaining `payload.muse` / `payload.daimoi` usage to backend reply normalization rather than frontend-owned type or state naming."
+      ]
+    },
+    {
+      "id": "VAL-UI-001",
+      "status": "pass",
+      "reason": "The previously failing translucent panel classes in active TSX are gone. Current panel/container surfaces in the checked frontend source use solid dark backgrounds; the remaining transparent tokens are limited to non-panel accents or form chrome allowed by the round-5 acceptance note.",
+      "evidence": [
+        "`Grep` over active `part64/frontend/src/**/*.ts{,x}` for `bg-white/5|bg-white/10|bg-[...]/10|bg-[...]/5|hover:bg-white/10` returned no matches.",
+        "`part64/frontend/src/components/Panels/PresenceCallDeck.tsx:483-574` now renders the checked card/section backgrounds with solid colors such as `bg-[#141424]`, `bg-[#1e202e]`, `bg-[#1e1f1f]`, `bg-[#1a1a2e]`, and `bg-[#242523]`.",
+        "The remaining transparency hits are `part64/frontend/src/components/Panels/RuntimeConfigPanel.tsx:1636` (`bg-transparent` on a search input), `part64/frontend/src/index.css:2225-2233` (scrollbar transparency), and `part64/frontend/src/components/Panels/PresenceCallDeck.tsx:469` (a 1px accent gradient to transparent), none of which are panel/container backgrounds.",
+        "`part64/frontend/src/components/Panels/Vitals.tsx:72-79` uses `bg-white/90` only for a 2px marker line, which is explicitly allowed by the orchestrator note."
+      ]
+    },
+    {
+      "id": "VAL-UI-006",
+      "status": "pass",
+      "reason": "The specific narrative/stylized visible copy that failed in round 4 has been removed from active non-test source. Current checked UI strings are neutral/technical, while any remaining backend entity IDs are confined to accepted routing/data contexts.",
+      "evidence": [
+        "`Grep` over active `part64/frontend/src/**/*.ts{,x}` for `Observer Thread Ledger|Glass Viewport|swarm mode braids nearby packets|double tap opens hologram|hologram opened:|transparent viewport|This lane remains glass|Council votes can move glass panes forward` returned no matches.",
+        "`part64/frontend/src/components/Panels/Chat.tsx:853-864` now uses the neutral title `Observer Continuity Ledger / \u89b3\u6e2c\u30b9\u30ec\u30c3\u30c9\u53f0\u5e33` with technical supporting copy.",
+        "`part64/frontend/src/components/Simulation/Canvas.tsx:5938-5944` now reports `detail view opened:` instead of the prior hologram wording, and `Canvas.tsx:6574-6580` now says `swarm mode groups nearby packets by owner + direction.` with `double tap opens detail view` guidance.",
+        "`part64/frontend/src/components/App/WorldPanelsViewport.tsx:1439-1450` and `1819-1843` now show neutral viewport text such as `Panel lane awaiting presence`, `standby viewport`, and `simulation viewport`, with no `Glass Viewport` label or prior glass-only guidance."
+      ]
+    }
+  ],
+  "toolsUsed": [
+    "TodoWrite",
+    "Read",
+    "LS",
+    "Grep",
+    "Execute"
+  ],
+  "frictions": [
+    {
+      "description": "Round-5 repo-shell validation required separating accepted backend wire-format residue from frontend-owned naming and visible-copy residue.",
+      "resolved": true,
+      "resolution": "I rechecked the exact prior-round findings and only counted active frontend-owned type/copy/background issues; backend interop fields, entity IDs used for routing, and tiny accent transparency were treated per the orchestrator acceptance rules.",
+      "affectedAssertions": [
+        "VAL-FS-003",
+        "VAL-UI-001",
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Repo-shell round 5 revalidated VAL-FS-003, VAL-UI-001, and VAL-UI-006 against active non-test frontend source and the round-5 acceptance rules. All three assertions pass: legacy frontend type names are gone, checked panel/container backgrounds are solid, and the previously failing narrative/stylized visible strings have been replaced with neutral technical copy."
+}

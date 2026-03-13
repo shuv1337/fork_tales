@@ -1,0 +1,51 @@
+{
+  "groupId": "browser-ui-round5",
+  "testedAt": "2026-03-13T14:26:37.231366+00:00",
+  "isolation": {
+    "appUrl": "http://127.0.0.1:5173",
+    "browserSession": "c7e1efa70c76__u1",
+    "mode": "browser-only read-only validation on shared Vite server",
+    "missionDir": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026"
+  },
+  "toolsUsed": [
+    "agent-browser"
+  ],
+  "assertionResults": [
+    {
+      "id": "VAL-UI-001",
+      "status": "pass",
+      "reason": "The visible dashboard panels, rails, and sidebars render as solid dark navy surfaces in the captured browser screenshots. I did not observe user-visible glass/translucent panel backgrounds; only transparent structural wrappers/canvas layers and small accent controls were present, which are acceptable for this round.",
+      "evidence": [
+        "frontend-refactor/browser-ui-round5/VAL-UI-001-VAL-UI-006-full.png",
+        "frontend-refactor/browser-ui-round5/VAL-UI-001-VAL-UI-006-annotated.png",
+        "Console errors: none after reload and inspection.",
+        "Visible surfaces checked: System Operating Rail, Threat Radar / GitHub Security Watch, Presence Rail, Simulation Controls, Layers Manager, Agent Creator."
+      ]
+    },
+    {
+      "id": "VAL-UI-006",
+      "status": "pass",
+      "reason": "The visible frontend-controlled panel labels are neutral/technical (for example: Threat Radar / GitHub Security Watch, Simulation Viewport, Dedicated World Views, Layers Manager, Agent Creator). Remaining stylized labels such as witness thread, view lens keeper, anchor registry, fork tax canticle, and receipt river appear as backend-driven entity/card names in live simulation data and are accepted for this round; the Threat Radar 'Failed to fetch' message is also accepted and did not count against the assertion.",
+      "evidence": [
+        "frontend-refactor/browser-ui-round5/VAL-UI-001-VAL-UI-006-full.png",
+        "frontend-refactor/browser-ui-round5/VAL-UI-001-VAL-UI-006-annotated.png",
+        "Observed frontend-controlled neutral labels: Threat Radar / GitHub Security Watch; Simulation Viewport; Dedicated World Views; Layers Manager; Agent Creator.",
+        "Observed accepted backend/entity labels from live data: witness thread; view lens keeper; anchor registry; fork tax canticle; receipt river.",
+        "Console errors: none after reload and inspection."
+      ]
+    }
+  ],
+  "frictions": [
+    {
+      "description": "The referenced /home/shuv/.factory/library/user-testing.md guidance file was not present in this environment.",
+      "resolved": true,
+      "resolution": "Used the mission AGENTS guidance and parent task instructions directly.",
+      "affectedAssertions": [
+        "VAL-UI-001",
+        "VAL-UI-006"
+      ]
+    }
+  ],
+  "blockers": [],
+  "summary": "Tested 2 browser UI assertions on the shared Vite app. VAL-UI-001 passed because the visible UI renders as a solid dark dashboard, and VAL-UI-006 passed because only accepted backend/entity residue remained while frontend-controlled labels were neutral."
+}

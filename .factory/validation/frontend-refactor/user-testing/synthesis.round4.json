@@ -1,0 +1,79 @@
+{
+  "milestone": "frontend-refactor",
+  "round": 4,
+  "status": "fail",
+  "generatedAt": "2026-03-13T14:15:50.701934+00:00",
+  "assertionsSummary": {
+    "total": 15,
+    "passed": 12,
+    "failed": 3,
+    "blocked": 0
+  },
+  "scopeAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-003",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-001",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-006",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "testedThisRound": [
+    "VAL-FS-003",
+    "VAL-UI-001",
+    "VAL-UI-006"
+  ],
+  "carriedForwardPassedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "passedAssertions": [
+    "VAL-BR-006",
+    "VAL-FS-001",
+    "VAL-FS-002",
+    "VAL-FS-004",
+    "VAL-FS-005",
+    "VAL-FS-006",
+    "VAL-UI-002",
+    "VAL-UI-003",
+    "VAL-UI-004",
+    "VAL-UI-005",
+    "VAL-UI-007",
+    "VAL-UI-008"
+  ],
+  "failedAssertions": [
+    {
+      "id": "VAL-FS-003",
+      "reason": "Frontend-owned legacy naming still remains in non-test source after excluding allowed backend interop reads, including `Create muse` comments, local `muse` identifiers, `|daimon|` overlay seed text, `e.g., \"muse\"` type comments, and `muse say request failed (...)` strings."
+    },
+    {
+      "id": "VAL-UI-001",
+      "reason": "The live dashboard still looks dark, but active TSX retains translucent background classes in `PresenceCallDeck.tsx` (`bg-white/5`, `bg-[#a6e22e]/10`, `bg-[#f92672]/10`, `bg-transparent`, `hover:bg-white/10`), so panel/container backgrounds are not yet uniformly solid."
+    },
+    {
+      "id": "VAL-UI-006",
+      "reason": "Narrative/stylized visible copy still remains in active source and the live UI, including `Observer Thread Ledger`, transparent/glass viewport guidance, `swarm mode braids nearby packets`, `double tap opens hologram`, `hologram opened: ...`, and visible labels such as `witness thread`, `view lens keeper`, `anchor registry`, `fork tax canticle`, and `receipt river`."
+    }
+  ],
+  "blockedAssertions": [],
+  "appliedUpdates": [],
+  "previousRound": ".factory/validation/frontend-refactor/user-testing/synthesis.round3.json"
+}
