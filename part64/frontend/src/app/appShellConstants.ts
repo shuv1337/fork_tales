@@ -19,7 +19,7 @@ export const PANEL_TOOL_HINTS: Record<string, string[]> = {
   "nexus.ui.chat.symmetry": ["chat", "nearby", "pin"],
   "nexus.ui.web_graph_weaver": ["crawl", "queue", "graph"],
   "nexus.ui.threat_radar": ["threat", "security", "review"],
-  "nexus.ui.inspiration_atlas": ["search", "curate", "seed"],
+  "nexus.ui.system_overview": ["search", "curate", "seed"],
   "nexus.ui.entity_vitals": ["vitals", "telemetry", "watch"],
   "nexus.ui.projection_ledger": ["projection", "trace", "audit"],
   "nexus.ui.autopilot_ledger": ["autopilot", "risk", "gates"],
@@ -48,7 +48,7 @@ export const FIXED_AGENT_PRESENCES = [
   {
     id: "nexus.ui.chat.witness_thread",
     presenceId: "witness_thread",
-    label: "Witness Thread",
+    label: "Observer Thread",
   },
   {
     id: "nexus.ui.chat.chaos",

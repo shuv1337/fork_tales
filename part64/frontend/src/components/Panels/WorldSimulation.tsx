@@ -4,7 +4,7 @@ interface Props {
   simulation: SimulationState | null;
   interaction: WorldInteractionResponse | null;
   interactingPersonId: string | null;
-  onInteract: (personId: string, action: "speak" | "pray" | "sing") => void;
+  onInteract: (personId: string, action: "speak" | "boost" | "sing") => void;
 }
 
 export function WorldSimulationPanel({
@@ -41,7 +41,7 @@ export function WorldSimulationPanel({
             <p className="text-xs mt-2">
               {person.instrument} · {person.hymn_bpm} BPM
             </p>
-            <p className="text-xs text-muted mt-1">prays to {person.prays_to}</p>
+            <p className="text-xs text-muted mt-1">linked to {person.prays_to}</p>
             <div className="mt-2 h-2 bg-bg-1 rounded-full overflow-hidden">
               <div
                 className="h-full bg-blue-500"
@@ -59,11 +59,11 @@ export function WorldSimulationPanel({
               </button>
               <button
                 type="button"
-                onClick={() => onInteract(person.id, "pray")}
+                onClick={() => onInteract(person.id, "boost")}
                 disabled={interactingPersonId === person.id}
                 className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
               >
-                Pray / 祈る
+                Boost / 増幅
               </button>
               <button
                 type="button"
@@ -71,7 +71,7 @@ export function WorldSimulationPanel({
                 disabled={interactingPersonId === person.id}
                 className="text-[12px] px-2 py-1 rounded border border-line bg-white/70 hover:bg-white disabled:opacity-60"
               >
-                Sing / 歌う
+                Generate / 生成
               </button>
             </div>
           </article>
@@ -94,7 +94,7 @@ export function WorldSimulationPanel({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <section className="border border-line rounded-xl bg-white/55 p-3">
-          <h4 className="font-bold text-sm mb-2">Songbook / 聖歌帳</h4>
+          <h4 className="font-bold text-sm mb-2">Tracks / トラック帳</h4>
           <div className="space-y-2">
             {world.songs.slice(0, 4).map((song) => (
               <div key={song.id} className="text-xs border-l-2 border-blue-200 pl-2">
@@ -110,7 +110,7 @@ export function WorldSimulationPanel({
           <h4 className="font-bold text-sm mb-2">Library / 文庫</h4>
           <div className="space-y-2">
             {world.books.length === 0 && (
-              <p className="text-xs text-muted">Scribes are drafting the first myth.</p>
+              <p className="text-xs text-muted">Loggers are drafting the first report.</p>
             )}
             {world.books.slice(-4).reverse().map((book) => (
               <div key={book.id} className="text-xs border-l-2 border-amber-300 pl-2">
@@ -125,7 +125,7 @@ export function WorldSimulationPanel({
       </div>
 
       <p className="text-xs text-muted">
-        prayer intensity {world.prayer_intensity.toFixed(2)} · tick {world.tick}
+        activity level {world.prayer_intensity.toFixed(2)} · tick {world.tick}
       </p>
     </div>
   );

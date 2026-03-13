@@ -26,7 +26,7 @@ export interface UseAppPanelConfigsArgs {
   handleSendVoice: (musePresenceId: string, workspace: AgentWorkspaceContext) => Promise<void>;
   handleTranscribe: () => Promise<string | undefined>;
   handleUserPresenceInput: (payload: UserPresenceInputPayload) => void;
-  handleWorldInteract: (personId: string, action: "speak" | "pray" | "sing") => Promise<void>;
+  handleWorldInteract: (personId: string, action: "speak" | "boost" | "sing") => Promise<void>;
   interactingPersonId: string | null;
   isRecording: boolean;
   isThinking: boolean;

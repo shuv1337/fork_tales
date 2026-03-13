@@ -134,12 +134,12 @@ function buildGlassViewportPanel(): PanelConfig {
     pinnedByDefault: true,
     render: () => (
       <div className="mt-0 rounded-xl border border-[#3d516b] bg-[#0d1523] p-3 h-full">
-        <p className="text-[12px] uppercase tracking-[0.12em] text-[#a6d6f5]">Glass Viewport Presence</p>
+        <p className="text-[12px] uppercase tracking-[0.12em] text-[#a6d6f5]">Simulation Viewport</p>
         <p className="text-xs text-[#cfe6f7] mt-1">
-          This lane is managed through transparent glass mode for camera guidance and gentle map panning.
+          This lane provides camera guidance and smooth map panning for the simulation view.
         </p>
         <p className="text-[12px] text-[#9ec7dd] mt-2">
-          Use the glass controls to let the view-lens keeper guide what you see in the simulation.
+          Use the viewport controls to navigate and focus on different regions of the simulation.
         </p>
       </div>
     ),
@@ -226,11 +226,11 @@ function buildThreatRadarPanel(args: BuildPanelConfigsArgs): PanelConfig {
 
 function buildInspirationAtlasPanel(args: BuildPanelConfigsArgs): PanelConfig {
   return {
-    id: "nexus.ui.inspiration_atlas",
+    id: "nexus.ui.system_overview",
     fallbackSpan: 6,
     render: () => renderDeferredPanel(
       args.deferredPanelsReady,
-      "Inspiration Atlas",
+      "System Overview",
       <InspirationAtlasPanel simulation={args.simulation} />,
     ),
   };
@@ -414,7 +414,7 @@ function buildOmniArchivePanel(args: BuildPanelConfigsArgs): PanelConfig {
       <>
         <div className="absolute top-0 left-0 w-1 h-full bg-[#ae81ff] opacity-65" />
         <h2 className="text-3xl font-bold mb-2">Omni Panel / 全感覚パネル</h2>
-        <p className="text-muted mb-6">Receipt River, Mage of Receipts, and other cover entities.</p>
+        <p className="text-muted mb-6">Log Stream, Log Writer, and other system entities.</p>
         {renderDeferredPanel(args.deferredPanelsReady, "Omni Archive", <OmniPanel catalog={args.catalog} />)}
         <div className="mt-8">
           <h3 className="text-2xl font-bold mb-4">Vault Artifacts / 遺物録</h3>
@@ -433,11 +433,11 @@ function buildWorldSimulationPanel(args: BuildPanelConfigsArgs): PanelConfig {
     render: () => (
       <>
         <div className="absolute top-0 left-0 w-1 h-full bg-[#fd971f] opacity-70" />
-        <h2 className="text-3xl font-bold mb-2">Myth Commons / 神話共同体</h2>
-        <p className="text-muted mb-6">People sing, pray to the Presences, and keep writing the myth.</p>
+        <h2 className="text-3xl font-bold mb-2">World Simulation / 世界シミュレーション</h2>
+        <p className="text-muted mb-6">Actors interact with presences, generate tracks, and produce reports.</p>
         {renderDeferredPanel(
           args.deferredPanelsReady,
-          "Myth Commons",
+          "World Simulation",
           <WorldSimulationPanel
             simulation={args.simulation}
             interaction={args.worldInteraction}

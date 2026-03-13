@@ -98,9 +98,9 @@ export function VitalsPanel({ entities, catalog, presenceDynamics }: Props) {
             <div className="rounded-xl border border-[var(--line)] bg-[#242523] p-3">
               <p className="text-[12px] uppercase tracking-wide text-muted mb-2">How To Read / 読み方</p>
               <ol className="space-y-1.5 text-xs text-ink list-decimal pl-4">
-                <li>Tap the field map to bind a target into witness continuity.</li>
+                <li>Tap the field map to bind a target into observer continuity.</li>
                 <li>Check lineage rows to see what changed and where it landed.</li>
-                <li>Use <code>/say witness_thread ...</code> to narrate why a trace matters.</li>
+                <li>Use <code>/say witness_thread ...</code> to describe why a trace matters.</li>
               </ol>
             </div>
           </div>

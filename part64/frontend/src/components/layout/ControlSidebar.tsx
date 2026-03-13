@@ -191,9 +191,9 @@ export function ControlSidebar(props: ControlSidebarProps) {
 
       <div className="mt-3 rounded-lg border border-[#324f68] bg-[#131727] px-3 py-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Muse Forge</p>
+          <p className="text-[12px] uppercase tracking-[0.12em] text-[#9ec7dd]">Agent Creator</p>
           <p className="text-[12px] text-[#b8d9ef]">
-            runtime: <code>{museRuntimeSnapshot?.muse_count ?? 0}</code> muses | seq <code>{museRuntimeSnapshot?.event_seq ?? 0}</code>
+            runtime: <code>{museRuntimeSnapshot?.muse_count ?? 0}</code> agents | seq <code>{museRuntimeSnapshot?.event_seq ?? 0}</code>
           </p>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -207,7 +207,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
                 onCreateMuse();
               }
             }}
-            placeholder="create muse label (e.g. Archive Witness)"
+            placeholder="create agent label (e.g. Archive Observer)"
             className="min-w-[220px] flex-1 rounded-md border border-[#355670] bg-[#0c1723] px-3 py-1.5 text-xs text-[#e6f5ff]"
           />
           <button
@@ -216,7 +216,7 @@ export function ControlSidebar(props: ControlSidebarProps) {
             onClick={onCreateMuse}
             className="rounded-md border border-[#59742e] bg-[#303a2e] px-3 py-1.5 text-xs font-semibold text-[#e9ffd3] disabled:opacity-45"
           >
-            {agentForgeBusy ? "creating..." : "Create Muse"}
+            {agentForgeBusy ? "creating..." : "Create Agent"}
           </button>
         </div>
         <p className="mt-1 text-[12px] text-[#9fc4dd]">

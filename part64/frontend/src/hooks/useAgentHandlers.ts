@@ -71,7 +71,7 @@ export interface AgentHandlersActions {
   handleAgentWorkspaceBindingsChange: (presenceId: string, fileNodeIds: string[]) => void;
   handleAgentWorkspaceContextChange: (presenceId: string, workspace: AgentWorkspaceContext) => void;
   handleAgentWorkspaceSend: (text: string, musePresenceId: string, workspace: AgentWorkspaceContext) => void;
-  handleWorldInteract: (personId: string, action: "speak" | "pray" | "sing") => Promise<void>;
+  handleWorldInteract: (personId: string, action: "speak" | "boost" | "sing") => Promise<void>;
   handleOverlayInit: (api: unknown) => void;
 }
 
@@ -195,10 +195,10 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       audio.src = resolvedUrl;
       audio.currentTime = 0;
       await audio.play();
-      emitUiToast("Muse Audio", `playing ${label || "selected track"}`);
+      emitUiToast("Agent Audio", `playing ${label || "selected track"}`);
       return true;
     } catch {
-      emitUiToast("Muse Audio Ready", `queued ${label || "track"} (${resolvedUrl})`);
+      emitUiToast("Agent Audio Ready", `queued ${label || "track"} (${resolvedUrl})`);
       return false;
     }
   }, [emitUiToast]);
@@ -209,13 +209,13 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     try {
       const opened = window.open(resolvedUrl, "_blank", "noopener,noreferrer");
       if (opened) {
-        emitUiToast("Muse Image", `opened ${label || "selected image"}`);
+        emitUiToast("Agent Image", `opened ${label || "selected image"}`);
         return true;
       }
-      emitUiToast("Muse Image Ready", `image selected: ${resolvedUrl}`);
+      emitUiToast("Agent Image Ready", `image selected: ${resolvedUrl}`);
       return false;
     } catch {
-      emitUiToast("Muse Image Ready", `image selected: ${resolvedUrl}`);
+      emitUiToast("Agent Image Ready", `image selected: ${resolvedUrl}`);
       return false;
     }
   }, [emitUiToast]);
@@ -226,7 +226,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     if (!label || agentForgeBusy) return;
     const agentId = toAgentSlug(label);
     if (!agentId) {
-      emitUiToast("Muse Create Failed", "Provide a valid muse label.");
+      emitUiToast("Agent Create Failed", "Provide a valid agent label.");
       return;
     }
     const anchor = {
@@ -251,18 +251,18 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       const createdLabel = String(payload?.muse?.label || label).trim() || label;
       setActiveAgentPresenceId(createdId);
       setAgentForgeLabel("");
-      emitUiToast("Muse Created", `${createdLabel} is online as ${createdId}`);
+      emitUiToast("Agent Created", `${createdLabel} is online as ${createdId}`);
       emitChatMessage({
         role: "assistant",
-        text: `muse created\nid=${createdId}\nlabel=${createdLabel}`,
+        text: `agent created\nid=${createdId}\nlabel=${createdLabel}`,
         meta: { channel: "command", source: "meta:/api/muse/create", presenceId: createdId, presenceName: createdLabel },
       });
     } catch (error) {
       const reason = error instanceof Error ? error.message : "unknown_error";
-      emitUiToast("Muse Create Failed", reason);
+      emitUiToast("Agent Create Failed", reason);
       emitChatMessage({
         role: "assistant",
-        text: `muse create failed\nreason=${reason}`,
+        text: `agent create failed\nreason=${reason}`,
         meta: { channel: "command", source: "meta:/api/muse/create", presenceId: activeAgentPresenceId },
       });
     } finally {
@@ -457,11 +457,11 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
     if (gpuStatus === "granted") {
       overlayApi?.singAll?.();
       const device = String(gpuClaim?.device ?? "gpu").trim() || "gpu";
-      emitUiToast("Muse GPU Claim", `${tracePresenceName} claimed ${device}`);
+      emitUiToast("Agent GPU Claim", `${tracePresenceName} claimed ${device}`);
     }
     if (toolRows.length > 0) {
       const toolNames = toolRows.slice(0, 3).map((row) => String(row.tool ?? "tool").trim() || "tool").join(", ");
-      emitUiToast("Muse Tools", `${tracePresenceName} ran ${toolNames}`);
+      emitUiToast("Agent Tools", `${tracePresenceName} ran ${toolNames}`);
     }
     if (mediaActions.length > 0) {
       const firstAction = mediaActions[0];
@@ -512,29 +512,29 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
       if (kind === "muse.gpu.claim.granted") {
         overlayApi?.singAll?.();
         const device = String(eventPayload.device ?? "gpu").trim() || "gpu";
-        emitUiToast("Muse GPU Claim", `${agentId} claimed ${device}`);
+        emitUiToast("Agent GPU Claim", `${agentId} claimed ${device}`);
       }
       if (kind === "audio.play.requested") {
         const label = String(eventPayload.label ?? "audio track").trim() || "audio track";
         const target = String(eventPayload.target_node_id ?? "audio").trim() || "audio";
-        emitUiToast("Muse Audio Request", `${agentId} requested ${label} (${target})`);
+        emitUiToast("Agent Audio Request", `${agentId} requested ${label} (${target})`);
       }
       if (kind === "image.open.requested") {
         const label = String(eventPayload.label ?? "image").trim() || "image";
         const target = String(eventPayload.target_node_id ?? "image").trim() || "image";
-        emitUiToast("Muse Image Request", `${agentId} requested ${label} (${target})`);
+        emitUiToast("Agent Image Request", `${agentId} requested ${label} (${target})`);
       }
       if (kind === "muse.turn.completed" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         const deltaCount = Number(eventPayload.field_deltas ?? 0);
-        const daimonCount = Number(eventPayload.daimoi ?? 0);
-        emitUiToast("Muse Turn Complete", `${agentId} emitted ${daimonCount} daimoi and ${deltaCount} field deltas`);
+        const particleCount = Number(eventPayload.daimoi ?? 0);
+        emitUiToast("Agent Turn Complete", `${agentId} emitted ${particleCount} particles and ${deltaCount} field deltas`);
       }
       if (kind === "muse.rate_limited" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
-        emitUiToast("Muse Rate Limit", `${agentId} hit turn budget; wait a moment.`);
+        emitUiToast("Agent Rate Limit", `${agentId} hit turn budget; wait a moment.`);
       }
       if (kind === "muse.rejected" && normalizeAgentPresenceId(agentId) === normalizeAgentPresenceId(activeAgentPresenceId)) {
         const reason = String(eventPayload.reason ?? "rejected").trim() || "rejected";
-        emitUiToast("Muse Rejected", `${agentId} blocked turn (${reason})`);
+        emitUiToast("Agent Rejected", `${agentId} blocked turn (${reason})`);
       }
     });
     processedAgentEventSeqRef.current = maxSeq;
@@ -694,7 +694,7 @@ export function useAgentHandlers(params: UseAgentHandlersParams): AgentHandlersS
   }, [activeAgentPresenceId, catalog, emitChatMessage, emitWitnessChatReply, handleAutopilotUserInput, buildAgentSurroundingNodes, handleChatCommand, simulation]);
 
   // --- World interaction ---
-  const handleWorldInteract = useCallback(async (personId: string, action: "speak" | "pray" | "sing") => {
+  const handleWorldInteract = useCallback(async (personId: string, action: "speak" | "boost" | "sing") => {
     setInteractingPersonId(personId);
     try {
       const baseUrl = runtimeBaseUrl();

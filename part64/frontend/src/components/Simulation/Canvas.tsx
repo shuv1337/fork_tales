@@ -4108,13 +4108,13 @@ export function SimulationCanvas({
     }
 
     const fallbackNamedForms = [
-      { id: "receipt_river", en: "Receipt River", ja: "領収書の川", hue: 212, x: 0.22, y: 0.38 },
-      { id: "witness_thread", en: "Witness Thread", ja: "証人の糸", hue: 262, x: 0.63, y: 0.33 },
-      { id: "fork_tax_canticle", en: "Fork Tax Canticle", ja: "フォーク税の聖歌", hue: 34, x: 0.44, y: 0.62 },
-      { id: "mage_of_receipts", en: "Mage of Receipts", ja: "領収魔導師", hue: 286, x: 0.33, y: 0.71 },
-      { id: "keeper_of_receipts", en: "Keeper of Receipts", ja: "領収書の番人", hue: 124, x: 0.57, y: 0.72 },
+      { id: "receipt_river", en: "Log Stream", ja: "ログストリーム", hue: 212, x: 0.22, y: 0.38 },
+      { id: "witness_thread", en: "Observer Thread", ja: "観測スレッド", hue: 262, x: 0.63, y: 0.33 },
+      { id: "fork_tax_canticle", en: "Fork Cost Metric", ja: "フォークコスト指標", hue: 34, x: 0.44, y: 0.62 },
+      { id: "mage_of_receipts", en: "Log Writer", ja: "ログライター", hue: 286, x: 0.33, y: 0.71 },
+      { id: "keeper_of_receipts", en: "Log Guardian", ja: "ログガーディアン", hue: 124, x: 0.57, y: 0.72 },
       { id: "anchor_registry", en: "Anchor Registry", ja: "錨台帳", hue: 184, x: 0.49, y: 0.5 },
-      { id: "gates_of_truth", en: "Gates of Truth", ja: "真理の門", hue: 52, x: 0.76, y: 0.54 },
+      { id: "gates_of_truth", en: "Compliance Gate", ja: "コンプライアンスゲート", hue: 52, x: 0.76, y: 0.54 },
     ];
 
     const toRgbFromHue = (hue: number): [number, number, number] => {
@@ -6577,7 +6577,7 @@ export function SimulationCanvas({
               swarm mode braids nearby packets by owner + direction.
             </p>
             {interactive ? (
-              <p className="mt-1 text-[12px] text-[#c4d7f0]">single tap centers nexus in glass lane · double tap opens hologram / 単タップで中心化・ダブルで起動</p>
+              <p className="mt-1 text-[12px] text-[#c4d7f0]">single tap centers nexus in viewport · double tap opens hologram / 単タップで中心化・ダブルで起動</p>
             ) : null}
             <div className="mt-2 rounded border border-[#385168] bg-[#111a2b] px-2 py-1.5">
               <p className="text-[12px] uppercase tracking-[0.11em] text-[#9fd5f2]">mp3 nexus tools</p>

@@ -344,7 +344,7 @@ export function ThreatRadarPanel() {
           <p className="dashboard-small">interval {Math.round(Number(runtime?.interval_seconds || 0))}s</p>
         </div>
         <div className="dashboard-card">
-          <p className="dashboard-k">muse</p>
+          <p className="dashboard-k">agent</p>
           <p className="dashboard-v">{runtime?.label || runtime?.muse_id || "-"}</p>
           <p className="dashboard-small">low {result.low_count}</p>
         </div>

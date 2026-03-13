@@ -62,17 +62,17 @@ const RUNTIME_REFRESH_MS = 6500;
 const FALLBACK_MUSES: WorldPresence[] = [
   {
     id: "witness_thread",
-    name: { en: "Witness Thread", ja: "証人の糸" },
+    name: { en: "Observer Thread", ja: "観測スレッド" },
     type: "presence",
   },
   {
     id: "anchor_registry",
-    name: { en: "Anchor Registry", ja: "錨台帳" },
+    name: { en: "Anchor Registry", ja: "アンカーレジストリ" },
     type: "presence",
   },
   {
     id: "gates_of_truth",
-    name: { en: "Gates of Truth", ja: "真理の門" },
+    name: { en: "Compliance Gate", ja: "コンプライアンスゲート" },
     type: "presence",
   },
 ];
@@ -678,7 +678,7 @@ export function ChatPanel({
         <div className="rounded-md border border-[#2c475c] bg-[#101522] px-3 py-2">
           <p className="text-sm font-semibold text-ink">{activeMuseLabel}</p>
           <p className="text-[12px] text-[#b7d8ee] mt-1">
-            Pinned nexus in this muse panel are always included in generation context.
+            Pinned nexus in this agent panel are always included in generation context.
           </p>
         </div>
 
@@ -686,7 +686,7 @@ export function ChatPanel({
           <p className="text-xs font-semibold text-[#d4ecff]">Nearby Nexus</p>
           <div className="mt-2 grid gap-1.5 max-h-[190px] overflow-auto pr-1">
             {nearbyNexusRows.length <= 0 ? (
-              <p className="text-xs text-muted">No nearby nexus rows for this muse.</p>
+              <p className="text-xs text-muted">No nearby nexus rows for this agent.</p>
             ) : (
               nearbyNexusRows.map((row) => {
                 const nodeId = String(row.id ?? row.node_id ?? "").trim();
@@ -752,8 +752,8 @@ export function ChatPanel({
         </div>
 
         <div className="rounded-lg border border-[var(--line)] bg-[#12151a] p-3">
-          <p className="text-sm font-semibold text-ink">Muse Chat</p>
-          <p className="text-[12px] text-muted mt-1">Messages route to `/api/muse/message` with pinned nexus context.</p>
+          <p className="text-sm font-semibold text-ink">Agent Chat</p>
+          <p className="text-[12px] text-muted mt-1">Messages route to `/api/agent/message` with pinned nexus context.</p>
           <div
             ref={scrollRef}
             className="mt-2 border border-[var(--line)] rounded-lg bg-[#1e1f1f] p-2 min-h-[130px] max-h-[260px] overflow-auto grid gap-2"
@@ -782,7 +782,7 @@ export function ChatPanel({
                     {msg.role === "user"
                       ? "operator / 操作者"
                       : msg.role === "assistant"
-                        ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeMuse?.en || "muse"} / ミューズ`
+                        ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeMuse?.en || "agent"} / エージェント`
                         : "system"}
                   </span>
                   {msg.text}
@@ -795,7 +795,7 @@ export function ChatPanel({
             {isThinking ? (
               <div className="border border-dashed border-[#3b6e82] rounded-lg p-2 text-sm bg-[#233045] animate-pulse text-[#66d9ef]">
                 <Sparkles size={14} className="inline mr-1" />
-                {activeMuse?.en || "muse"} is synthesizing from simulation state...
+                {activeMuse?.en || "agent"} is synthesizing from simulation state...
               </div>
             ) : null}
           </div>
@@ -806,7 +806,7 @@ export function ChatPanel({
               ref={inputRef}
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder={isThinking ? "Thinking... / 思考中..." : "Ask this muse..."}
+              placeholder={isThinking ? "Thinking... / 思考中..." : "Ask this agent..."}
               disabled={isThinking}
               className="w-full min-h-[74px] max-h-[180px] resize-y border border-[var(--line)] rounded-lg p-2 font-inherit bg-[#272822] text-ink disabled:opacity-50"
               onKeyDown={(event) => {
@@ -847,14 +847,14 @@ export function ChatPanel({
   const dominantField = String(chatLensState?.explain?.dominant_field || "(none)");
   const linkedPresenceText = isWitnessMuse
     ? (witnessState?.linked_presences ?? []).join(" · ") || "(none)"
-    : selectedImpact?.notes_en || "(no linked presences reported for this muse)";
+    : selectedImpact?.notes_en || "(no linked presences reported for this agent)";
   const lineageRows = isWitnessMuse ? witnessState?.lineage ?? [] : [];
   const runtimeSignals = studySnapshot?.signals;
   const checkpoint = lineageSnapshot?.checkpoint;
   const treeState = lineageSnapshot?.working_tree;
   const ledgerTitle = isWitnessMuse
-    ? "Witness Thread Ledger / 証人の糸 台帳"
-    : "Muse Workspace Ledger / ミューズ作業台帳";
+    ? "Observer Thread Ledger / 観測スレッド台帳"
+    : "Agent Workspace Ledger / エージェント作業台帳";
 
   return (
     <div
@@ -865,21 +865,21 @@ export function ChatPanel({
         <div>
           <p className="text-sm font-semibold text-ink">{ledgerTitle}</p>
           <p className="text-xs text-muted mt-1">
-            Muse channel is the single conversation lane for operator input, system needs, and state translation.
+            Agent channel is the single conversation lane for operator input, system needs, and state translation.
           </p>
           <p className="text-[12px] text-[#b8d9ef] mt-1">
-            active muse <code>{activeMuseLabel}</code>
+            active agent <code>{activeMuseLabel}</code>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {fixedAgentPresenceId ? (
             <div className="rounded-md border border-[#305367] bg-[#0f1722] px-3 py-2">
-              <p className="text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">Muse Workspace</p>
+              <p className="text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">Agent Workspace</p>
               <p className="text-xs text-[#d9edff] mt-1">{activeMuseLabel}</p>
             </div>
           ) : (
             <label className="grid gap-1 text-[12px] uppercase tracking-[0.12em] text-[#a8c6db]">
-              Muse Presence
+              Agent Presence
               <select
                 value={resolvedMusePresenceId}
                 onChange={(event) => onAgentPresenceChange?.(event.target.value)}
@@ -910,7 +910,7 @@ export function ChatPanel({
 
       <div className="rounded-lg border border-[#2d4b60] bg-[#0e1422] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-semibold text-[#cfe9ff]">Muse Workspace Nexus Binds / 結び目</p>
+          <p className="text-xs font-semibold text-[#cfe9ff]">Agent Workspace Nexus Binds / 結び目</p>
           <p className="text-[12px] text-[#9dc6dd]">Pinned nexus are used as active conversational context.</p>
         </div>
         <div className="mt-2 grid gap-2 md:grid-cols-[1fr_auto] md:items-start">
@@ -918,7 +918,7 @@ export function ChatPanel({
             type="text"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="search files/resources to pin into this muse workspace"
+            placeholder="search files/resources to pin into this agent workspace"
             className="w-full rounded-md border border-[#2f4f64] bg-[#0e1825] px-3 py-2 text-xs text-[#e5f3ff]"
           />
           <p className="text-[12px] text-[#9dc6dd]">
@@ -947,7 +947,7 @@ export function ChatPanel({
             })}
           </div>
         ) : (
-          <p className="text-xs text-muted mt-2">No nexus pinned yet for this muse workspace.</p>
+          <p className="text-xs text-muted mt-2">No nexus pinned yet for this agent workspace.</p>
         )}
 
         <div className="mt-2 grid gap-1.5 max-h-[168px] overflow-auto pr-1">
@@ -1019,7 +1019,7 @@ export function ChatPanel({
           </div>
         </div>
         <div className="rounded-md border border-[#44562d] bg-[#161d18] px-3 py-2">
-          <p className="text-[12px] uppercase tracking-wide text-[#bfe8a7]">muse particles</p>
+          <p className="text-[12px] uppercase tracking-wide text-[#bfe8a7]">agent particles</p>
           <p className="text-sm font-semibold text-[#e5ffdb]">{witnessParticles.length}</p>
           <p className="text-[12px] text-[#d2efc0] mt-1">
             linked {isWitnessMuse ? witnessState?.linked_presences?.length ?? 0 : "n/a"}
@@ -1034,8 +1034,8 @@ export function ChatPanel({
           {lineageRows.length <= 0 ? (
             <p className="text-xs text-muted">
               {isWitnessMuse
-                ? "No lineage rows yet; waiting for witness touch or file drift."
-                : "Lineage ledger is currently witness-thread specific; this muse relies on nearby embedding context."}
+                ? "No lineage rows yet; waiting for observer touch or file drift."
+                : "Lineage ledger is currently observer-thread specific; this agent relies on nearby embedding context."}
             </p>
           ) : (
             lineageRows.slice(0, 8).map((entry, index) => (
@@ -1062,10 +1062,10 @@ export function ChatPanel({
       <div className="rounded-lg border border-[#44562d] bg-[#0f1719] p-3">
         <p className="text-xs font-semibold text-[#dff4d5]">Particles Made Clear / 粒子明瞭化</p>
         <p className="text-[12px] text-[#b4d6bb] mt-1">
-          Active muse particles are shown as explicit slices with deterministic order.
+          Active agent particles are shown as explicit slices with deterministic order.
         </p>
         {witnessParticles.length <= 0 ? (
-          <p className="text-xs text-muted mt-2">No active muse particles in this frame.</p>
+          <p className="text-xs text-muted mt-2">No active agent particles in this frame.</p>
         ) : (
           <>
             <div className="mt-2 grid grid-cols-12 gap-1 sm:grid-cols-16">
@@ -1146,10 +1146,10 @@ export function ChatPanel({
       <div className="rounded-lg border border-[#2d4b60] bg-[#101724] p-3">
         <p className="text-xs font-semibold text-[#d4ecff]">Nearby Embedded Context / 近傍埋め込み</p>
         <p className="text-[12px] text-[#9dc6dd] mt-1">
-          Nearby embedding-bearing items are sent with muse state context for language synthesis.
+          Nearby embedding-bearing items are sent with agent state context for language synthesis.
         </p>
         {nearbyEmbedSummaries.length <= 0 ? (
-          <p className="text-xs text-muted mt-2">No nearby embedding summaries for this muse presence yet.</p>
+          <p className="text-xs text-muted mt-2">No nearby embedding summaries for this agent presence yet.</p>
         ) : (
           <div className="mt-2 grid gap-1.5">
             {nearbyEmbedSummaries.map((line) => (
@@ -1166,7 +1166,7 @@ export function ChatPanel({
 
       <div className="rounded-lg border border-[var(--line)] bg-[#12151a] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-ink">Muse Conversation / ミューズ対話</p>
+          <p className="text-sm font-semibold text-ink">Agent Conversation / エージェント対話</p>
           <div className="inline-flex rounded-md border border-[#32576b] overflow-hidden">
             <button
               type="button"
@@ -1188,7 +1188,7 @@ export function ChatPanel({
         <p className="text-[12px] text-muted mt-1">
           {chatChannel === "ledger"
             ? `ledger mode auto-routes plain text into /say ${resolvedMusePresenceId} for deterministic evidence replies.`
-            : "llm mode uses /api/muse/message and carries live muse state + nearby embedding context."}
+            : "llm mode uses /api/agent/message and carries live agent state + nearby embedding context."}
         </p>
 
         <div
@@ -1219,7 +1219,7 @@ export function ChatPanel({
                   {msg.role === "user"
                     ? "operator / 操作者"
                     : msg.role === "assistant"
-                      ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeMuse?.en || "muse"} / ミューズ`
+                      ? `${msg.meta?.presenceName || msg.meta?.presenceId || activeMuse?.en || "agent"} / エージェント`
                       : "system"}
                 </span>
                 {msg.text}
@@ -1232,7 +1232,7 @@ export function ChatPanel({
           {isThinking ? (
             <div className="border border-dashed border-[#3b6e82] rounded-lg p-2 text-sm bg-[#233045] animate-pulse text-[#66d9ef]">
               <Sparkles size={14} className="inline mr-1" />
-              {activeMuse?.en || "muse"} is synthesizing from simulation state... / ミューズが状態から合成中...
+              {activeMuse?.en || "agent"} is synthesizing from simulation state... / エージェントが状態から合成中...
             </div>
           ) : null}
         </div>
@@ -1285,8 +1285,8 @@ export function ChatPanel({
               isThinking
                 ? "Thinking... / 思考中..."
                 : chatChannel === "ledger"
-                  ? `Describe the work you want ${activeMuse?.en || "the muse"} to route into system signals...`
-                  : "Ask the muse for a state-derived language response..."
+                  ? `Describe the work you want ${activeMuse?.en || "the agent"} to route into system signals...`
+                  : "Ask the agent for a state-derived language response..."
             }
             disabled={isThinking}
             className="w-full min-h-[74px] max-h-[180px] resize-y border border-[var(--line)] rounded-lg p-2 font-inherit bg-[#272822] text-ink disabled:opacity-50"
@@ -1340,7 +1340,7 @@ export function ChatPanel({
         </p>
         <p className="text-[12px] text-muted/80 mt-1">
           <Activity size={11} className="inline mr-1" />
-          Muse lane translates language into system signals, and turns live system state back into language.
+          Agent lane translates language into system signals, and turns live system state back into language.
         </p>
       </div>
     </div>

@@ -159,7 +159,7 @@ async function handlePresenceSayCommand(
     context.emitWitnessChatReply(payload as Record<string, unknown>, "command:/say", presenceId);
     context.emitSystemMessage(buildSayCommandSystemMessage(payload, presenceId));
   } catch {
-    context.emitSystemMessage("muse say failed");
+    context.emitSystemMessage("agent say failed");
   }
 
   return true;
@@ -168,7 +168,7 @@ async function handlePresenceSayCommand(
 function buildSayCommandSystemMessage(payload: SayCommandResponse, presenceId: string): string {
   const explicitCount = payload?.manifest?.explicit_selected?.length || 0;
   const surroundingCount = payload?.manifest?.surround_selected?.length || 0;
-  return `${payload?.muse?.label || presenceId} / muse turn ${payload?.turn_id || ""}\n${payload?.reply || "(no reply)"}\n`
+  return `${payload?.muse?.label || presenceId} / agent turn ${payload?.turn_id || ""}\n${payload?.reply || "(no reply)"}\n`
     + `explicit=${explicitCount} surrounding=${surroundingCount}`;
 }
 

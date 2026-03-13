@@ -38,17 +38,17 @@ interface Props {
 const FALLBACK_PRESENCES: WorldPresence[] = [
   {
     id: "witness_thread",
-    name: { en: "Witness Thread", ja: "証人の糸" },
+    name: { en: "Observer Thread", ja: "観測スレッド" },
     type: "presence",
   },
   {
     id: "receipt_river",
-    name: { en: "Receipt River", ja: "領収書の川" },
+    name: { en: "Log Stream", ja: "ログストリーム" },
     type: "presence",
   },
   {
     id: "gates_of_truth",
-    name: { en: "Gates of Truth", ja: "真理の門" },
+    name: { en: "Compliance Gate", ja: "コンプライアンスゲート" },
     type: "presence",
   },
 ];

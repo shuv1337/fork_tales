@@ -30,11 +30,11 @@ const INSPIRATION_BOARDS: InspirationBoard[] = [
     subtitle: "Nexus state map + open questions",
     relPath: ".ημ/ChatGPT Image Feb 15, 2026, 01_50_05 PM.png",
     anchorPresence: "anchor_registry",
-    notes: "Keep flow legible: receipts, queue, drift, api, and meta-daimoi.",
+    notes: "Keep flow legible: receipts, queue, drift, api, and meta-particles.",
   },
   {
     id: "inner-jam",
-    title: "Operation Mindfuck :: Inner Jam",
+    title: "Council Rhythm :: Artifact Workstation",
     subtitle: "Council rhythm + artifact workstation",
     relPath: ".ημ/ChatGPT Image Feb 15, 2026, 11_20_58 AM.png",
     anchorPresence: "mage_of_receipts",
@@ -109,7 +109,7 @@ export function InspirationAtlasPanel({ simulation }: Props) {
   return (
     <section className="card inspiration-shell relative overflow-hidden">
       <div className="absolute top-0 left-0 w-1 h-full bg-[#fd971f] opacity-70" />
-      <h2 className="text-3xl font-bold mb-2">Inspiration Atlas / .eta-mu</h2>
+      <h2 className="text-3xl font-bold mb-2">System Overview / .eta-mu</h2>
       <p className="text-muted mb-5 text-sm">
         Visual references from <code>.ημ/</code> now feed UI emphasis: stronger field and presence
         force means larger card weight.

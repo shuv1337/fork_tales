@@ -84,12 +84,17 @@ const GLASS_MIDDLE_PAN_CLAMP = 0.32;
 const GLASS_TOUCH_PAN_GAIN = 1;
 const GLASS_TOUCH_PAN_CLAMP = 0.14;
 
+const PANEL_LABEL_OVERRIDES: Record<string, string> = {
+  "nexus.ui.glass_viewport": "simulation viewport",
+  "nexus.ui.system_overview": "system overview",
+};
+
 function panelLabelFromId(panelId: string): string {
   const cached = PANEL_LABEL_CACHE.get(panelId);
   if (cached) {
     return cached;
   }
-  const label = panelId.split(".").slice(-1)[0].replace(/_/g, " ");
+  const label = PANEL_LABEL_OVERRIDES[panelId] ?? panelId.split(".").slice(-1)[0].replace(/_/g, " ");
   PANEL_LABEL_CACHE.set(panelId, label);
   return label;
 }
@@ -1817,7 +1822,7 @@ function WorldPanelsViewportInner({
 
         {paneMode === "glass" ? (
             <div className="world-glass-pane">
-            <p className="world-glass-title">glass viewport</p>
+            <p className="world-glass-title">simulation viewport</p>
             <div className="world-glass-grid">
               <p className="world-glass-row">
                 middle drag or touch drag to pan · wheel zooms sim · click opens/focuses nexus

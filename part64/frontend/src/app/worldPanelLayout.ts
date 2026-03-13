@@ -118,7 +118,7 @@ export const PANEL_ANCHOR_PRESETS: Record<string, PanelAnchorPreset> = {
     pinnedByDefault: true,
     anchorId: "witness_thread",
   },
-  "nexus.ui.inspiration_atlas": {
+  "nexus.ui.system_overview": {
     kind: "cluster",
     worldSize: "m",
   },
