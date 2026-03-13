@@ -79,17 +79,17 @@ DOCKER_SIMULATION_API_TIMEOUT_SECONDS = _env_float(
 )
 DOCKER_SIMULATION_LABEL_KEY = (
     str(
-        os.getenv("DOCKER_SIMULATION_LABEL_KEY", "io.fork_tales.simulation")
-        or "io.fork_tales.simulation"
+        os.getenv("DOCKER_SIMULATION_LABEL_KEY", "io.eta_mu.simulation")
+        or "io.eta_mu.simulation"
     ).strip()
-    or "io.fork_tales.simulation"
+    or "io.eta_mu.simulation"
 )
 DOCKER_SIMULATION_ROLE_LABEL_KEY = (
     str(
-        os.getenv("DOCKER_SIMULATION_ROLE_LABEL_KEY", "io.fork_tales.simulation.role")
-        or "io.fork_tales.simulation.role"
+        os.getenv("DOCKER_SIMULATION_ROLE_LABEL_KEY", "io.eta_mu.simulation.role")
+        or "io.eta_mu.simulation.role"
     ).strip()
-    or "io.fork_tales.simulation.role"
+    or "io.eta_mu.simulation.role"
 )
 DOCKER_SIMULATION_NETWORK_HINT = (
     str(
@@ -574,7 +574,7 @@ def _simulation_endpoints(ports: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def _selected_labels(labels: dict[str, str]) -> dict[str, str]:
     selected: dict[str, str] = {}
     for key, value in labels.items():
-        if key.startswith("io.fork_tales.") or key.startswith("com.docker.compose."):
+        if key.startswith("io.eta_mu.") or key.startswith("com.docker.compose."):
             selected[key] = value
     if DOCKER_SIMULATION_LABEL_KEY in labels:
         selected[DOCKER_SIMULATION_LABEL_KEY] = labels[DOCKER_SIMULATION_LABEL_KEY]
@@ -1507,7 +1507,7 @@ def build_docker_simulation_snapshot(
             "example_labels": {
                 DOCKER_SIMULATION_LABEL_KEY: "true",
                 DOCKER_SIMULATION_ROLE_LABEL_KEY: "experiment",
-                "io.fork_tales.simulation.name": "eta-mu-exp-a",
+                "io.eta_mu.simulation.name": "eta-mu-exp-a",
             },
         },
         "simulations": simulations,

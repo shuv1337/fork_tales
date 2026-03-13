@@ -132,7 +132,7 @@ class SimulationManager:
         results = []
         for c in containers:
             labels = c.get("Labels", {})
-            if labels.get("io.fork_tales.simulation") != "true":
+            if labels.get("io.eta_mu.simulation") != "true":
                 continue
 
             # Extract port
@@ -150,10 +150,10 @@ class SimulationManager:
                     "status": c.get("Status"),
                     "port": port,
                     "backend": labels.get(
-                        "io.fork_tales.simulation.variant", "unknown"
+                        "io.eta_mu.simulation.variant", "unknown"
                     ),
-                    "preset": labels.get("io.fork_tales.simulation.preset", "none"),
-                    "role": labels.get("io.fork_tales.simulation.role", "unknown"),
+                    "preset": labels.get("io.eta_mu.simulation.preset", "none"),
+                    "role": labels.get("io.eta_mu.simulation.role", "unknown"),
                 }
             )
         return results
@@ -201,11 +201,11 @@ class SimulationManager:
         config = {
             "Image": image_name,
             "Labels": {
-                "io.fork_tales.simulation": "true",
-                "io.fork_tales.simulation.role": "experiment",
-                "io.fork_tales.simulation.variant": preset.get("backend", "unknown"),
-                "io.fork_tales.simulation.preset": preset_id,
-                "io.fork_tales.simulation.instance": instance_name,
+                "io.eta_mu.simulation": "true",
+                "io.eta_mu.simulation.role": "experiment",
+                "io.eta_mu.simulation.variant": preset.get("backend", "unknown"),
+                "io.eta_mu.simulation.preset": preset_id,
+                "io.eta_mu.simulation.instance": instance_name,
             },
             "HostConfig": {
                 "PortBindings": {"8787/tcp": [{"HostPort": str(port)}]},

@@ -46,10 +46,10 @@ services:
       SIM_PARTICLE_BACKEND: "cdb"
       SIM_SLICE_OFFLOAD_MODE: "local"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "sim-slice-bench"
-      io.fork_tales.simulation.variant: "local"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "sim-slice-bench"
+      io.eta_mu.simulation.variant: "local"
     depends_on:
       - chroma
     ports:
@@ -144,10 +144,10 @@ services:
       SIMULATION_FILE_GRAPH_PROJECTION_EDGE_THRESHOLD: "340"
       SIMULATION_FILE_GRAPH_PROJECTION_EDGE_CAP_MAX: "860"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "sim-slice-bench"
-      io.fork_tales.simulation.variant: "cdb"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "sim-slice-bench"
+      io.eta_mu.simulation.variant: "cdb"
     depends_on:
       - chroma
     ports:
@@ -238,10 +238,10 @@ services:
       SIM_SLICE_REDIS_TIMEOUT_MS: "160"
       SIM_SLICE_REDIS_POLL_MS: "5"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "sim-slice-bench"
-      io.fork_tales.simulation.variant: "redis"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "sim-slice-bench"
+      io.eta_mu.simulation.variant: "redis"
     depends_on:
       - chroma
       - sim-slice-redis
@@ -332,10 +332,10 @@ services:
       SIM_SLICE_UDS_PATH: "/sim-socket/sim_slice.sock"
       SIM_SLICE_UDS_TIMEOUT_MS: "40"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "sim-slice-bench"
-      io.fork_tales.simulation.variant: "uds"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "sim-slice-bench"
+      io.eta_mu.simulation.variant: "uds"
     depends_on:
       - chroma
       - sim-slice-worker-uds

@@ -115,8 +115,8 @@ services:
       CDB_CLUSTER_THETA: "${CDB_CLUSTER_THETA:-0.68}"
       CDB_CLUSTER_REST_LENGTH: "${CDB_CLUSTER_REST_LENGTH:-0.08}"
       CDB_CLUSTER_STIFFNESS: "${CDB_CLUSTER_STIFFNESS:-1.0}"
-      DOCKER_SIMULATION_LABEL_KEY: "io.fork_tales.simulation"
-      DOCKER_SIMULATION_ROLE_LABEL_KEY: "io.fork_tales.simulation.role"
+      DOCKER_SIMULATION_LABEL_KEY: "io.eta_mu.simulation"
+      DOCKER_SIMULATION_ROLE_LABEL_KEY: "io.eta_mu.simulation.role"
       DOCKER_SIMULATION_NAME_HINTS: "eta-mu,muse-song,sim-slice,simulation,experiment"
       DOCKER_SIMULATION_NETWORK_HINT: "eta-mu-sim-net"
       DOCKER_SIMULATION_WS_REFRESH_SECONDS: "2.5"
@@ -135,9 +135,9 @@ services:
       MUSE_THREAT_RADAR_TOKEN_BUDGET: "${MUSE_THREAT_RADAR_TOKEN_BUDGET:-1400}"
       MUSE_THREAT_RADAR_PROMPT: "${MUSE_THREAT_RADAR_PROMPT:-/facts /graph github_threat_radar 1440 24}"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "world-runtime"
-      io.fork_tales.simulation.track: "core"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "world-runtime"
+      io.eta_mu.simulation.track: "core"
     depends_on:
       - chroma
     ports:

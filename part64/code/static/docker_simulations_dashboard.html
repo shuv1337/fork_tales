@@ -1229,7 +1229,7 @@
           simulationList.innerHTML = `
             <div class="empty">
               No simulation containers are currently visible. Add labels like
-              <code>io.fork_tales.simulation=true</code> and join network
+              <code>io.eta_mu.simulation=true</code> and join network
               <code>${safeText(payload?.discovery_contract?.network_hint, "eta-mu-sim-net")}</code> for automatic discovery.
             </div>
           `;
@@ -1670,7 +1670,7 @@
         const stale = Boolean(payload?.stale);
         sourceNote.textContent = sourceError
           ? `Source ${sourceMode} reported ${sourceError}${stale ? " (showing cached snapshot)" : ""}.`
-          : `Source ${sourceMode} healthy. Label key: ${safeText(payload?.source?.label_key, "io.fork_tales.simulation")}.`;
+          : `Source ${sourceMode} healthy. Label key: ${safeText(payload?.source?.label_key, "io.eta_mu.simulation")}.`;
 
         const nextFingerprint = safeText(payload?.fingerprint, "pending");
         const changed = nextFingerprint !== lastFingerprint;

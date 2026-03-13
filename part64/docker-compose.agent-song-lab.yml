@@ -46,10 +46,10 @@ services:
       MUSE_RUNTIME_MAX_PARTICLES_PER_TURN: "10"
       MUSE_RUNTIME_TURNS_PER_MINUTE: "14"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "muse-song-lab"
-      io.fork_tales.simulation.variant: "baseline"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "agent-song-lab"
+      io.eta_mu.simulation.variant: "baseline"
     depends_on:
       - chroma
     ports:
@@ -134,10 +134,10 @@ services:
       MUSE_RUNTIME_MAX_PARTICLES_PER_TURN: "14"
       MUSE_RUNTIME_TURNS_PER_MINUTE: "16"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "muse-song-lab"
-      io.fork_tales.simulation.variant: "chaos"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "agent-song-lab"
+      io.eta_mu.simulation.variant: "chaos"
     depends_on:
       - chroma
     ports:
@@ -222,10 +222,10 @@ services:
       MUSE_RUNTIME_MAX_PARTICLES_PER_TURN: "8"
       MUSE_RUNTIME_TURNS_PER_MINUTE: "12"
     labels:
-      io.fork_tales.simulation: "true"
-      io.fork_tales.simulation.role: "experiment"
-      io.fork_tales.simulation.track: "muse-song-lab"
-      io.fork_tales.simulation.variant: "stability"
+      io.eta_mu.simulation: "true"
+      io.eta_mu.simulation.role: "experiment"
+      io.eta_mu.simulation.track: "agent-song-lab"
+      io.eta_mu.simulation.variant: "stability"
     depends_on:
       - chroma
     ports:
