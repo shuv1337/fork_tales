@@ -1057,7 +1057,7 @@ class RotatingClient:
         headers.setdefault("conversation_id", session_id)
         headers.setdefault("x-session-id", session_id)
         headers.setdefault("x-conversation-id", session_id)
-        headers.setdefault("originator", "fork_tales_proxy")
+        headers.setdefault("originator", "eta_mu_proxy")
 
         litellm_kwargs["extra_headers"] = headers
 

@@ -61,7 +61,7 @@ def test_build_docker_simulation_snapshot_tracks_network_awareness() -> None:
                 name="eta-mu-song-chaos",
                 service="eta-mu-song-chaos",
                 project="song-lab",
-                labels={"io.fork_tales.simulation": "true"},
+                labels={"io.eta_mu.simulation": "true"},
                 public_port=19878,
             ),
             _container_row(
@@ -69,7 +69,7 @@ def test_build_docker_simulation_snapshot_tracks_network_awareness() -> None:
                 name="eta-mu-song-stability",
                 service="eta-mu-song-stability",
                 project="song-lab",
-                labels={"io.fork_tales.simulation": "true"},
+                labels={"io.eta_mu.simulation": "true"},
                 public_port=19879,
             ),
             _container_row(
@@ -77,7 +77,7 @@ def test_build_docker_simulation_snapshot_tracks_network_awareness() -> None:
                 name="sim-slice-worker-c",
                 service="sim-slice-worker-c",
                 project="bench",
-                labels={"io.fork_tales.simulation": "false"},
+                labels={"io.eta_mu.simulation": "false"},
                 private_port=7711,
                 public_port=0,
             ),
@@ -141,8 +141,8 @@ def test_build_snapshot_includes_gateway_route_and_control_policy() -> None:
                 service="eta-mu-system",
                 project="part64",
                 labels={
-                    "io.fork_tales.simulation": "true",
-                    "io.fork_tales.simulation.role": "world-runtime",
+                    "io.eta_mu.simulation": "true",
+                    "io.eta_mu.simulation.role": "world-runtime",
                 },
                 public_port=8787,
             ),
@@ -151,7 +151,7 @@ def test_build_snapshot_includes_gateway_route_and_control_policy() -> None:
                 name="part64-eta-mu-cdb-1",
                 service="eta-mu-cdb",
                 project="part64",
-                labels={"io.fork_tales.simulation": "true"},
+                labels={"io.eta_mu.simulation": "true"},
                 public_port=18880,
             ),
         ],
@@ -216,7 +216,7 @@ def test_build_snapshot_includes_resource_usage_and_limit_pressure() -> None:
                 name="eta-mu-resource",
                 service="eta-mu-resource",
                 project="bench",
-                labels={"io.fork_tales.simulation": "true"},
+                labels={"io.eta_mu.simulation": "true"},
                 private_port=8787,
                 public_port=18881,
             )
@@ -290,7 +290,7 @@ def test_build_snapshot_includes_lifecycle_failure_signals() -> None:
                 name="eta-mu-chaos",
                 service="eta-mu-chaos",
                 project="song",
-                labels={"io.fork_tales.simulation": "true"},
+                labels={"io.eta_mu.simulation": "true"},
                 private_port=8787,
                 public_port=19878,
             )
@@ -370,7 +370,7 @@ def test_collect_snapshot_uses_cached_payload_when_refresh_fails(
             name="eta-mu-system",
             service="eta-mu-system",
             project="core",
-            labels={"io.fork_tales.simulation": "true"},
+            labels={"io.eta_mu.simulation": "true"},
             private_port=8787,
             public_port=8788,
         )

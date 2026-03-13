@@ -1009,7 +1009,7 @@ def test_witness_lineage_payload_reports_ahead_behind_when_upstream_present(
             return subprocess.CompletedProcess(cmd, 0, "def5678 synced\n", "")
         if args == ["remote", "get-url", "origin"]:
             return subprocess.CompletedProcess(
-                cmd, 0, "git@github.com:err/fork_tales.git\n", ""
+                cmd, 0, "git@github.com:err/eta_mu.git\n", ""
             )
         raise AssertionError(f"unexpected git command: {cmd}")
 
@@ -1025,7 +1025,7 @@ def test_witness_lineage_payload_reports_ahead_behind_when_upstream_present(
     assert payload["push_obligation"] is True
     assert payload["push_obligation_unknown"] is False
     assert payload["repo"]["remote"] == "origin"
-    assert payload["repo"]["remote_url"] == "git@github.com:err/fork_tales.git"
+    assert payload["repo"]["remote_url"] == "git@github.com:err/eta_mu.git"
     assert payload["continuity_drift"]["active"] is True
     assert payload["continuity_drift"]["code"] == "behind_upstream"
 

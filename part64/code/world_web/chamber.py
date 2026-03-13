@@ -3780,7 +3780,7 @@ def _gibs_fetch_capabilities_layers(
         headers={
             "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
             "Cache-Control": "no-cache",
-            "User-Agent": "eta-mu-world-web/1.0 (+https://github.com/err/fork_tales)",
+            "User-Agent": "eta-mu-world-web/1.0 (+https://github.com/err/eta_mu)",
         },
         method="GET",
     )
