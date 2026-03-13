@@ -1,4 +1,0 @@
-# Audit Sample — Step 17
-- run_id: `20260213_223920_seed776649440`
-
-Relationship dataset not present yet.
