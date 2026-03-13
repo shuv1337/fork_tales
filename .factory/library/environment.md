@@ -19,6 +19,8 @@ Environment variables, external dependencies, and setup notes.
 - Tailwind CSS 4.x with PostCSS
 - Frontend dependencies installed in `part64/frontend/node_modules/`
 - Electron support exists but is not the primary dev workflow
+- `part64/frontend/.env.local` is loaded in the checked-in frontend environment and currently sets `VITE_RUNTIME_BASE_URL=http://127.0.0.1:9787` and `VITE_WEAVER_BASE_URL=http://127.0.0.1:9793`
+- Because `VITE_RUNTIME_BASE_URL` is set locally, frontend tests/helpers that would otherwise derive relative URLs from `window.location` can emit absolute `http://127.0.0.1:9787/...` URLs unless the env var is overridden or unset during the test run
 
 ## Pre-existing Issues (do NOT fix)
 - 12 frontend test failures across 6 test files (pre-existing before this mission)

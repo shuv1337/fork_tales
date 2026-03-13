@@ -1,0 +1,28 @@
+{
+  "featureId": "fix-eslint-regression-frontend",
+  "reviewedAt": "2026-03-13T12:42:53Z",
+  "commitId": "158bb05a5146f96bf038e0533b71094a9cb5dee1",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "Commit `158bb05` cleans up the TypeScript test-file lint regressions in `App.test.tsx` and `Canvas.test.tsx`, but the `useWorldPanelManager.ts` portion of the feature is only partially addressed. The hook still performs a render-time `coreFlightVelocityRef.current` read and suppresses `react-hooks/refs` with an inline eslint-disable instead of refactoring the access, so the stated fix for the hook's ref-access violations is not fully implemented.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/hooks/useWorldPanelManager.ts",
+        "line": 624,
+        "severity": "blocking",
+        "description": "The feature description explicitly called for fixing the hook's `react-hooks/refs` violations, but this commit leaves one of those render-time ref reads in place and silences it with `/* eslint-disable react-hooks/refs */` around `coreFlightVelocityRef.current`. That gets the lint count down, but it suppresses the violation rather than implementing the requested ref-safe fix in this file."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "`refactor-worker` does not currently give workers concrete guidance for resolving `react-hooks/refs` violations in render-path React code, which likely contributed to this feature landing as a `useState`-backed mutable-Map workaround plus an inline lint suppression instead of a fully refactored fix.",
+      "evidence": "The feature contract at `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/features.json:749-758` explicitly calls out `react-hooks/refs` fixes in `useWorldPanelManager.ts`. The skill file `/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md:28-30,61-65` covers baselines and linting but has no React-hooks-specific guidance, and the worker handoff `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-38-52-659Z__fix-eslint-regression-frontend__ac518fe4-f820-4269-aa90-f57c1070f342.json:38-41` already suggests adding such guidance."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review failed: the test-file lint cleanups look sound, but `useWorldPanelManager.ts` still contains a render-time ref access that is hidden behind an inline `react-hooks/refs` suppression rather than actually fixed."
+}

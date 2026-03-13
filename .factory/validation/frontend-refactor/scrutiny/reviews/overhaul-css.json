@@ -1,0 +1,34 @@
+{
+  "featureId": "overhaul-css",
+  "reviewedAt": "2026-03-13T12:43:03Z",
+  "commitId": "5c096b9729e65148ece97a65c4148293111f8e68",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The commit delivers the bulk CSS palette cleanup: `rgba()` backgrounds, `mindfuck-*` classes, `backdrop-filter`/`blur`, and scanline/noise selectors are removed from the frontend CSS surface. However, the implementation stops at deleting the CSS for the galaxy/vignette backdrop effects; the React runtime still renders those decorative layers and still exposes a live vignette control, so the feature does not fully remove the effect path it claims to eliminate.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/components/App/CoreBackdrop.tsx",
+        "line": 87,
+        "severity": "blocking",
+        "description": "The feature description explicitly called for removing the galaxy parallax star layers and vignette overlay, but this component still renders all three `simulation-galaxy-layer` elements plus `simulation-core-vignette`, and `App.tsx:188-197` still computes parallax transforms for them. The commit only deleted the matching CSS selectors from `index.css`, so the decorative layer implementation is still present as dead DOM/runtime work instead of being fully removed."
+      },
+      {
+        "file": "part64/frontend/src/components/App/CoreControlPanel.tsx",
+        "line": 412,
+        "severity": "blocking",
+        "description": "The overhauled UI still shows an `edge vignette` slider even though the commit removed the `.simulation-core-vignette` styling from `index.css`. The setting is still clamped in `hooks/useSimulationTuning.ts:142-151` and defaulted in `app/coreSimulationConfig.ts:101-119`, so users are left with a visible control whose target effect was removed. That is a user-facing regression in the exact area this feature was supposed to clean up."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "`refactor-worker` says frontend refactors must run lint, but this feature's handoff still marked `followedProcedure: true` after skipping lint entirely. That process gap matters here because the very next frontend feature in repo history is an ESLint-regression cleanup.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md:61-65` requires typecheck and lint for frontend changes. The handoff `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-02-42-924Z__overhaul-css__2b18b2a7-ad36-46ef-aee4-056e3124692e.json:14-80` lists typecheck, vitest, grep/manual checks, but no lint command and still records `followedProcedure: true`. `git log --oneline -5` in the repo immediately shows `158bb05 fix: resolve 18 ESLint errors in frontend` after this feature's commit."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review failed: the CSS cleanup is substantial, but galaxy/vignette effect code and a now-broken vignette control remain wired into the React app, so the feature did not fully remove the decorative backdrop path it claimed to overhaul."
+}

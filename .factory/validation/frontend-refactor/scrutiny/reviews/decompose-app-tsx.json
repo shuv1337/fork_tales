@@ -1,0 +1,39 @@
+{
+  "featureId": "decompose-app-tsx",
+  "reviewedAt": "2026-03-13T05:43:16-07:00",
+  "commitId": "4c482a3",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The refactor hit the size/organization targets for `App.tsx`, but it does not preserve behavior: the new shell mounts `useMuseHandlers` twice, which duplicates side effects and splits command/autopilot state away from the UI-visible muse/workspace state.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/App.tsx",
+        "line": 87,
+        "severity": "blocking",
+        "description": "`App.tsx` mounts `useMuseHandlers` twice (`muse` at lines 87-96 and `museWithDeps` at 119-128). Because the hook owns internal state plus a `useEffect` that drains `museEvents` via its own `processedMuseEventSeqRef` (`part64/frontend/src/hooks/useMuseHandlers.ts:152,493-541`), every incoming event is processed twice. That duplicates toasts/overlay pulses and breaks the requirement that the refactor render/behave identically to the pre-refactor app." 
+      },
+      {
+        "file": "part64/frontend/src/App.tsx",
+        "line": 107,
+        "severity": "blocking",
+        "description": "`useAutopilotController` and `useChatCommandHandlers` are wired to the bootstrap `muse` instance (`App.tsx:105-116`), but the UI only exposes and mutates `museWithDeps` state (`App.tsx:143-168`). `useChatCommandHandlers` calls `buildMuseSurroundingNodes(presenceId, null)` (`part64/frontend/src/app/useChatCommandHandlers.ts:148-159`), and that helper reads workspace bindings from the bootstrap hook's private state (`part64/frontend/src/hooks/useMuseHandlers.ts:317-360`). After a user changes the active muse or workspace pins, slash commands/autopilot can run against stale context instead of the selection shown in the UI." 
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "knowledge",
+      "observation": "The shared architecture note is now stale: it still tells workers that the frontend is a single monolithic `App.tsx` waiting to be decomposed.",
+      "evidence": ".factory/library/architecture.md:37-39 says `Single monolithic App.tsx with ~50 useState hooks (to be decomposed)`, but this feature already replaced that structure."
+    },
+    {
+      "area": "skills",
+      "observation": "Procedure tracking missed a required frontend lint run. The refactor-worker skill requires lint for frontend changes, and services.yaml defines the lint command, but this feature handoff records only `tsc` and `vitest` while `skillFeedback.followedProcedure` is `true`.",
+      "evidence": ".factory/skills/refactor-worker/SKILL.md:63-65 requires lint; .factory/services.yaml:6 defines `lint`; handoff `2026-03-13T11-36-04-917Z__decompose-app-tsx__19c9d531-b832-417d-81ad-9b052ca717eb.json`:14-21 lists only `tsc`/`vitest`, and line 70 sets `followedProcedure` to true."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Reviewed the feature transcript, handoff, skill, shared-state docs, and commit `4c482a3`. The decomposition met the line-count/organization goals, but the bootstrap/final `useMuseHandlers` split introduces duplicate event side effects and stale command/autopilot context, so the feature does not fully preserve App behavior."
+}

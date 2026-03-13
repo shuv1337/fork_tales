@@ -67,6 +67,8 @@ Comprehensive mapping of narrative terms to neutral/technical replacements.
 | /api/muse/* | /api/agent/* |
 | /api/witness | /api/continuity |
 
+Important: the checked-in backend has already renamed the route paths, but some `/api/agent/*` handlers still accept legacy payload keys such as `muse_id` and still route through internal `muse` manager methods. Treat path renames and payload-field renames as separate verification surfaces.
+
 ## Record Type String Renames
 
 | Old | New |

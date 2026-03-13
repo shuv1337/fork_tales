@@ -1,0 +1,39 @@
+{
+  "featureId": "strip-narrative-labels",
+  "reviewedAt": "2026-03-13T12:43:52Z",
+  "commitId": "9c34e996399f9b2f88c418d99f0893b743143e7a",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "Most of the requested frontend label cleanup landed: the current tree uses neutral panel IDs, the app title is `eta-mu`, and the major panel/button renames are present. However, the feature is still incomplete because user-visible `muse` status messages remain in the chat workflow and the deck panel itself still uses an old title instead of the requested `Particle Deck` name.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/hooks/useAgentHandlers.ts",
+        "line": 422,
+        "severity": "blocking",
+        "description": "The feature explicitly required narrative/status text cleanup, but the agent chat lane still renders old `muse` wording to users: `muse fallback active` (line 422), `muse turn signal` (line 432), `muse media action` (line 474), and `muse request failed` (line 689). These are user-visible system messages, so the frontend still exposes terminology this feature was supposed to remove."
+      },
+      {
+        "file": "part64/frontend/src/components/Panels/PresenceCallDeck.tsx",
+        "line": 473,
+        "severity": "blocking",
+        "description": "The feature description specifically called for renaming the former `Daimoi Presence Deck` to `Particle Deck`, but the panel body still renders the heading `Presence Call Deck`. The outer panel label has been neutralized elsewhere, so the UI now shows inconsistent naming for the same panel instead of the requested `Particle Deck` title."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "`refactor-worker`'s frontend verification procedure is not aligned with how this mission records worker compliance: the skill requires `typecheck` and `test_frontend` for frontend features, but this worker handoff marked `followedProcedure: true` while only recording `npx tsc -b --pretty false` plus grep checks. Either the skill or the handoff checklist should explicitly say when validator-owned test/lint steps may be omitted from worker handoffs.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md` says frontend features should run `typecheck` and `test_frontend`, while `/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-16-11-995Z__strip-narrative-labels__5b6889ec-94b6-4705-92a9-fccedb5457a2.json` records only typecheck and rg commands under `verification.commandsRun` and still sets `skillFeedback.followedProcedure` to true."
+    },
+    {
+      "area": "skills",
+      "observation": "The rename/refactor skill should explicitly tell workers to audit both ID-derived panel labels and panel-internal headings. This feature updated the outer label path but still missed the panel's own heading text.",
+      "evidence": "`part64/frontend/src/components/App/WorldPanelsViewport.tsx:87-97` uses `PANEL_LABEL_OVERRIDES` / `panelLabelFromId` for outer labels, while `part64/frontend/src/components/Panels/PresenceCallDeck.tsx:473` still hard-codes `Presence Call Deck`. The worker handoff's `skillFeedback.suggestedChanges` also calls out panel label derivation edge cases."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review failed: the feature covers most of the requested frontend label cleanup, but user-visible `muse` status strings remain in `useAgentHandlers.ts` and the deck panel still shows `Presence Call Deck` instead of the requested `Particle Deck` title."
+}

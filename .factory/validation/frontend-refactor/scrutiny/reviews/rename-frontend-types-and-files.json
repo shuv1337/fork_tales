@@ -1,0 +1,51 @@
+{
+  "featureId": "rename-frontend-types-and-files",
+  "reviewedAt": "2026-03-13T12:43:05Z",
+  "commitId": "a6c39047fc2f145d66101cc3ddce022f89d78469",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "The feature successfully renamed the targeted TypeScript types, component files, and module filenames, but it did not finish the runtime contract rename needed to match the already-renamed backend. Current frontend code still calls legacy `/api/muse*` and `/api/witness*` routes and still listens for legacy `muse.*` event kinds, so key agent, continuity, and threat-radar flows remain out of sync with the backend this feature was supposed to match.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/hooks/useAgentHandlers.ts",
+        "line": 241,
+        "severity": "blocking",
+        "description": "The renamed agent handler still posts to legacy `/api/muse/*` routes (`/api/muse/create` at line 241, `/api/muse/message` at lines 598 and 673, `/api/muse/sync-pins` at line 637). The backend route rename was already complete before this feature: `part64/code/world_web/server.py` serves `/api/agent/create` at line 11334, `/api/agent/sync-pins` at line 11440, and `/api/agent/message` at line 11464. Agent creation, chat, and workspace sync requests therefore target routes the server no longer exposes."
+      },
+      {
+        "file": "part64/frontend/src/components/Panels/ThreatRadarPanel.tsx",
+        "line": 133,
+        "severity": "blocking",
+        "description": "Frontend runtime consumers outside the renamed files were left on removed route names: `ThreatRadarPanel.tsx` still fetches `/api/muse/threat-radar/report` (line 133) and `/api/muse/threat-radar/tick` (line 203), `Chat.tsx` still fetches `/api/witness/lineage` (line 519), `Canvas.tsx` still posts to `/api/witness` (line 5890), and `useChatCommandHandlers.ts` still posts to `/api/muse/message` (line 182). The server only exposes `/api/agent/threat-radar/*` (`server.py:9072-9099`) and `/api/continuity*` (`server.py:9409`, `server.py:11773`), so these UI flows remain broken against the current backend."
+      },
+      {
+        "file": "part64/frontend/src/hooks/useAgentHandlers.ts",
+        "line": 512,
+        "severity": "blocking",
+        "description": "Live runtime event handling was only renamed superficially. The hook still waits for `muse.gpu.claim.granted` (line 512), `muse.turn.completed` (line 527), `muse.rate_limited` (line 532), and `muse.rejected` (line 535), and it still reads `eventPayload.daimoi` at line 529. The backend now emits `agent.gpu.claim.granted` (`part64/code/world_web/agent_runtime.py:1544`), `agent.turn.completed` (`agent_runtime.py:940`), and `agent.rate_limited` (`agent_runtime.py:655`), with `particles` in the turn-complete payload (`agent_runtime.py:944-947`). That means live turn-complete/rate-limit/GPU notifications from the renamed backend are ignored or misread by the frontend."
+      },
+      {
+        "file": "part64/frontend/src/components/layout/ControlSidebar.tsx",
+        "line": 68,
+        "severity": "non_blocking",
+        "description": "The rename is still incomplete in internal frontend identifiers. Examples include `onMuseForgeLabelChange` in `ControlSidebar.tsx:68`, `selectedMuseSeed` in `Chat.tsx:295`, and `musePresenceOptions` in `Chat.tsx:297`. These leftovers do not break runtime behavior by themselves, but they fall short of the feature's stated goal to update references throughout the frontend and they increase follow-up churn for later rename work."
+      }
+    ]
+  },
+  "sharedStateObservations": [
+    {
+      "area": "skills",
+      "observation": "The `refactor-worker` skill should call out API-path and event-kind greps explicitly for rename features that are meant to align frontend and backend contracts. In this run the worker followed the skill, but the handoff verification only checked type names, file imports, and panel IDs, which allowed stale `/api/muse`, `/api/witness`, and `muse.*` strings to survive in runtime code.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md` says to run comprehensive greps for remaining old patterns, while the reviewed handoff for session `daebb9d3-deba-484c-9fe6-98e5ca43e125` only records greps for old type names, file imports, and panel IDs. Current residues remain at `part64/frontend/src/hooks/useAgentHandlers.ts:241,512,598,637,673`, `part64/frontend/src/components/Panels/ThreatRadarPanel.tsx:133,203`, `part64/frontend/src/components/Panels/Chat.tsx:519`, and `part64/frontend/src/components/Simulation/Canvas.tsx:5890`."
+    },
+    {
+      "area": "knowledge",
+      "observation": "The repo currently uses a hybrid renamed contract: route paths moved to `/api/agent/*`, but request/response payloads still use legacy `muse_id` and `muse` fields. That nuance is not captured in the naming map, making future rename work easy to over-rename or under-rename.",
+      "evidence": "`/home/shuv/repos/fork_tales/.factory/library/naming-map.md:67-68` documents only the path renames, while `part64/code/world_web/server.py:11334-11479` serves `/api/agent/*` endpoints that still read `muse_id` request keys and route through `create_muse`/related manager methods."
+    }
+  ],
+  "addressesFailureFrom": null,
+  "summary": "Review failed. Commit `a6c39047fc2f145d66101cc3ddce022f89d78469` completed most filename/type renames, but it left the frontend runtime contract on legacy `/api/muse*`, `/api/witness*`, and `muse.*` strings, so the checked-in agent, continuity, and threat-radar flows do not actually match the renamed backend."
+}

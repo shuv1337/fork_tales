@@ -25,17 +25,20 @@ Architectural decisions, patterns, and module dependencies.
 - `world_life.py` (10KB) → LifeStateTracker (simulated actors with roles/interactions)
 
 ## Key Concern: Massive Files
-Several backend files are very large:
+Several backend/frontend files are still very large:
 - `chamber.py`: 231KB — governance/council system
 - `ai.py`: 133KB — LLM integration
 - `web_graph_weaver.js`: 107KB — web crawler
 - `index.css`: 64KB — all CSS styles
-- `App.tsx`: 134KB — monolithic React component
+- `Canvas.tsx`: ~7.3K lines — simulation rendering and interaction logic
+- `WorldPanelsViewport.tsx`: ~2.4K lines — floating-panel layout and orchestration logic
 
 Workers should use grep + targeted edits rather than reading entire files for these.
 
 ## Frontend Architecture
-- Single monolithic App.tsx with ~50 useState hooks (to be decomposed)
+- `App.tsx` is now a thin shell (~364 lines) that composes extracted app/layout/panel modules
+- Most shell orchestration lives in `src/components/App/`, `src/components/layout/`, and hooks under `src/hooks/`
+- The largest remaining frontend modules are `WorldPanelsViewport.tsx` and `Canvas.tsx`
 - WebSocket connection to backend world server
 - Panel-based floating UI with drag/resize
 - Canvas-based particle simulation rendering
@@ -45,4 +48,5 @@ Workers should use grep + targeted edits rather than reading entire files for th
 - REST endpoints on port 8787 (`/api/catalog`, `/api/attribution`, `/api/agent/*`, `/api/continuity`, etc.)
 - WebSocket on ws://localhost:8787/ws for real-time simulation data
 - Chunked/packed streaming for large payloads
+- Backend route paths are renamed, but some `/api/agent/*` handlers still accept legacy payload keys like `muse_id` and still delegate to `create_muse`/related manager methods internally
 - Current checked-in frontend still contains some legacy `/api/muse/*`, `/api/witness*`, and `muse_events` consumers pending the later frontend-refactor milestone, so backend-only route/event renames can temporarily leave a mixed-state contract.

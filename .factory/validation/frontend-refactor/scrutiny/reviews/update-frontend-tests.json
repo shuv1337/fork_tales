@@ -1,0 +1,72 @@
+{
+  "featureId": "update-frontend-tests",
+  "milestone": "frontend-refactor",
+  "reviewedAt": "2026-03-13T12:43:33Z",
+  "commitId": "74612a666e0d7b2f654087dd6939f823e487375f",
+  "transcriptSkeletonReviewed": true,
+  "diffReviewed": true,
+  "status": "fail",
+  "codeReview": {
+    "summary": "Commit `74612a6` correctly updates four failing test files and restores the Vitest baseline to 111 passing / 12 failing, but it does not fully satisfy the feature contract. The feature was scoped to update all frontend tests and their mock data to the new naming, yet several untouched test-only helpers still use removed narrative-era labels, and the handoff itself records ESLint at 18 errors even though the mission baseline for this feature was 10.",
+    "issues": [
+      {
+        "file": "part64/frontend/src/App.test.tsx",
+        "line": 131,
+        "severity": "blocking",
+        "description": "The feature description in `features.json:718` says to update all frontend test files and their mock data to the new naming, but the checked-in test suite still contains legacy test-only terminology after this commit. `App.test.tsx` still exposes a `set mouse daimon` helper button and `Witness Thread` fixture labels (`part64/frontend/src/App.test.tsx:131,164,211`), and `part64/frontend/src/app/useAppPanelConfigs.test.tsx:24,68,167` still uses `muse-presence-*` and `lazy-daimoi-panel` test IDs. These are test scaffolding strings rather than backend wire-format fields, so the frontend tests were only partially updated instead of comprehensively aligned to the new naming." 
+      },
+      {
+        "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-23-45-398Z__update-frontend-tests__9710a027-5421-48a0-a324-d4152566c48b.json",
+        "line": 28,
+        "severity": "blocking",
+        "description": "The feature was marked successful even though its own handoff records `npx eslint .` at 18 errors (`...handoffs/...update-frontend-tests...json:28`), while the mission baseline for this feature remained 10 errors in `AGENTS.md:66-71` and `features.json:718`. That means the stated expected behavior `ESLint errors do not increase from baseline` was not met when this feature completed; the follow-up feature `fix-eslint-regression-frontend` was required to repair that gap later."
+      }
+    ]
+  },
+  "blockingIssues": [
+    {
+      "file": "part64/frontend/src/App.test.tsx",
+      "line": 131,
+      "description": "Legacy test-only names such as `set mouse daimon`, `muse-presence-*`, and `lazy-daimoi-panel` remained in untouched frontend tests even though this feature was scoped to update all frontend test files and mock data to the new naming."
+    },
+    {
+      "file": "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-23-45-398Z__update-frontend-tests__9710a027-5421-48a0-a324-d4152566c48b.json",
+      "line": 28,
+      "description": "The feature handoff documents 18 ESLint errors, exceeding the mission's accepted 10-error baseline, so the feature did not actually meet its own lint acceptance criteria at completion time."
+    }
+  ],
+  "nonBlockingIssues": [],
+  "sharedStateObservations": [
+    {
+      "area": "knowledge",
+      "observation": "The frontend test environment is affected by `part64/frontend/.env.local`, but that behavior is not documented in the mission or repo shared-state docs.",
+      "evidence": "The feature handoff attributes four persistent frontend failures to `.env.local` overriding `VITE_RUNTIME_BASE_URL` (`...update-frontend-tests...json:18,55`), and `part64/frontend/.env.local` currently sets `VITE_RUNTIME_BASE_URL=http://127.0.0.1:9787`. Neither mission `AGENTS.md` nor `.factory/library/environment.md` mentions `.env.local` or `VITE_RUNTIME_BASE_URL` (grep found no matches)."
+    },
+    {
+      "area": "skills",
+      "observation": "`refactor-worker` needs a more explicit repo-wide cleanup check for test-update features; the current procedure says to grep all occurrences first, but this feature still shipped with untouched legacy test scaffolding.",
+      "evidence": "`.factory/skills/refactor-worker/SKILL.md:25` says to `Use grep/glob to find ALL occurrences of terms/patterns being changed BEFORE making any changes.` Despite that, the repository still contains old test-only names at `part64/frontend/src/App.test.tsx:131,164,211` and `part64/frontend/src/app/useAppPanelConfigs.test.tsx:24,68,167` after commit `74612a6`."
+    }
+  ],
+  "evidence": {
+    "reviewedArtifacts": [
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/features.json",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/validation-contract.md",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/AGENTS.md",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/handoffs/2026-03-13T12-23-45-398Z__update-frontend-tests__9710a027-5421-48a0-a324-d4152566c48b.json",
+      "/home/shuv/.factory/missions/1e8791af-a113-4b92-81a8-45beb67de026/worker-transcripts.jsonl",
+      "/home/shuv/repos/fork_tales/.factory/skills/refactor-worker/SKILL.md",
+      "/home/shuv/repos/fork_tales/.factory/services.yaml",
+      "/home/shuv/repos/fork_tales/.factory/library/naming-map.md",
+      "/home/shuv/repos/fork_tales/.factory/library/environment.md"
+    ],
+    "keyFindings": [
+      "`git show --stat 74612a6` confirms the feature only touched four test files: `useChatCommandHandlers.test.tsx`, `InspirationAtlasPanel.test.tsx`, `PresenceCallDeck.test.tsx`, and `WorldSimulation.test.tsx`.",
+      "The diff correctly updates the six assertions that had been failing after the label refactor (`Pray`→`Boost`, `Sing`→`Generate`, `Inspiration Atlas`→`System Overview`, `Witness Thread`→`Observer Thread`, and `muse turn`→`agent turn`).",
+      "Repository-wide grep still finds legacy test-only naming in other untouched frontend tests (`App.test.tsx`, `useAppPanelConfigs.test.tsx`, and `ParticleDeckPanel.test.tsx`), so the feature's `update all frontend test files` scope was not fully covered.",
+      "The handoff records Vitest back at the accepted baseline and TypeScript clean, but also records ESLint at 18 errors, which exceeded the mission baseline documented in mission `AGENTS.md`."
+    ]
+  },
+  "addressesFailureFrom": null,
+  "summary": "Reviewed the feature transcript skeleton, handoff, and commit `74612a6`. The commit successfully repaired the specific renamed-label failures in four tests, but the feature still fails review because it left other frontend tests on legacy naming and it did not satisfy the feature's own ESLint baseline requirement when handed off."
+}
